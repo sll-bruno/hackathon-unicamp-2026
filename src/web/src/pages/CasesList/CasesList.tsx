@@ -3,17 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { isDeadlineSoon, useCases, useCasesSummary } from '../../api/cases';
 import { RecommendationTag, StatusBadge } from '../../components/Badges/Badges';
 import { ButtonLink } from '../../components/Button/Button';
-import { CaseCard } from '../../components/CaseCard/CaseCard';
 import { Deadline } from '../../components/Deadline/Deadline';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { StatCard } from '../../components/StatCard/StatCard';
 import { formatBRL } from '../../lib/format';
+import { DISPLAY_STATUS_ORDER, toDisplayStatus, type DisplayStatus } from '../../lib/status';
 import type { CaseListItem, CaseStatus } from '../../types/case';
 import { STATUS_LABEL, THESIS_LABEL } from '../../types/labels';
 import styles from './CasesList.module.css';
 
 type RecFilter = 'TODAS' | 'ACORDO' | 'DEFESA' | 'SEM';
-type ViewMode = 'tabela' | 'cartoes';
 
 const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
@@ -54,11 +53,10 @@ export default function CasesList() {
   const summary = useCasesSummary();
 
   const [query, setQuery] = useState('');
-  const [status, setStatus] = useState<CaseStatus | 'TODOS'>('TODOS');
+  const [status, setStatus] = useState<DisplayStatus | 'TODOS'>('TODOS');
   const [rec, setRec] = useState<RecFilter>('TODAS');
   const [onlySoon, setOnlySoon] = useState(false);
   const [showClosed, setShowClosed] = useState(false);
-  const [view, setView] = useState<ViewMode>('tabela');
 
   // Estado dos cards de resumo, que também funcionam como atalho de filtro.
   const isAberto = status === 'TODOS' && !onlySoon && !showClosed;
@@ -70,7 +68,7 @@ export default function CasesList() {
     setOnlySoon(false);
     setShowClosed(false);
   };
-  const toggleQuickStatus = (target: CaseStatus, active: boolean) => {
+  const toggleQuickStatus = (target: DisplayStatus, active: boolean) => {
     if (active) return resetToAberto();
     setStatus(target);
     setOnlySoon(false);
@@ -92,7 +90,7 @@ export default function CasesList() {
         if (digits && c.cnj.replace(/\D/g, '').includes(digits)) return true;
         return normalize(c.plaintiff_name).includes(text);
       })
-      .filter((c) => status === 'TODOS' || c.status === status)
+      .filter((c) => status === 'TODOS' || toDisplayStatus(c.status) === status)
       .filter((c) => {
         if (rec === 'TODAS') return true;
         if (rec === 'SEM') return c.recommendation === null;
@@ -132,9 +130,14 @@ export default function CasesList() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <select className={styles.select} value={status} onChange={(e) => setStatus(e.target.value as CaseStatus | 'TODOS')} aria-label="Status">
+        <select
+          className={styles.select}
+          value={status}
+          onChange={(e) => setStatus(e.target.value as DisplayStatus | 'TODOS')}
+          aria-label="Status"
+        >
           <option value="TODOS">Todos os status</option>
-          {(Object.keys(STATUS_LABEL) as CaseStatus[]).map((st) => (
+          {DISPLAY_STATUS_ORDER.map((st) => (
             <option key={st} value={st}>
               {STATUS_LABEL[st]}
             </option>
@@ -150,23 +153,13 @@ export default function CasesList() {
           <input type="checkbox" checked={showClosed} onChange={(e) => setShowClosed(e.target.checked)} />
           Mostrar encerrados
         </label>
-        <div className={styles.viewSwitch} role="group" aria-label="Formato de visualização">
-          <button type="button" className={view === 'tabela' ? styles.viewOn : ''} onClick={() => setView('tabela')}>
-            Tabela
-          </button>
-          <button type="button" className={view === 'cartoes' ? styles.viewOn : ''} onClick={() => setView('cartoes')}>
-            Cartões
-          </button>
-        </div>
       </section>
 
       {cases.isPending && <p className={styles.message}>Carregando processos…</p>}
-      {cases.isError && (
-        <p className={styles.message}>Não foi possível carregar os processos. {cases.error.message}</p>
-      )}
+      {cases.isError && <p className={styles.message}>Não foi possível carregar os processos. {cases.error.message}</p>}
       {cases.isSuccess && rows.length === 0 && <p className={styles.message}>Nenhum processo com esses filtros.</p>}
 
-      {cases.isSuccess && rows.length > 0 && view === 'tabela' && (
+      {cases.isSuccess && rows.length > 0 && (
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead>
@@ -186,14 +179,6 @@ export default function CasesList() {
               ))}
             </tbody>
           </table>
-        </div>
-      )}
-
-      {cases.isSuccess && rows.length > 0 && view === 'cartoes' && (
-        <div className={styles.grid}>
-          {rows.map((c) => (
-            <CaseCard key={c.id} item={c} />
-          ))}
         </div>
       )}
 

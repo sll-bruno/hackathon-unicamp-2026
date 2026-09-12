@@ -151,41 +151,6 @@
   white-space: nowrap;
 }
 
-/* ── Alternador de visualização ── */
-.viewSwitch {
-  display: inline-flex;
-  height: 2.5rem;
-  margin-left: auto;
-  border: 1px solid var(--stroke-primary);
-  border-radius: var(--radius-8);
-  overflow: hidden;
-}
-
-.viewSwitch button {
-  padding: 0 var(--space-4);
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: var(--text-14);
-  cursor: pointer;
-}
-
-.viewSwitch button:hover {
-  background: var(--hover);
-}
-
-.viewOn {
-  background: var(--accent) !important;
-  color: var(--text-on-accent) !important;
-}
-
-/* ── Cartões ── */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-  gap: var(--space-4);
-}
-
 .message {
   padding: var(--space-12);
   color: var(--text-muted);
