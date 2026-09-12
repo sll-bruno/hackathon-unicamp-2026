@@ -1,13 +1,12 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { isDeadlineSoon, useCases, useCasesSummary } from '../../api/cases';
-import { RecommendationTag, StatusBadge } from '../../components/Badges/Badges';
+import { RecommendationTag, StatusBadge, UrgencyBadge } from '../../components/Badges/Badges';
 import { ButtonLink } from '../../components/Button/Button';
 import { Deadline } from '../../components/Deadline/Deadline';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
-import { PendencyFeed } from '../../components/PendencyFeed/PendencyFeed';
 import { formatBRL } from '../../lib/format';
-import { buildPendencyFeed } from '../../lib/pendencies';
+import { pendencyRank } from '../../lib/pendencies';
 import { toDisplayStatus, type DisplayStatus } from '../../lib/status';
 import type { CaseListItem } from '../../types/case';
 import { STATUS_LABEL, THESIS_LABEL } from '../../types/labels';
@@ -25,7 +24,9 @@ const FILTERABLE_STATUS: Exclude<DisplayStatus, 'ENCERRADO'>[] = [
 
 const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
-const byDeadline = (a: CaseListItem, b: CaseListItem) => {
+const byUrgency = (a: CaseListItem, b: CaseListItem) => {
+  const rank = pendencyRank(a) - pendencyRank(b);
+  if (rank !== 0) return rank;
   if (a.deadline_at === b.deadline_at) return 0;
   if (a.deadline_at === null) return 1;
   if (b.deadline_at === null) return -1;
@@ -44,6 +45,9 @@ function CaseRow({ item }: { item: CaseListItem }) {
       <td>{item.uf}</td>
       <td>{THESIS_LABEL[item.thesis]}</td>
       <td className={styles.num}>{formatBRL(item.claim_value)}</td>
+      <td>
+        <UrgencyBadge item={item} />
+      </td>
       <td>
         <StatusBadge status={item.status} />
       </td>
@@ -113,11 +117,10 @@ export default function CasesList() {
       })
       .filter((c) => !onlySoon || isDeadlineSoon(c))
       .filter((c) => !onlyAlert || c.alert !== null)
-      .sort(byDeadline);
+      .sort(byUrgency);
   }, [cases.data, query, status, rec, onlySoon, onlyAlert]);
 
   const s = summary.data;
-  const feed = useMemo(() => buildPendencyFeed(cases.data), [cases.data]);
 
   return (
     <div className={styles.page}>
@@ -130,8 +133,6 @@ export default function CasesList() {
         }
         actions={<ButtonLink to="/processos/novo">Novo processo</ButtonLink>}
       />
-
-      <PendencyFeed items={feed} />
 
       <section className={styles.filters} aria-label="Filtros">
         <div className={styles.chips}>
@@ -197,6 +198,7 @@ export default function CasesList() {
                 <th>UF</th>
                 <th>Tese</th>
                 <th className={styles.num}>Valor da causa</th>
+                <th>Urgência</th>
                 <th>Status</th>
                 <th>Recomendação</th>
                 <th>Prazo</th>
