@@ -8,6 +8,28 @@
   border: 1px solid var(--stroke-secondary);
   border-radius: var(--radius-12);
   background: var(--surface-primary);
+  text-align: left;
+  font-family: inherit;
+  cursor: default;
+}
+
+button.card {
+  cursor: pointer;
+  transition: border-color 120ms, background-color 120ms;
+}
+
+button.card:hover {
+  background: var(--hover);
+}
+
+button.card.active:not(.accent) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+button.card.accent.active {
+  outline: 2px solid var(--surface-page);
+  outline-offset: -4px;
 }
 
 .label {

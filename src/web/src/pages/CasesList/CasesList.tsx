@@ -12,6 +12,8 @@ import styles from './CasesList.module.css';
 
 type RecFilter = 'TODAS' | 'ACORDO' | 'DEFESA' | 'SEM';
 
+const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
 const byDeadline = (a: CaseListItem, b: CaseListItem) => {
   if (a.deadline_at === b.deadline_at) return 0;
   if (a.deadline_at === null) return 1;
@@ -44,11 +46,39 @@ export default function CasesList() {
   const [onlySoon, setOnlySoon] = useState(false);
   const [showClosed, setShowClosed] = useState(false);
 
+  // Estado dos cards de resumo, que também funcionam como atalho de filtro.
+  const isAberto = status === 'TODOS' && !onlySoon && !showClosed;
+  const isDecisao = status === 'AGUARDANDO_DECISAO' && !onlySoon;
+  const isAnalise = status === 'EM_ANALISE' && !onlySoon;
+
+  const resetToAberto = () => {
+    setStatus('TODOS');
+    setOnlySoon(false);
+    setShowClosed(false);
+  };
+  const toggleQuickStatus = (target: CaseStatus, active: boolean) => {
+    if (active) return resetToAberto();
+    setStatus(target);
+    setOnlySoon(false);
+    setShowClosed(false);
+  };
+  const toggleSoon = () => {
+    if (onlySoon) return resetToAberto();
+    setOnlySoon(true);
+    setStatus('TODOS');
+    setShowClosed(false);
+  };
+
   const rows = useMemo(() => {
     const digits = query.replace(/\D/g, '');
+    const text = normalize(query.trim());
     return (cases.data ?? [])
       .filter((c) => showClosed || status === 'ENCERRADO' || c.status !== 'ENCERRADO')
-      .filter((c) => !digits || c.cnj.replace(/\D/g, '').includes(digits))
+      .filter((c) => {
+        if (!text) return true;
+        if (digits && c.cnj.replace(/\D/g, '').includes(digits)) return true;
+        return normalize(c.plaintiff_name).includes(text);
+      })
       .filter((c) => status === 'TODOS' || c.status === status)
       .filter((c) => {
         if (rec === 'TODAS') return true;
@@ -69,18 +99,24 @@ export default function CasesList() {
         actions={<ButtonLink to="/processos/novo">Novo processo</ButtonLink>}
       />
 
-      <section className={styles.stats} aria-label="Resumo">
-        <StatCard label="Em aberto" value={s?.open} />
-        <StatCard label="Aguardando decisão" value={s?.awaiting_decision} accent />
-        <StatCard label="Em análise" value={s?.in_analysis} />
-        <StatCard label="Prazo ≤ 5 dias" value={s?.deadline_soon} />
+      <section className={styles.stats} aria-label="Resumo e filtros rápidos">
+        <StatCard label="Em aberto" value={s?.open} active={isAberto} onClick={resetToAberto} />
+        <StatCard
+          label="Aguardando decisão"
+          value={s?.awaiting_decision}
+          accent
+          active={isDecisao}
+          onClick={() => toggleQuickStatus('AGUARDANDO_DECISAO', isDecisao)}
+        />
+        <StatCard label="Em análise" value={s?.in_analysis} active={isAnalise} onClick={() => toggleQuickStatus('EM_ANALISE', isAnalise)} />
+        <StatCard label="Prazo ≤ 5 dias" value={s?.deadline_soon} active={onlySoon} onClick={toggleSoon} />
       </section>
 
       <section className={styles.filters} aria-label="Filtros">
         <input
           className={styles.search}
           type="search"
-          placeholder="Buscar por número CNJ"
+          placeholder="Buscar por autor ou número CNJ"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -98,10 +134,6 @@ export default function CasesList() {
           <option value="DEFESA">Defesa</option>
           <option value="SEM">Sem recomendação</option>
         </select>
-        <label className={`${styles.toggle} ${onlySoon ? styles.toggleOn : ''}`}>
-          <input type="checkbox" checked={onlySoon} onChange={(e) => setOnlySoon(e.target.checked)} />
-          Prazo ≤ 5 dias
-        </label>
         <label className={`${styles.toggle} ${showClosed ? styles.toggleOn : ''}`}>
           <input type="checkbox" checked={showClosed} onChange={(e) => setShowClosed(e.target.checked)} />
           Mostrar encerrados
@@ -112,35 +144,34 @@ export default function CasesList() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Processo (CNJ)</th>
+              <th>Processo</th>
               <th>UF</th>
               <th>Tese</th>
               <th className={styles.num}>Valor da causa</th>
               <th>Status</th>
               <th>Recomendação</th>
               <th>Prazo</th>
-              <th>Escritório</th>
             </tr>
           </thead>
           <tbody>
             {cases.isPending &&
               Array.from({ length: 5 }, (_, i) => (
                 <tr key={i} className={styles.skeletonRow}>
-                  <td colSpan={8}>
+                  <td colSpan={7}>
                     <span className={styles.skeleton} />
                   </td>
                 </tr>
               ))}
             {cases.isError && (
               <tr>
-                <td colSpan={8} className={styles.message}>
+                <td colSpan={7} className={styles.message}>
                   Não foi possível carregar os processos. {cases.error.message}
                 </td>
               </tr>
             )}
             {cases.isSuccess && rows.length === 0 && (
               <tr>
-                <td colSpan={8} className={styles.message}>
+                <td colSpan={7} className={styles.message}>
                   Nenhum processo com esses filtros.
                 </td>
               </tr>
@@ -153,7 +184,10 @@ export default function CasesList() {
                 onClick={() => navigate(`/processos/${c.id}`)}
                 onKeyDown={(e) => e.key === 'Enter' && navigate(`/processos/${c.id}`)}
               >
-                <td className={styles.cnj}>{c.cnj}</td>
+                <td>
+                  <span className={styles.plaintiff}>{c.plaintiff_name}</span>
+                  <span className={styles.cnj}>{c.cnj}</span>
+                </td>
                 <td>{c.uf}</td>
                 <td>{THESIS_LABEL[c.thesis]}</td>
                 <td className={styles.num}>{formatBRL(c.claim_value)}</td>
@@ -166,7 +200,6 @@ export default function CasesList() {
                 <td>
                   <Deadline item={c} />
                 </td>
-                <td className={styles.muted}>{c.office}</td>
               </tr>
             ))}
           </tbody>

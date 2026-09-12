@@ -128,10 +128,18 @@
   outline-offset: -2px;
 }
 
-.cnj {
+.plaintiff {
+  display: block;
   color: var(--text-primary);
-  font-family: var(--font-mono);
   font-size: var(--text-14);
+  white-space: nowrap;
+}
+
+.cnj {
+  display: block;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
   letter-spacing: 0;
   white-space: nowrap;
 }

@@ -13,8 +13,9 @@ export function AppLayout() {
   return (
     <div className={styles.shell}>
       <header className={styles.topbar}>
-        <NavLink to="/processos" className={styles.brand} aria-label="Início">
+        <NavLink to="/processos" className={styles.brand} aria-label="EnterOS — início">
           <EnterLogo />
+          <span className={styles.brandSuffix}>OS</span>
         </NavLink>
         <nav className={styles.nav}>
           {NAV.map((item) => (

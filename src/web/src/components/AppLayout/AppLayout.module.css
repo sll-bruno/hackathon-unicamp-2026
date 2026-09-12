@@ -18,7 +18,17 @@
 
 .brand {
   display: flex;
+  align-items: flex-end;
+  gap: var(--space-1);
   color: var(--text-primary);
+}
+
+.brandSuffix {
+  padding-bottom: 1px;
+  color: var(--accent);
+  font-size: var(--text-14);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--ls-label);
 }
 
 .nav {

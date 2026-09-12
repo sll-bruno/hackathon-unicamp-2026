@@ -29,11 +29,12 @@ export interface RecommendationSummary {
 export interface CaseListItem {
   id: string;
   cnj: string;
+  plaintiff_name: string; // nome da parte autora — identificador amigável do caso
   uf: string;
   thesis: Thesis;
   claim_value: number;
   status: CaseStatus;
-  office: string;
+  office: string; // escritório responsável; não exibido nesta lista (um advogado só vê os próprios casos)
   deadline_at: string | null; // ISO date
   updated_at: string; // ISO datetime
   recommendation: RecommendationSummary | null;
