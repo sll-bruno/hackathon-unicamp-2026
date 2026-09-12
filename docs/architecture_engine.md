@@ -13,9 +13,9 @@ A recomendação não é produzida por um classificador de acordo versus defesa.
 2. risco judicial estimado a partir do histórico de 60 mil processos;
 3. custo possível de cada desfecho, usando os valores do processo;
 4. comparação econômica entre acordo e defesa;
-5. controles de incerteza, alçada e integridade probatória, que definem o nível de confiança.
+5. controles de incerteza do modelo, qualidade da extração e alçada, que definem o nível de confiança.
 
-Os fatos probatórios são usados **na solução atual** por dois caminhos. Fatos sobre a qualidade e a disponibilidade da prova alteram os cenários nos quais o risco é recalculado. Fatos monetários confirmados ou contestados alteram diretamente os componentes de custo desses mesmos cenários. Como a base histórica possui somente a presença ou ausência dos seis subsídios, um fato contestado não recebe um peso probabilístico arbitrário: ele altera estados que podem ser simulados e auditados.
+**Escopo atual — disponibilidade binária:** o modelo recebe apenas os metadados do processo e os seis indicadores de subsídios disponibilizados. `1` significa disponível e `0` indisponível, conforme o inventário de entrada. O sistema não contesta nem valida a existência, autenticidade, validade ou força probatória de um documento. Não existem cenários documental, verificado ou adverso que alterem essas flags. A extração com fontes apoia a explicação e os valores financeiros; não reclassifica a disponibilidade.
 
 ## Visão geral
 
@@ -25,18 +25,17 @@ flowchart LR
     extraction --> evidence[Mapa de pretensões, fatos e evidências]
     extraction --> monetary[Fatos monetários do processo]
 
-    evidence --> scenarios[Construtor de cenários probatórios]
+    inventory[Inventário de disponibilidade binária] --> risk
     history[(Histórico de 60 mil processos)] --> risk[Modelo de risco judicial]
-    scenarios --> risk
-    risk --> probabilities[Probabilidades por cenário]
+    risk --> probabilities[Probabilidades de desfecho]
 
     monetary --> severity[Estimador do custo da condenação]
     history --> severity
     probabilities --> severity
-    severity --> exposure[Exposição judicial por cenário]
+    severity --> exposure[Exposição judicial]
 
     exposure --> finance[Motor financeiro]
-    evidence --> finance
+    evidence --> explanation[Explicação com fontes]
     policy[Custos, alçadas, margem e regras] --> finance
     finance --> decision[Política de decisão]
     decision --> action[Acordo ou defesa]
@@ -60,8 +59,8 @@ flowchart LR
 5. extrai fatos monetários;
 6. liga cada fato às alegações que ele sustenta ou refuta;
 7. deduplica fatos repetidos em documentos diferentes;
-8. detecta contradições, lacunas e inconsistências aritméticas;
-9. valida deterministicamente identidade, datas, valores, parcelas e somas.
+8. registra divergências de conteúdo para leitura humana e inconsistências aritméticas;
+9. confere o formato dos dados extraídos e recalcula parcelas e somas, sem validar documentos ou alterar flags.
 
 ### Ontologia probatória
 
@@ -93,7 +92,6 @@ O sistema não produz um único “score de força”. Ele registra:
 | `relation` | se o fato sustenta, refuta ou é neutro em relação à alegação |
 | `relation_confidence` | confiança de que essa relação foi identificada corretamente |
 | `source_grade` | natureza da fonte: primária, secundária, declaratória ou ausente |
-| `verification_status` | confirmado, contestado, não verificável ou inconsistente |
 
 `relation_confidence` não representa probabilidade de vitória. Ela mede apenas a confiança na ligação semântica entre o fato e a alegação.
 
@@ -136,103 +134,37 @@ O sistema não produz um único “score de força”. Ele registra:
 }
 ```
 
-## 2. Construtor de cenários probatórios
+## 2. Disponibilidade binária dos subsídios
 
-Esta camada é a ligação entre os documentos e o modelo de risco na versão atual.
+O histórico informa se cada tipo de subsídio foi disponibilizado. A inferência mantém esse mesmo significado:
 
-### Por que usar cenários
-
-O histórico de 60 mil processos informa somente se cada tipo de subsídio estava disponível. Ele não possui os fatos extraídos do conteúdo dos PDFs. Portanto, não é possível afirmar que um vídeo de liveness ausente reduz a chance de improcedência em um percentual aprendido.
-
-É possível, porém, avaliar o caso nos estados que o modelo conhece:
-
-- documento disponível e utilizável: indicador `1`;
-- documento ausente ou materialmente inutilizável: indicador `0`;
-- documento contestado: avaliar os dois estados, `0` e `1`.
-
-### Estados dos artefatos
-
-| Estado | Tratamento |
+| Indicador | Significado |
 |---|---|
-| Confirmado e consistente | permanece disponível em todos os cenários |
-| Ausente ou ilegível | permanece indisponível em todos os cenários |
-| Materialmente contestado | disponível no cenário favorável e indisponível no adverso |
-| Internamente inconsistente | valor é recalculado; se não for reconciliável, torna-se contestado |
-| Identidade incompatível | artefato é inutilizável e gera alerta crítico |
+| `1` | Subsídio disponível no inventário de entrada |
+| `0` | Subsídio indisponível no inventário de entrada |
 
-### Cenários produzidos
+O vetor é fornecido pelo cadastro/inventário do caso, sem etapa de validação da existência do documento. Ilegibilidade ou divergência de conteúdo não convertem `1` em `0`. Falhas de OCR são tratadas na extração, separadamente. Disponibilidade desconhecida é entrada incompleta e não deve ser silenciosamente convertida em ausência.
 
-```text
-Cenário documental:
-  usa a disponibilidade nominal informada na planilha
-
-Cenário verificado:
-  considera somente artefatos cuja evidência primária foi confirmada
-
-Cenário adverso:
-  retira artefatos com contradição material ou lacuna que possa impedir seu uso
-```
-
-O sistema não declara que esses cenários são efeitos causais. Eles são um teste de sensibilidade dentro do espaço de variáveis conhecido pelo modelo.
-
-### Exemplo
-
-No Caso 2, o comprovante declara que o crédito foi enviado para conta de titularidade do autor, mas essa titularidade é contestada e não existe extrato externo no pacote. O indicador de comprovante é avaliado como:
-
-```text
-Cenário documental: comprovante = 1
-Cenário verificado: comprovante = 0
-Cenário adverso:   comprovante = 0
-```
-
-O laudo continua registrado como presente, mas gera uma lacuna crítica porque menciona autenticação por liveness e informa que o vídeo não foi localizado. A ausência do artefato primário não é convertida em um desconto monetário; ela amplia a faixa de risco e reduz a confiança da recomendação.
-
-### Saída
-
-Um conjunto de vetores compatíveis com o modelo histórico e as hipóteses monetárias de cada cenário:
+Cada análise usa um único vetor. Não há remoção hipotética de documentos nem exigência de concordância entre cenários probatórios.
 
 ```json
 {
-  "documented": {
-    "contract": 0,
-    "statement": 0,
-    "credit_proof": 1,
-    "dossier": 0,
-    "debt_evolution": 1,
-    "referenced_report": 1
-  },
-  "verified": {
-    "contract": 0,
-    "statement": 0,
-    "credit_proof": 0,
-    "dossier": 0,
-    "debt_evolution": 1,
-    "referenced_report": 1
-  },
-  "monetary_scenarios": {
-    "documented": {
-      "credited_amount_recoverable": 8500.0
-    },
-    "verified": {
-      "credited_amount_recoverable": null
-    },
-    "adverse": {
-      "credited_amount_recoverable": 0.0
-    }
-  },
-  "critical_alerts": [
-    "unverified_credit_account_ownership",
-    "missing_liveness_artifact",
-    "missing_acceptance_term"
-  ]
+  "contract": 0,
+  "statement": 0,
+  "credit_proof": 1,
+  "dossier": 0,
+  "debt_evolution": 1,
+  "referenced_report": 1
 }
 ```
+
+O exemplo ilustra disponibilidade, não qualidade ou autenticidade da prova.
 
 ## 3. Modelo de risco judicial
 
 ### Entradas
 
-Para cada cenário probatório:
+Para o vetor de disponibilidade informado:
 
 - UF;
 - assunto;
@@ -248,7 +180,6 @@ Um classificador supervisionado treinado nos resultados históricos estima quatr
 
 ```json
 {
-  "scenario": "verified",
   "probabilities": {
     "extinction": 0.15,
     "dismissal": 0.45,
@@ -258,11 +189,11 @@ Um classificador supervisionado treinado nos resultados históricos estima quatr
 }
 ```
 
-As probabilidades são calculadas para todos os cenários. A diferença entre elas materializa quanto a decisão depende de uma evidência contestada.
+As probabilidades são calculadas uma vez por vetor de entrada. O conteúdo extraído não altera as flags nem adiciona pesos probatórios ao modelo.
 
 ## 4. Estimador do custo da condenação
 
-O estimador não recebe “quantidade de argumentos”. Ele recebe probabilidades por cenário, fatos monetários auditáveis, o estado de verificação desses fatos e referências históricas de condenação.
+O estimador não recebe “quantidade de argumentos”. Ele recebe probabilidades de desfecho, valores extraídos com suas fontes e referências históricas de condenação.
 
 ### Entradas documentais
 
@@ -276,7 +207,7 @@ O estimador não recebe “quantidade de argumentos”. Ele recebe probabilidade
 - cancelamento do contrato ou saldo pedido;
 - datas relevantes para atualização monetária.
 
-Fatos confirmados permanecem iguais em todos os cenários. Valores contestados variam de maneira explícita. Por exemplo, no Caso 2, o comprovante informa crédito de R$ 8.500, mas a titularidade da conta está contestada. O valor liberado é um fato confirmado; sua recuperabilidade em eventual derrota não é. Portanto, a recuperação pode ser R$ 8.500 no cenário documental, desconhecida no verificado e R$ 0 no cenário adverso. Isso altera diretamente o custo líquido da procedência.
+Os valores extraídos formam um único conjunto de entradas financeiras. Recuperação, compensação e demais efeitos econômicos são premissas explícitas da política; não são inferidos da validade ou autenticidade documental. Valor necessário ausente ou não extraível exige complemento ou revisão, sem modificar a disponibilidade do subsídio.
 
 ### Entradas históricas
 
@@ -301,9 +232,9 @@ Se o resumo de um demonstrativo divergir da própria tabela, prevalece o cálcul
 
 ### Custo por desfecho
 
-Para cada resultado judicial `o` e cenário probatório `s`, o motor constrói `L(o, F_s, θ)`, em que:
+Para cada resultado judicial `o`, o motor constrói `L(o, F, θ)`, em que:
 
-- `F_s` são os fatos monetários e suas hipóteses verificadas naquele cenário;
+- `F` são os valores extraídos e as premissas financeiras registradas;
 - `θ` são premissas explícitas, como honorários, custas e regra de restituição.
 
 ```text
@@ -311,12 +242,12 @@ L_extinção = custos processuais aplicáveis
 
 L_improcedência = custos de defesa aplicáveis
 
-L_parcial = restituição do cenário parcial
+L_parcial = restituição aplicável à procedência parcial
             + condenação histórica compatível
             + honorários e custas
             + efeito contratual aplicável
 
-L_procedência = restituição do cenário adverso
+L_procedência = restituição aplicável à procedência
                 + condenação histórica compatível
                 + honorários e custas
                 + baixa ou cancelamento do saldo
@@ -325,32 +256,22 @@ L_procedência = restituição do cenário adverso
 
 Quando a base histórica não separa dano material, dano moral e honorários, o valor histórico total não deve ser somado cegamente aos componentes documentais. Ele é usado como benchmark de total, e o sistema apresenta a memória de cálculo e o intervalo resultante.
 
-### Exposição por cenário
+### Exposição judicial
 
-Para cada cenário probatório `s`:
+Para as entradas do caso:
 
 ```text
-exposição_judicial(s) = Σ P(resultado = o | cenário s) × L(o, F_s, θ)
+exposição_judicial = Σ P(resultado = o | entradas) × L(o, F, θ)
 
-custo_defesa(s) = exposição_judicial(s) + custo_jurídico_da_defesa
+custo_defesa = exposição_judicial + custo_jurídico_da_defesa
 ```
 
 ### Saída
 
 ```json
 {
-  "documented_scenario": {
-    "expected_exposure": 4200.0,
-    "range": [2800.0, 6900.0]
-  },
-  "verified_scenario": {
-    "expected_exposure": 6100.0,
-    "range": [3900.0, 9800.0]
-  },
-  "adverse_scenario": {
-    "expected_exposure": 7900.0,
-    "range": [5100.0, 12500.0]
-  },
+  "expected_exposure": 6100.0,
+  "range": [3900.0, 9800.0],
   "calculation_trace": []
 }
 ```
@@ -361,13 +282,13 @@ Os números acima ilustram o contrato de saída; não são estimativas dos casos
 
 ### Entradas
 
-- custo esperado da defesa em cada cenário probatório;
-- faixa de condenação em cada cenário;
+- custo esperado da defesa para o caso;
+- faixa estimada de condenação;
 - ofertas de acordo candidatas;
 - custo operacional da negociação;
 - efeitos do acordo sobre restituição, saldo e contrato;
 - margem de segurança e alçadas configuradas;
-- alertas críticos e confiança de extração.
+- dados necessários ao cálculo e confiança de extração.
 
 ### Custo do acordo
 
@@ -385,17 +306,17 @@ Como a base não possui ofertas, contrapropostas e aceites, a versão inicial n�
 
 ### Teto econômico
 
-Para cada cenário `s`:
+Para as premissas financeiras informadas:
 
 ```text
-teto_acordo(s) = custo_defesa(s)
+teto_acordo = custo_defesa
                  - custo_de_negociação
                  - margem_de_segurança
                  - demais_concessões_do_acordo
                  + recuperações_previstas
 ```
 
-O intervalo de tetos mostra quanto a política depende de fatos probatórios contestados.
+A incerteza financeira deve refletir a estimação de custos e as premissas econômicas, sem simular contestação documental.
 
 ### Regra de decisão
 
@@ -409,18 +330,7 @@ Senão:
     DEFESA
 ```
 
-Incerteza, alertas críticos e evidência contestada **não mudam o tipo de ação**. Eles reduzem a confiança, e os motivos são registrados e exibidos ao advogado, que decide seguir ou divergir da recomendação. O critério exato de confiança ainda está em definição.
-
-Uma decisão é robusta quando permanece a mesma nos cenários documental, verificado e adverso. Essa regra faz com que a evidência documental participe da decisão agora:
-
-```text
-Fato contestado
-  → muda o estado probatório
-  → muda as probabilidades
-  → muda a exposição judicial
-  → pode mudar o teto de acordo
-  → pode mudar a ação final ou a confiança
-```
+Incerteza do modelo, qualidade da extração e premissas econômicas são comunicadas no nível de confiança, com os motivos exibidos ao advogado. O critério exato de confiança ainda está em definição. A política usa um único vetor de disponibilidade; não testa concordância entre cenários probatórios.
 
 ### Saída para o advogado
 
@@ -428,7 +338,7 @@ Fato contestado
 {
   "action": "AGREEMENT",
   "confidence": "low",
-  "reason": "A decisão muda quando o comprovante contestado é desconsiderado",
+  "reason": "A comparação econômica depende de premissas de custo ainda não confirmadas",
   "defense_cost": {
     "central": 6100.0,
     "range": [4200.0, 7900.0]
@@ -443,17 +353,11 @@ Fato contestado
 }
 ```
 
-## 6. Papel das contradições
+## 6. Papel da extração e das divergências de conteúdo
 
-Contradições têm três efeitos possíveis:
+A extração conserva fatos, alegações e fontes para o advogado consultar. Divergências textuais podem ser apresentadas como observações, sem declarar um documento válido, inválido ou inexistente. Elas não alteram os indicadores, não geram cenários probatórios e não recebem pesos de risco.
 
-| Tipo | Efeito |
-|---|---|
-| Alegação da parte versus documento confirmado | explica por que a evidência sustenta ou refuta a pretensão |
-| Dois documentos internos incompatíveis | recalcula valores e cria cenário adverso |
-| Ausência de artefato primário essencial | amplia a faixa de risco e reduz a confiança |
-
-Uma contradição nunca é convertida diretamente em reais. Ela altera a utilização da evidência, o cenário de risco e, por consequência, a exposição esperada.
+Conferência aritmética e tratamento de erro de OCR são controles de cálculo e extração, não validação documental.
 
 ## 7. Rastreabilidade e monitoramento
 
@@ -462,8 +366,8 @@ Cada recomendação deve persistir:
 - versão dos modelos e da política;
 - documentos e páginas utilizados;
 - fatos extraídos e respectivas confianças;
-- cenários probatórios avaliados;
-- probabilidades e custos por cenário;
+- vetor de disponibilidade binária utilizado;
+- probabilidades de desfecho, custos e premissas;
 - ação recomendada e teto de acordo;
 - ação tomada pelo advogado;
 - justificativa estruturada para divergência;
@@ -473,7 +377,7 @@ Esses registros permitem medir aderência e efetividade e alimentar o retreino p
 
 ## 8. Limitações assumidas
 
-- Os 60 mil registros não contêm o conteúdo integral dos documentos; por isso, a contribuição probatória atual é uma análise de sensibilidade, não um efeito causal aprendido.
+- Os 60 mil registros contêm disponibilidade binária, não qualidade documental. O modelo aprende associações com disponibilidade; não avalia validade da prova nem efeitos causais.
 - O valor histórico de condenação é agregado e pode não separar dano material, moral, honorários e outros componentes.
 - Custos de defesa, negociação, alçadas e curva de aceitação não foram fornecidos; são parâmetros explícitos da política.
 - Somente dois casos completos foram disponibilizados. Eles demonstram a extração e a decisão, mas não validam estatisticamente os scores semânticos.

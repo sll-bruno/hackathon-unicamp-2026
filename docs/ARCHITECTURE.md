@@ -122,11 +122,13 @@ Regras:
 
 ## 5. Pipeline de IA — contrato (caixa-preta)
 
-O backend só depende deste contrato. O miolo (OCR, extração, validação, risco, severidade, motor financeiro e política) fica em `src/api/app/pipeline/` e será detalhado no `.md` do pipeline.
+O backend só depende deste contrato. O miolo (OCR, extração, controle de extração, risco, severidade, motor financeiro e política) fica em `src/api/app/pipeline/` e será detalhado no `.md` do pipeline.
 
 ```python
 def run_pipeline(case: CaseInput) -> PipelineOutput: ...
 ```
+
+O risco usa exclusivamente metadados e as seis flags do inventário: disponível = 1, indisponível = 0. O pipeline não valida existência, autenticidade ou validade documental. Qualidade de OCR e observações de conteúdo não alteram flags; não há cenários de contestação.
 
 ### Entrada — `CaseInput`
 
@@ -160,7 +162,7 @@ def run_pipeline(case: CaseInput) -> PipelineOutput: ...
       "text": "Crédito caiu na conta do autor",
       "sources": [{ "document_id": "uuid", "page": 3, "quote": "TED CRÉDITO EMPRÉSTIMO R$ 5.200,00" }],
       "confidence": "alta" | "media" | "baixa",
-      "impact": "Se juntado e válido: perda 78% → 26%, decisão vira DEFESA" }
+      "impact": "Subsídio indisponível no inventário; disponibilidade é uma entrada binária do modelo" }
   ],
   "risk": { "p_extincao": 0.1, "p_improcedencia": 0.12, "p_parcial": 0.48, "p_procedencia": 0.3,
             "cohort_size": 9946 },
@@ -170,17 +172,17 @@ def run_pipeline(case: CaseInput) -> PipelineOutput: ...
     "action": "ACORDO" | "DEFESA",
     "confidence": "alta" | "media" | "baixa",
     "reason_codes": ["BAIXA_CONFIANCA", "EVIDENCIA_CONTRADITORIA", …], // alertas exibidos no cartão, não mudam a ação
-    "summary": "prova — contrato ausente, assinatura divergente · risco — perda 78% …",
-    "what_changes": ["contrato válido → DEFESA", "pedido acima de R$ 9.800 → DEFESA"]
+    "summary": "disponibilidade — contrato ausente · risco — perda 78% …",
+    "what_changes": ["alteração dos dados de entrada exige nova análise", "pedido acima de R$ 9.800 → DEFESA"]
   },
   "errors": [{ "code": "ARQUIVO_ILEGIVEL", "document_id": "uuid" }]
 }
 ```
 
-- O pipeline sempre devolve `ACORDO` ou `DEFESA`. Casos incertos (evidência contraditória, lacunas, intervalos sobrepostos) saem com `confidence: baixa` e `reason_codes` visíveis no cartão. Quem decide é o advogado, que pode aceitar ou divergir.
+- O pipeline sempre devolve `ACORDO` ou `DEFESA`. Casos incertos (dados insuficientes, falhas de extração, intervalos sobrepostos) saem com `confidence: baixa` e `reason_codes` visíveis no cartão. Quem decide é o advogado, que pode aceitar ou divergir.
 - A saída inteira é persistida como snapshot imutável em `recommendations.payload_json`, junto com as `versions`. Isso garante a auditoria e alimenta o retreino.
 - O chatbot (`POST /cases/{id}/chat`) recebe o snapshot e os trechos dos documentos. Toda resposta tem que citar documento e página.
-- Execução assíncrona: `POST /analyze` cria um `analysis_jobs` com status `queued`, e o pipeline vai atualizando `progress` e `stage` (OCR, extração, validação, risco, motor financeiro). A Tela 1/2 faz polling.
+- Execução assíncrona: `POST /analyze` cria um `analysis_jobs` com status `queued`, e o pipeline vai atualizando `progress` e `stage` (OCR, extração, controle de extração, risco, motor financeiro). A Tela 1/2 faz polling.
 
 ## 6. Modelo de dados (SQLite)
 

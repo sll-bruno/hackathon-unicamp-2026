@@ -1,5 +1,7 @@
 # Motor de Decisão Econômica — Fluxo Consolidado
 
+> Escopo vigente: seis flags de disponibilidade informada (`1` disponível, `0` indisponível), sem contestar ou validar existência, autenticidade ou validade dos documentos. Não há cenários probatórios que alterem flags. A extração e suas fontes apoiam a explicação e os valores financeiros. Referência canônica: `architecture_engine.md`.
+
 ## 1. Objetivo
 
 Construir uma política operacional que recomende uma entre duas ações, sempre com um nível de confiança:
@@ -20,7 +22,7 @@ O advogado deve receber uma decisão que consiga entender, contestar e executar.
 3. O valor histórico de condenação é usado como **target de severidade**, nunca como feature disponível antes da decisão.
 4. Os 280 acordos históricos não são ground truth da melhor decisão. Eles refletem uma política anterior desconhecida e representam somente cerca de 0,47% da base.
 5. Acordo não deve ser tratado como derrota judicial nem misturado ao modelo de resultado da defesa.
-6. O LLM extrai, valida e explica evidências. Ele não inventa pesos estatísticos nem decide sozinho.
+6. O LLM extrai e explica informações com fontes. Ele não inventa pesos estatísticos nem decide sozinho.
 7. A sugestão inicial deve ser uma **faixa ou teto econômico de acordo**, não um valor pontual com falsa precisão.
 8. “Inconclusivo” é um motivo que reduz a **confiança** da recomendação, não uma terceira ação.
 9. Explicabilidade e retroalimentação são componentes centrais, não funcionalidades posteriores.
@@ -94,12 +96,12 @@ Inventário documental + OCR
         │
         └──→ LLM Extrator
                     ↓
-              LLM Validador
+              Controle de extração
                     ↓
               Evidências estruturadas
               ├─ fatos relevantes
               ├─ documentos e trechos
-              ├─ validade e consistência
+              ├─ qualidade da extração
               ├─ contradições
               └─ lacunas probatórias
 
@@ -153,7 +155,7 @@ Custos, alçadas, margem e premissas ─────┘           ↓
 └──────────────────────────────────────────────────────────┘
 
 Resultado financeiro ─────────────────────┐
-Evidências e alertas de validação ─────────┼──→ Política de Decisão
+Entradas e alertas de extração ─────────┼──→ Política de Decisão
 Regras, alçadas e critérios de confiança ──┘           ↓
                                       ACORDO | DEFESA + confiança
 
@@ -197,7 +199,7 @@ Decisão + ação do advogado + negociação + resultado final
 | Experiência do advogado | Recomendação e evidências | Ação executada ou override justificado |
 | Monitoramento e aprendizado | Recomendação, ação, negociação, custos e resultado final | Aderência, eficiência e nova versão validada do sistema |
 
-## 5. Extração e validação
+## 5. Extração com fontes
 
 ### Entrada
 
@@ -208,12 +210,12 @@ Decisão + ação do advogado + negociação + resultado final
 
 ### Processamento
 
-1. Identificar quais dos seis subsídios estão presentes e gerar o vetor binário compatível com a base histórica.
+1. Receber do inventário os seis indicadores de disponibilidade, com o mesmo significado da base histórica.
 2. Executar OCR somente quando necessário.
 3. Extrair fatos relevantes, valores, datas, partes, assinaturas, canais e referências.
-4. Validar consistência entre autos e subsídios.
+4. Registrar divergências de conteúdo para consulta humana, sem validar documentos.
 5. Preservar documento, página e trecho de origem de cada conclusão.
-6. Sinalizar documento ilegível, ausente, inválido ou contraditório.
+6. Sinalizar falhas de extração e campos necessários ausentes, sem alterar flags.
 
 ### Responsabilidade do LLM
 
@@ -324,7 +326,7 @@ A saída inicial deve ser o teto ou a faixa em que acordo permanece economicamen
 
 ### 6.4 Política de decisão
 
-**Acordo** quando o custo do acordo for materialmente menor em cenários plausíveis, respeitando alçadas, margem mínima e evidência necessária.
+**Acordo** quando o custo do acordo for materialmente menor em premissas econômicas explícitas, respeitando alçadas, margem mínima e entradas necessárias.
 
 **Defesa** quando o custo esperado da defesa for menor ou quando o acordo não respeitar as alçadas.
 
@@ -333,13 +335,12 @@ A ação é sempre Acordo ou Defesa. A **confiança é reduzida** quando ocorrer
 - baixa confiança ou caso fora da distribuição;
 - intervalos financeiros sobrepostos;
 - decisão muda conforme premissas plausíveis;
-- documento inválido ou contraditório;
 - extração/OCR com baixa qualidade;
-- dados ou provas insuficientes;
+- dados necessários ao cálculo insuficientes;
 - exposição alta ou fora da alçada;
 - diferença econômica abaixo da margem de segurança.
 
-Motivos como `INCONCLUSIVO_ECONOMICO`, `BAIXA_CONFIANCA`, `EVIDENCIA_CONTRADITORIA` e `FORA_DA_ALCADA` devem ser registrados separadamente da ação.
+Motivos como `INCONCLUSIVO_ECONOMICO`, `BAIXA_CONFIANCA`, `DADOS_INSUFICIENTES` e `FORA_DA_ALCADA` devem ser registrados separadamente da ação.
 
 ## 7. Explicabilidade para o advogado
 
@@ -363,7 +364,7 @@ A explicação deve ser produzida junto com a decisão e possuir quatro camadas.
 ### Jurídica e probatória
 
 - fatos alegados;
-- fatos comprovados;
+- fatos extraídos com fontes;
 - documentos e trechos correspondentes;
 - contradições e lacunas;
 - consequência jurídica de cada evidência.
@@ -373,7 +374,7 @@ A explicação deve ser produzida junto com a decisão e possuir quatro camadas.
 O contrafactual entra como explicação subordinada ao motor:
 
 - valor acima do qual defesa se torna preferível;
-- prova ou validação que mudaria a ação;
+- dado de entrada ou premissa econômica que mudaria a ação;
 - premissa econômica que torna a análise inconclusiva.
 
 O cartão principal deve começar pela ação:
@@ -489,7 +490,7 @@ Esse feedback alimenta componentes diferentes:
 | Condenação final | Modelo de severidade |
 | Oferta, contraproposta e aceite | Modelo futuro de negociação |
 | Custos realizados | Motor financeiro |
-| Override e correções | Extração, validação, regras e UX |
+| Override e correções | Extração, regras e UX |
 | Economia realizada | Avaliação da política |
 
 ### Regras do loop
@@ -511,7 +512,7 @@ Existe viés de seleção: casos acordados não revelam qual seria o resultado d
 3. Construir baseline e modelo de severidade com intervalos.
 4. Implementar motor financeiro determinístico com parâmetros configuráveis.
 5. Implementar política das três ações e respectivos reason codes.
-6. Integrar extração e validação documental aos dois processos completos.
+6. Integrar extração com fontes aos dois processos completos.
 7. Construir o cartão explicável do advogado e o fluxo de override.
 8. Registrar eventos de decisão, negociação e resultado final.
 9. Construir monitoramento de aderência e eficiência.
@@ -547,4 +548,4 @@ Dados externos podem apoiar etapas específicas: jurisprudência para fundamenta
 
 ---
 
-**Estado do documento:** consolidação funcional para guiar desenvolvimento. A função econômica permanece condicionada à definição das premissas listadas na seção 12. Referência de acompanhamento: Beads `enter-fba.8` e memória `enter-motor-decisao-economico`; sincronização da última formulação pendente enquanto o terminal local estiver indisponível.
+**Estado do documento:** consolidação funcional para guiar desenvolvimento. A função econômica permanece condicionada à definição das premissas listadas na seção 12. Referência de acompanhamento: Beads `enter-fba.8` e memória `enter-motor-decisao-economico`; escopo atualizado para disponibilidade binária conforme orientação do usuário.
