@@ -26,6 +26,13 @@ export interface RecommendationSummary {
   policy_version: string;
 }
 
+// Pendência que trava a análise e exige reenvio do advogado (docs/ARCHITECTURE.md §4/§7,
+// erros de analysis_jobs como ARQUIVO_ILEGIVEL).
+export interface CaseAlert {
+  code: 'DOCUMENTO_ILEGIVEL' | 'FALHA_EXTRACAO';
+  message: string;
+}
+
 export interface CaseListItem {
   id: string;
   cnj: string;
@@ -38,11 +45,14 @@ export interface CaseListItem {
   deadline_at: string | null; // ISO date
   updated_at: string; // ISO datetime
   recommendation: RecommendationSummary | null;
+  alert: CaseAlert | null;
 }
 
 export interface CasesSummary {
   open: number;
-  awaiting_decision: number;
+  awaiting_decision: number; // precisa revisar a recomendação (aceitar/divergir)
+  pending_outcome: number; // decisão tomada, falta registrar o desfecho
+  document_errors: number; // documento com erro de leitura, precisa reenvio
   in_analysis: number;
-  deadline_soon: number; // prazo ≤ 5 dias
+  deadline_soon: number; // prazo em até 5 dias
 }

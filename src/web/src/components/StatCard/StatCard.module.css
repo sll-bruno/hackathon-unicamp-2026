@@ -1,9 +1,8 @@
 .card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: var(--space-6);
-  min-height: 8rem;
+  gap: var(--space-3);
+  min-height: 9rem;
   padding: var(--space-5);
   border: 1px solid var(--stroke-secondary);
   border-radius: var(--radius-12);
@@ -24,7 +23,7 @@ button.card:hover {
 
 .label {
   color: var(--text-secondary);
-  font-size: var(--text-12);
+  font-size: var(--text-14);
   letter-spacing: var(--ls-label);
   text-transform: uppercase;
 }
@@ -38,6 +37,15 @@ button.card:hover {
   font-variant-numeric: tabular-nums;
 }
 
+.hint {
+  overflow: hidden;
+  margin-top: auto;
+  color: var(--text-muted);
+  font-size: var(--text-14);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Filtro ativo — preenchimento sólido, sem meio-termo. */
 .active {
   border-color: transparent;
@@ -45,6 +53,7 @@ button.card:hover {
 }
 
 .active .label,
-.active .value {
+.active .value,
+.active .hint {
   color: var(--text-on-accent);
 }

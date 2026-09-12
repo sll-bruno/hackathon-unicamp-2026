@@ -1,18 +1,26 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isDeadlineSoon, useCases, useCasesSummary } from '../../api/cases';
+import { isDeadlineSoon, mostUrgent, useCases, useCasesSummary } from '../../api/cases';
 import { RecommendationTag, StatusBadge } from '../../components/Badges/Badges';
 import { ButtonLink } from '../../components/Button/Button';
 import { Deadline } from '../../components/Deadline/Deadline';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { StatCard } from '../../components/StatCard/StatCard';
 import { formatBRL } from '../../lib/format';
-import { DISPLAY_STATUS_ORDER, toDisplayStatus, type DisplayStatus } from '../../lib/status';
-import type { CaseListItem, CaseStatus } from '../../types/case';
+import { toDisplayStatus, type DisplayStatus } from '../../lib/status';
+import type { CaseListItem } from '../../types/case';
 import { STATUS_LABEL, THESIS_LABEL } from '../../types/labels';
 import styles from './CasesList.module.css';
 
 type RecFilter = 'TODAS' | 'ACORDO' | 'DEFESA' | 'SEM';
+// Status que fazem sentido filtrar aqui — Encerrado já tem tela própria (Histórico).
+const FILTERABLE_STATUS: Exclude<DisplayStatus, 'ENCERRADO'>[] = [
+  'RASCUNHO',
+  'DOCUMENTOS_ENVIADOS',
+  'EM_ANALISE',
+  'AGUARDANDO_DECISAO',
+  'AGUARDANDO_ENCERRAMENTO',
+];
 
 const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
@@ -56,35 +64,41 @@ export default function CasesList() {
   const [status, setStatus] = useState<DisplayStatus | 'TODOS'>('TODOS');
   const [rec, setRec] = useState<RecFilter>('TODAS');
   const [onlySoon, setOnlySoon] = useState(false);
-  const [showClosed, setShowClosed] = useState(false);
+  const [onlyAlert, setOnlyAlert] = useState(false);
 
-  // Estado dos cards de resumo, que também funcionam como atalho de filtro.
-  const isAberto = status === 'TODOS' && !onlySoon && !showClosed;
-  const isDecisao = status === 'AGUARDANDO_DECISAO' && !onlySoon;
-  const isAnalise = status === 'EM_ANALISE' && !onlySoon;
+  // Estado dos cards de pendência, que também funcionam como atalho de filtro.
+  const isDecisao = status === 'AGUARDANDO_DECISAO' && !onlySoon && !onlyAlert;
+  const isEncerramento = status === 'AGUARDANDO_ENCERRAMENTO' && !onlySoon && !onlyAlert;
 
-  const resetToAberto = () => {
+  const resetFiltros = () => {
     setStatus('TODOS');
     setOnlySoon(false);
-    setShowClosed(false);
+    setOnlyAlert(false);
   };
   const toggleQuickStatus = (target: DisplayStatus, active: boolean) => {
-    if (active) return resetToAberto();
+    if (active) return resetFiltros();
     setStatus(target);
     setOnlySoon(false);
-    setShowClosed(false);
+    setOnlyAlert(false);
   };
   const toggleSoon = () => {
-    if (onlySoon) return resetToAberto();
+    if (onlySoon) return resetFiltros();
     setOnlySoon(true);
     setStatus('TODOS');
-    setShowClosed(false);
+    setOnlyAlert(false);
   };
+  const toggleAlert = () => {
+    if (onlyAlert) return resetFiltros();
+    setOnlyAlert(true);
+    setStatus('TODOS');
+    setOnlySoon(false);
+  };
+
   const rows = useMemo(() => {
     const digits = query.replace(/\D/g, '');
     const text = normalize(query.trim());
     return (cases.data ?? [])
-      .filter((c) => showClosed || status === 'ENCERRADO' || c.status !== 'ENCERRADO')
+      .filter((c) => c.status !== 'ENCERRADO') // encerrados ficam só no Histórico
       .filter((c) => {
         if (!text) return true;
         if (digits && c.cnj.replace(/\D/g, '').includes(digits)) return true;
@@ -97,29 +111,54 @@ export default function CasesList() {
         return c.recommendation?.action === rec;
       })
       .filter((c) => !onlySoon || isDeadlineSoon(c))
+      .filter((c) => !onlyAlert || c.alert !== null)
       .sort(byDeadline);
-  }, [cases.data, query, status, rec, onlySoon, showClosed]);
+  }, [cases.data, query, status, rec, onlySoon, onlyAlert]);
 
   const s = summary.data;
+  const peek = (c: CaseListItem | null) => c?.plaintiff_name;
 
   return (
     <div className={styles.page}>
       <PageHeader
         title="Meus processos"
-        description="Casos de não reconhecimento de contratação de empréstimo."
+        description={
+          s
+            ? `${s.open} processos em aberto · ${s.in_analysis} em análise no momento.`
+            : 'Casos de não reconhecimento de contratação de empréstimo.'
+        }
         actions={<ButtonLink to="/processos/novo">Novo processo</ButtonLink>}
       />
 
-      <section className={styles.stats} aria-label="Resumo e filtros rápidos">
-        <StatCard label="Em aberto" value={s?.open} active={isAberto} onClick={resetToAberto} />
+      <section className={styles.stats} aria-label="Pendências">
+        <StatCard
+          label="Documento com erro de leitura"
+          value={s?.document_errors}
+          hint={peek(mostUrgent(cases.data, (c) => c.alert !== null))}
+          active={onlyAlert}
+          onClick={toggleAlert}
+        />
         <StatCard
           label="Revisar recomendação"
           value={s?.awaiting_decision}
+          hint={peek(mostUrgent(cases.data, (c) => c.status === 'AGUARDANDO_DECISAO'))}
           active={isDecisao}
           onClick={() => toggleQuickStatus('AGUARDANDO_DECISAO', isDecisao)}
         />
-        <StatCard label="Em análise" value={s?.in_analysis} active={isAnalise} onClick={() => toggleQuickStatus('EM_ANALISE', isAnalise)} />
-        <StatCard label="Prazo encerra em até 5 dias" value={s?.deadline_soon} active={onlySoon} onClick={toggleSoon} />
+        <StatCard
+          label="Falta registrar o desfecho"
+          value={s?.pending_outcome}
+          hint={peek(mostUrgent(cases.data, (c) => toDisplayStatus(c.status) === 'AGUARDANDO_ENCERRAMENTO'))}
+          active={isEncerramento}
+          onClick={() => toggleQuickStatus('AGUARDANDO_ENCERRAMENTO', isEncerramento)}
+        />
+        <StatCard
+          label="Prazo encerra em até 5 dias"
+          value={s?.deadline_soon}
+          hint={peek(mostUrgent(cases.data, isDeadlineSoon))}
+          active={onlySoon}
+          onClick={toggleSoon}
+        />
       </section>
 
       <section className={styles.filters} aria-label="Filtros">
@@ -137,7 +176,7 @@ export default function CasesList() {
           aria-label="Status"
         >
           <option value="TODOS">Todos os status</option>
-          {DISPLAY_STATUS_ORDER.map((st) => (
+          {FILTERABLE_STATUS.map((st) => (
             <option key={st} value={st}>
               {STATUS_LABEL[st]}
             </option>
@@ -149,10 +188,6 @@ export default function CasesList() {
           <option value="DEFESA">Defesa</option>
           <option value="SEM">Sem recomendação</option>
         </select>
-        <label className={`${styles.toggle} ${showClosed ? styles.toggleOn : ''}`}>
-          <input type="checkbox" checked={showClosed} onChange={(e) => setShowClosed(e.target.checked)} />
-          Mostrar encerrados
-        </label>
       </section>
 
       {cases.isPending && <p className={styles.message}>Carregando processos…</p>}
@@ -184,7 +219,7 @@ export default function CasesList() {
 
       {cases.isSuccess && (
         <p className={styles.count}>
-          {rows.length} de {cases.data.length} processos
+          {rows.length} de {cases.data.filter((c) => c.status !== 'ENCERRADO').length} processos em aberto
         </p>
       )}
     </div>

@@ -14,7 +14,7 @@ export function AppLayout() {
     <div className={styles.shell}>
       <header className={styles.topbar}>
         <NavLink to="/processos" className={styles.brand} aria-label="EnterOS — início">
-          <EnterLogo />
+          <EnterLogo height={22} />
           <span className={styles.brandSuffix}>OS</span>
         </NavLink>
         <nav className={styles.nav}>
