@@ -113,7 +113,7 @@ export default function CasesList() {
       <section className={styles.stats} aria-label="Resumo e filtros rápidos">
         <StatCard label="Em aberto" value={s?.open} active={isAberto} onClick={resetToAberto} />
         <StatCard
-          label="Aguardando decisão"
+          label="Revisar recomendação"
           value={s?.awaiting_decision}
           active={isDecisao}
           onClick={() => toggleQuickStatus('AGUARDANDO_DECISAO', isDecisao)}

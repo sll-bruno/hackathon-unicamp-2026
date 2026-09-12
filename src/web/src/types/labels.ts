@@ -4,7 +4,7 @@ export const STATUS_LABEL: Record<CaseStatus, string> = {
   RASCUNHO: 'Rascunho',
   DOCUMENTOS_ENVIADOS: 'Documentos enviados',
   EM_ANALISE: 'Em análise',
-  AGUARDANDO_DECISAO: 'Aguardando decisão',
+  AGUARDANDO_DECISAO: 'Revisar recomendação',
   PROPOSTA_ACEITA: 'Proposta aceita',
   DIVERGIU: 'Divergiu',
   EM_NEGOCIACAO: 'Em negociação',
