@@ -43,7 +43,7 @@ flowchart TB
 
   subgraph FRONT[Frontend · React]
     direction LR
-    ADVUI[Telas do advogado<br/>processos · documentos · área de trabalho · encerrar]
+    ADVUI[Telas do advogado<br/>processos · documentos · área de trabalho · encerrar · histórico geral]
     DASH[Dashboard<br/>aderência · efetividade]
   end
 
@@ -75,7 +75,7 @@ flowchart TB
 
 | Bloco | Responsabilidade |
 |---|---|
-| **web (React)** | As 5 telas do Figma. Na demo, o mesmo usuário vê tudo |
+| **web (React)** | As 5 telas do Figma + Histórico geral. Na demo, o mesmo usuário vê tudo |
 | **Processos** | Cadastro, upload e status. Registra a decisão do advogado (aceitou/divergiu) e o desfecho |
 | **Pipeline de IA** | Recebe autos + subsídios e devolve recomendação, faixa de valor, confiança e evidências (§5) |
 | **Motor de aderência** | Lê as decisões e calcula quanto a política é seguida e os motivos de divergência (§7) |
@@ -106,7 +106,7 @@ stateDiagram-v2
 ```
 
 Regras:
-- Toda transição grava uma linha em `case_status_history`, que alimenta o "Histórico do estado" da Tela 3.
+- Toda transição grava uma linha em `case_status_history`, que alimenta a tela **Histórico geral**. O histórico fica **fora da visão de um processo**: a Tela 3 mostra só o status atual.
 - `ENCERRADO` é somente leitura.
 - Contrato ausente **não bloqueia** a análise. Ele entra como lacuna no cálculo (Tela 2).
 
@@ -116,9 +116,27 @@ Regras:
 |---|---|---|
 | **1. Meus processos** | listar, buscar CNJ, filtrar status/prazo/recomendação, cards de resumo | `GET /api/cases`, `GET /api/cases/summary` |
 | **2. Cadastrar + documentos** | dados do processo, upload múltiplo, checklist dos 6 subsídios, salvar rascunho, avaliar | `POST /api/cases`, `PATCH /api/cases/{id}`, `POST /api/cases/{id}/documents`, `PATCH /api/documents/{id}` (trocar tipo), `POST /api/cases/{id}/analyze`, `GET /api/cases/{id}/analysis` (polling) |
-| **3. Área de trabalho** | cartão de recomendação, evidências com citação, PDF viewer, chatbot, aceitar/não aceitar, negociação, histórico | `GET /api/cases/{id}/workspace`, `GET /api/documents/{id}/file`, `POST /api/evidences/{id}/feedback` (confirmar/corrigir), `POST /api/cases/{id}/decision`, `POST /api/cases/{id}/negotiation-rounds`, `POST /api/cases/{id}/chat` |
+| **3. Área de trabalho** | cartão de recomendação, evidências com citação, PDF viewer, chatbot, aceitar/não aceitar, negociação | `GET /api/cases/{id}/workspace`, `GET /api/documents/{id}/file`, `POST /api/evidences/{id}/feedback` (confirmar/corrigir), `POST /api/cases/{id}/decision`, `POST /api/cases/{id}/negotiation-rounds`, `POST /api/cases/{id}/chat` |
+| **Histórico geral** (tela própria no menu, fora do processo) | duas visualizações: **Casos críticos** (padrão, ordenada por criticidade) e **Linha do tempo** (todas as transições de status). Filtro por processo (CNJ), status, escritório e período; clicar abre o processo | `GET /api/history/critical`, `GET /api/history` (filtros `cnj, status, office_id, period`) |
 | **4. Encerrar caso** | como terminou, valores, resumo automático, comentário | `GET /api/cases/{id}/closure-preview`, `POST /api/cases/{id}/closure` |
 | **5. Dashboard do banco** (na demo, acessível pelo menu do advogado) | KPIs, economia prevista vs. realizada, motivos de divergência, aderência por escritório, alertas | `GET /api/dashboard/kpis`, `/economy-timeseries`, `/divergence-reasons`, `/adherence-by-office`, `/alerts` (todos com os filtros `period, uf, office_id, thesis, confidence, policy_version`) |
+
+### Casos críticos (Histórico geral)
+
+Visualização padrão da área geral. Lista os processos **abertos** (não `ENCERRADO`) ordenados pelos que mais precisam de atenção. Cada linha mostra os motivos da criticidade como etiquetas, por exemplo `prazo ≤ 5 dias`, `R$ 11.300 em risco` e `confiança baixa`.
+
+Sinais usados, todos já disponíveis nas tabelas (§6):
+
+| Sinal | Fonte |
+|---|---|
+| Valor em risco | `recommendations.expected_defense_cost` (ou `cases.claim_value` antes da análise) |
+| Prazo próximo | `cases.deadline_at` |
+| Confiança baixa | `recommendations.confidence` |
+| Divergiu da recomendação | `lawyer_decisions.accepted = false` |
+| Parado há muito tempo | último `case_status_history.at` |
+| Pendência de documento | arquivo ilegível ou erro na análise (`analysis_jobs`) |
+
+A ordenação é calculada no backend por uma regra simples e configurável: primeiro prazo, depois valor em risco, com os demais sinais como desempate. Os pesos exatos ficam em aberto (§12).
 
 ## 5. Pipeline de IA — contrato (caixa-preta)
 
@@ -207,7 +225,7 @@ erDiagram
 | `offices` | id, name | filtro/aderência por escritório |
 | `lawyers` | id, office_id, name, email | autoria |
 | `cases` | id, cnj (unique), uf, thesis, claim_value, lawyer_id, status, deadline_at, created_at | Tela 1 |
-| `case_status_history` | case_id, from_status, to_status, at, actor | histórico (Tela 3), tempo por etapa |
+| `case_status_history` | case_id, from_status, to_status, at, actor | Histórico geral, tempo por etapa |
 | `documents` | id, case_id, path, filename, declared_type, detected_type, legible, illegible_pages_json | checklist (Tela 2) |
 | `analysis_jobs` | id, case_id, status, stage, progress, error, started_at, finished_at | loading/polling |
 | `policy_versions` | id (`v1.0`), params_json, created_at, active | filtro "versão da política" |
@@ -282,6 +300,7 @@ src/
 │   │   │   ├── CasesList/        # Tela 1
 │   │   │   ├── CaseNew/          # Tela 2 (stepper)
 │   │   │   ├── Workspace/        # Tela 3
+│   │   │   ├── History/          # Histórico geral: casos críticos + linha do tempo
 │   │   │   └── BankDashboard/    # Tela 5
 │   │   ├── components/           # RecommendationCard, EvidenceCard, PdfViewer,
 │   │   │                         # Chat, DivergenceModal, CloseCaseModal (Tela 4)
@@ -355,3 +374,4 @@ POLICY_VERSION=v1.0
 | 3 | Período do retreino periódico (Fluxo C: "definir períodos") | §9 |
 | 4 | Limites `N_MIN` e `X%` dos alertas de padrão | §7 |
 | 5 | Fluxo de negociação: o advogado registra cada rodada ou só o valor final? | `negotiation_rounds` |
+| 6 | Critério de criticidade: quais sinais entram, pesos e limites (ex.: prazo ≤ 5 dias, valor em risco acima de R$ X, dias parado) | Casos críticos (Histórico geral) |
