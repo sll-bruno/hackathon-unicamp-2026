@@ -2,11 +2,10 @@
 
 ## Objetivo
 
-A solução recomenda uma das três ações para cada processo:
+A solução recomenda uma de duas ações para cada processo, sempre acompanhada de um nível de confiança:
 
 - **ACORDO**;
-- **DEFESA**;
-- **REVISÃO HUMANA**.
+- **DEFESA**.
 
 A recomendação não é produzida por um classificador de acordo versus defesa. Ela resulta da combinação de:
 
@@ -14,7 +13,7 @@ A recomendação não é produzida por um classificador de acordo versus defesa.
 2. risco judicial estimado a partir do histórico de 60 mil processos;
 3. custo possível de cada desfecho, usando os valores do processo;
 4. comparação econômica entre acordo e defesa;
-5. controles de incerteza, alçada e integridade probatória.
+5. controles de incerteza, alçada e integridade probatória, que definem o nível de confiança.
 
 Os fatos probatórios são usados **na solução atual** por dois caminhos. Fatos sobre a qualidade e a disponibilidade da prova alteram os cenários nos quais o risco é recalculado. Fatos monetários confirmados ou contestados alteram diretamente os componentes de custo desses mesmos cenários. Como a base histórica possui somente a presença ou ausência dos seis subsídios, um fato contestado não recebe um peso probabilístico arbitrário: ele altera estados que podem ser simulados e auditados.
 
@@ -39,9 +38,9 @@ flowchart LR
     exposure --> finance[Motor financeiro]
     evidence --> finance
     policy[Custos, alçadas, margem e regras] --> finance
-    finance --> decision{Decisão robusta?}
-    decision -->|Sim| automatic[Acordo ou defesa]
-    decision -->|Não| review[Revisão humana]
+    finance --> decision[Política de decisão]
+    decision --> action[Acordo ou defesa]
+    decision --> confidence[Confiança: alta, média ou baixa]
 ```
 
 ## 1. Motor de extração probatória
@@ -186,7 +185,7 @@ Cenário verificado: comprovante = 0
 Cenário adverso:   comprovante = 0
 ```
 
-O laudo continua registrado como presente, mas gera uma lacuna crítica porque menciona autenticação por liveness e informa que o vídeo não foi localizado. A ausência do artefato primário não é convertida em um desconto monetário; ela amplia a faixa de risco e pode impedir uma decisão automática.
+O laudo continua registrado como presente, mas gera uma lacuna crítica porque menciona autenticação por liveness e informa que o vídeo não foi localizado. A ausência do artefato primário não é convertida em um desconto monetário; ela amplia a faixa de risco e reduz a confiança da recomendação.
 
 ### Saída
 
@@ -401,20 +400,17 @@ O intervalo de tetos mostra quanto a política depende de fatos probatórios con
 
 ### Regra de decisão
 
-```text
-Se existe alerta crítico que impede calcular ou verificar o caso:
-    REVISÃO HUMANA
+A ação é sempre **ACORDO** ou **DEFESA**, acompanhada de um nível de confiança (alta, média ou baixa):
 
-Senão, se o acordo é economicamente preferível em todos os cenários
-e respeita as alçadas:
+```text
+Se o acordo é economicamente preferível e respeita as alçadas:
     ACORDO
 
-Senão, se a defesa é economicamente preferível em todos os cenários:
-    DEFESA
-
 Senão:
-    REVISÃO HUMANA
+    DEFESA
 ```
+
+Incerteza, alertas críticos e evidência contestada **não mudam o tipo de ação**. Eles reduzem a confiança, e os motivos são registrados e exibidos ao advogado, que decide seguir ou divergir da recomendação. O critério exato de confiança ainda está em definição.
 
 Uma decisão é robusta quando permanece a mesma nos cenários documental, verificado e adverso. Essa regra faz com que a evidência documental participe da decisão agora:
 
@@ -424,14 +420,15 @@ Fato contestado
   → muda as probabilidades
   → muda a exposição judicial
   → pode mudar o teto de acordo
-  → pode mudar a ação final
+  → pode mudar a ação final ou a confiança
 ```
 
 ### Saída para o advogado
 
 ```json
 {
-  "action": "HUMAN_REVIEW",
+  "action": "AGREEMENT",
+  "confidence": "low",
   "reason": "A decisão muda quando o comprovante contestado é desconsiderado",
   "defense_cost": {
     "central": 6100.0,
@@ -455,7 +452,7 @@ Contradições têm três efeitos possíveis:
 |---|---|
 | Alegação da parte versus documento confirmado | explica por que a evidência sustenta ou refuta a pretensão |
 | Dois documentos internos incompatíveis | recalcula valores e cria cenário adverso |
-| Ausência de artefato primário essencial | amplia a faixa de risco ou força revisão humana |
+| Ausência de artefato primário essencial | amplia a faixa de risco e reduz a confiança |
 
 Uma contradição nunca é convertida diretamente em reais. Ela altera a utilização da evidência, o cenário de risco e, por consequência, a exposição esperada.
 

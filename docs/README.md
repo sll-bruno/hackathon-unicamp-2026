@@ -20,4 +20,4 @@ Coloque aqui os artefatos de entrega da sua equipe.
 
 ## Arquitetura da solução
 
-A arquitetura canônica está documentada em [`architecture_engine.md`](architecture_engine.md). Ela descreve como os fatos extraídos dos documentos entram imediatamente em cenários probatórios, alteram a exposição judicial e participam da decisão entre acordo, defesa e revisão humana.
+A arquitetura canônica está documentada em [`architecture_engine.md`](architecture_engine.md). Ela descreve como os fatos extraídos dos documentos entram imediatamente em cenários probatórios, alteram a exposição judicial e participam da decisão entre acordo e defesa.

@@ -2,11 +2,12 @@
 
 ## 1. Objetivo
 
-Construir uma política operacional que recomende uma entre três ações:
+Construir uma política operacional que recomende uma entre duas ações, sempre com um nível de confiança:
 
 - **Acordo**;
-- **Defesa**;
-- **Revisão humana**, quando a análise for inconclusiva, houver baixa confiança ou faltarem informações relevantes.
+- **Defesa**.
+
+Quando a análise for inconclusiva, houver baixa confiança ou faltarem informações relevantes, a recomendação é emitida com **confiança baixa** e os motivos ficam visíveis para o advogado.
 
 O núcleo da solução não é prever se historicamente um caso “parece acordo ou defesa”. O objetivo é estimar as consequências judiciais e financeiras de cada alternativa e recomendar a ação economicamente preferível, com justificativa verificável para o advogado.
 
@@ -21,7 +22,7 @@ O advogado deve receber uma decisão que consiga entender, contestar e executar.
 5. Acordo não deve ser tratado como derrota judicial nem misturado ao modelo de resultado da defesa.
 6. O LLM extrai, valida e explica evidências. Ele não inventa pesos estatísticos nem decide sozinho.
 7. A sugestão inicial deve ser uma **faixa ou teto econômico de acordo**, não um valor pontual com falsa precisão.
-8. “Inconclusivo” é um motivo para a ação **Revisão humana**, não uma quarta decisão.
+8. “Inconclusivo” é um motivo que reduz a **confiança** da recomendação, não uma terceira ação.
 9. Explicabilidade e retroalimentação são componentes centrais, não funcionalidades posteriores.
 10. A principal métrica de negócio é economia esperada e realizada versus uma política de referência; accuracy é uma métrica técnica intermediária.
 
@@ -154,8 +155,8 @@ Custos, alçadas, margem e premissas ─────┘           ↓
 
 Resultado financeiro ─────────────────────┐
 Evidências e alertas de validação ─────────┼──→ Política de Decisão
-Regras, alçadas e critérios de revisão ────┘           ↓
-                                      ACORDO | DEFESA | REVISÃO HUMANA
+Regras, alçadas e critérios de confiança ──┘           ↓
+                                      ACORDO | DEFESA + confiança
 
                             ↓
 
@@ -168,7 +169,7 @@ Explicação da recomendação
 ├─ evidências utilizadas
 ├─ premissas e incerteza
 ├─ condição que muda a decisão
-└─ seguir, solicitar revisão ou fazer override justificado
+└─ seguir ou fazer override justificado
 
                             ↓
 
@@ -193,8 +194,8 @@ Decisão + ação do advogado + negociação + resultado final
 | Extração de dados | Documentos e pacote do caso | Flags binárias, fatos, evidências, contradições e qualidade |
 | Julgamento do risco | Dados estruturados disponíveis antes da decisão | Probabilidades de desfecho, condenação esperada e incerteza |
 | Estimativa financeira | Risco, severidade, custos, alçadas e margem | Comparação econômica e faixa de acordo |
-| Decisão | Comparação econômica e alertas probatórios | Acordo, Defesa ou Revisão humana, com motivo |
-| Experiência do advogado | Recomendação e evidências | Ação executada, revisão ou override justificado |
+| Decisão | Comparação econômica e alertas probatórios | Acordo ou Defesa, com confiança e motivo |
+| Experiência do advogado | Recomendação e evidências | Ação executada ou override justificado |
 | Monitoramento e aprendizado | Recomendação, ação, negociação, custos e resultado final | Aderência, eficiência e nova versão validada do sistema |
 
 ## 5. Extração e validação
@@ -223,7 +224,7 @@ O LLM pode:
 - comparar documentos;
 - identificar contradições e lacunas;
 - gerar uma explicação jurídica com citações;
-- sugerir revisão quando a evidência não for confiável.
+- sinalizar quando a evidência não for confiável, reduzindo a confiança da recomendação.
 
 O LLM não deve:
 
@@ -244,7 +245,7 @@ Um JSON versionado contendo:
 - evidências e respectivas fontes;
 - contradições;
 - lacunas;
-- alertas que exigem revisão humana.
+- alertas que reduzem a confiança da recomendação.
 
 Os sinais semânticos dos dois processos completos ajudam na demonstração e na explicação, mas não possuem histórico suficiente para receber pesos estatísticos aprendidos.
 
@@ -326,9 +327,9 @@ A saída inicial deve ser o teto ou a faixa em que acordo permanece economicamen
 
 **Acordo** quando o custo do acordo for materialmente menor em cenários plausíveis, respeitando alçadas, margem mínima e evidência necessária.
 
-**Defesa** quando o custo esperado da defesa for materialmente menor e a evidência não exigir revisão.
+**Defesa** quando o custo esperado da defesa for menor ou quando o acordo não respeitar as alçadas.
 
-**Revisão humana** quando ocorrer ao menos uma condição:
+A ação é sempre Acordo ou Defesa. A **confiança é reduzida** quando ocorrer ao menos uma condição:
 
 - baixa confiança ou caso fora da distribuição;
 - intervalos financeiros sobrepostos;
@@ -358,7 +359,7 @@ A explicação deve ser produzida junto com a decisão e possuir quatro camadas.
 - probabilidades por desfecho;
 - fatores que mais influenciaram o risco;
 - suporte e tamanho da coorte histórica;
-- confiança e condição de revisão.
+- nível de confiança e motivos.
 
 ### Jurídica e probatória
 
@@ -391,7 +392,7 @@ Premissas: ...
 A decisão muda se: ...
 ```
 
-O advogado pode seguir, solicitar revisão ou fazer override. Todo override exige motivo estruturado e permite observação complementar.
+O advogado pode seguir ou fazer override. Todo override exige motivo estruturado e permite observação complementar.
 
 ## 8. Monitoramento de aderência
 
@@ -405,15 +406,14 @@ Registrar no momento da decisão:
 - aderiu ou fez override;
 - motivo do override;
 - informação nova considerada;
-- data e responsável;
-- encaminhamento para revisão.
+- data e responsável.
 
 Métricas principais:
 
 - aderência geral e por tipo de recomendação;
 - taxa de override;
 - motivos de override;
-- taxa de revisão humana;
+- aderência por nível de confiança;
 - tempo entre recomendação e ação;
 - acordos realizados dentro e fora da faixa;
 - diferenças entre escritórios e regiões para treinamento e governança.
@@ -449,7 +449,7 @@ Eficiência mede custo, tempo e qualidade do fluxo. Efetividade mede se a polít
 - MAE/erro da severidade;
 - cobertura dos intervalos;
 - desempenho por UF, subassunto e faixa de valor;
-- cobertura de decisões automáticas versus taxa de revisão;
+- distribuição das recomendações por nível de confiança;
 - estabilidade e drift.
 
 Accuracy isolada não mede qualidade econômica. Um erro em caso de alta exposição deve pesar mais que um erro pequeno.
@@ -465,7 +465,6 @@ Capturado no momento da decisão:
 - aderência ou override;
 - motivo jurídico ou operacional;
 - documento novo ou correção de extração;
-- decisão humana após revisão;
 - oferta e contraproposta.
 
 Esse feedback melhora regras, extração e UX. A decisão do advogado não é ground truth automática.

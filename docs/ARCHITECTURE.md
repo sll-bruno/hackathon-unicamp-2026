@@ -167,7 +167,7 @@ def run_pipeline(case: CaseInput) -> PipelineOutput: ...
   "financial": { "expected_defense_cost": 11300, "expected_savings": 6950,
                  "settlement_range": { "opening": 3750, "target": 4350, "ceiling": 9800 } },
   "recommendation": {
-    "action": "ACORDO" | "DEFESA",   // sempre binária — não há revisão humana
+    "action": "ACORDO" | "DEFESA",
     "confidence": "alta" | "media" | "baixa",
     "confidence_score": 0.83,        // usado na calibração (Tela 5)
     "reason_codes": ["BAIXA_CONFIANCA", "EVIDENCIA_CONTRADITORIA", …], // alertas exibidos no cartão, não mudam a ação
@@ -178,7 +178,7 @@ def run_pipeline(case: CaseInput) -> PipelineOutput: ...
 }
 ```
 
-- **Sem revisão humana:** o pipeline sempre devolve `ACORDO` ou `DEFESA`. Casos incertos (baixa confiança, evidência contraditória, intervalos sobrepostos) saem com `confidence: baixa` e `reason_codes` visíveis no cartão. Quem decide é o advogado, que pode aceitar ou divergir. Isso difere do relatório do motor (§6.4), que previa uma terceira ação.
+- O pipeline sempre devolve `ACORDO` ou `DEFESA`. Casos incertos (evidência contraditória, lacunas, intervalos sobrepostos) saem com `confidence: baixa` e `reason_codes` visíveis no cartão. Quem decide é o advogado, que pode aceitar ou divergir.
 - A saída inteira é persistida como snapshot imutável em `recommendations.payload_json`, junto com as `versions`. Isso garante a auditoria e o backtest.
 - O chatbot (`POST /cases/{id}/chat`) recebe o snapshot e os trechos dos documentos. Toda resposta tem que citar documento e página.
 - Execução assíncrona: `POST /analyze` cria um `analysis_jobs` com status `queued`, e o pipeline vai atualizando `progress` e `stage` (OCR, extração, validação, risco, motor financeiro). A Tela 1/2 faz polling.
@@ -358,6 +358,5 @@ POLICY_VERSION=v1.0
 | 2 | Baseline de "economia": custo esperado da defesa (modelo) ou valor da causa (sticky do Fluxo C)? | Economia prevista/realizada |
 | 3 | ~~Perfis `advogado` e `banco`~~ **Demo:** perfil único e dashboard visível ao advogado. **Pós-demo:** `lawyers.role` (`advogado`/`banco`) + guarda nas rotas `/api/dashboard/*` e no menu | Tela 5 |
 | 4 | Período e gatilho do retreino (Fluxo C: "definir períodos") | §9 |
-| 5 | ~~Revisão humana~~ **Decidido:** não existe. Ação sempre `ACORDO`/`DEFESA`, e a incerteza aparece como confiança + `reason_codes` | — |
 | 6 | Limites `N_MIN` e `X%` dos alertas de padrão | §7 |
 | 7 | Fluxo de negociação: o advogado registra cada rodada ou só o valor final? | `negotiation_rounds` |

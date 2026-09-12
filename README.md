@@ -135,7 +135,7 @@ Além do repositório, submeter:
 
 A arquitetura proposta combina extração probatória rastreável, risco judicial, estimação do custo da condenação e comparação financeira entre acordo e defesa. Os fatos dos documentos entram na decisão atual por cenários probatórios e análise de sensibilidade, sem tratar a confiança da LLM como probabilidade de vitória.
 
-Consulte [`docs/architecture_engine.md`](docs/architecture_engine.md) para os fluxos, contratos de entrada e saída, fórmulas e regras de revisão humana.
+Consulte [`docs/architecture_engine.md`](docs/architecture_engine.md) para os fluxos, contratos de entrada e saída, fórmulas e regra de decisão.
 
 ---
 
