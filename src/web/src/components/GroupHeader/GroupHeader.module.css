@@ -1,0 +1,32 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) 0;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--text-14);
+  letter-spacing: var(--ls-label);
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.chevron {
+  display: inline-block;
+  color: var(--text-muted);
+  font-size: var(--text-12);
+  transition: transform 120ms;
+}
+
+.chevron.expanded {
+  transform: rotate(90deg);
+}
+
+.count {
+  color: var(--text-muted);
+  letter-spacing: normal;
+  text-transform: none;
+}

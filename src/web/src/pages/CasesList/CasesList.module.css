@@ -150,51 +150,57 @@
   white-space: nowrap;
 }
 
-.muted {
-  color: var(--text-muted);
+.groupRow td {
+  padding: var(--space-2) var(--space-4) 0;
+  border-bottom: none;
+  background: var(--surface-raised);
 }
 
-.deadline {
-  display: flex;
-  flex-direction: column;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
+/* ── Alternador de visualização ── */
+.viewSwitch {
+  display: inline-flex;
+  height: 2.5rem;
+  margin-left: auto;
+  border: 1px solid var(--stroke-primary);
+  border-radius: var(--radius-8);
+  overflow: hidden;
 }
 
-.deadline small {
-  color: var(--text-muted);
-  font-size: var(--text-12);
+.viewSwitch button {
+  padding: 0 var(--space-4);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-14);
+  cursor: pointer;
 }
 
-.soon,
-.soon small {
-  color: var(--accent);
+.viewSwitch button:hover {
+  background: var(--hover);
 }
 
-.overdue,
-.overdue small {
-  color: var(--status-negative);
+.viewOn {
+  background: var(--accent) !important;
+  color: var(--text-on-accent) !important;
+}
+
+/* ── Cartões agrupados ── */
+.groups {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-2);
 }
 
 .message {
-  padding: var(--space-12) !important;
+  padding: var(--space-12);
   color: var(--text-muted);
   text-align: center;
-}
-
-.skeleton {
-  display: block;
-  height: 1.25rem;
-  border-radius: var(--radius-4);
-  background: linear-gradient(90deg, var(--hover), var(--pressed), var(--hover));
-  background-size: 200% 100%;
-  animation: shimmer 1.2s linear infinite;
-}
-
-@keyframes shimmer {
-  to {
-    background-position: -200% 0;
-  }
 }
 
 .count {

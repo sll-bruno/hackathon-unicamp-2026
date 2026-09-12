@@ -1,0 +1,25 @@
+.muted {
+  color: var(--text-muted);
+}
+
+.deadline {
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.deadline small {
+  color: var(--text-muted);
+  font-size: var(--text-12);
+}
+
+.soon,
+.soon small {
+  color: var(--accent);
+}
+
+.overdue,
+.overdue small {
+  color: var(--status-negative);
+}
