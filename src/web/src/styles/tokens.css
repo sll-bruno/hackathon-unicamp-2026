@@ -1,0 +1,121 @@
+/*
+ * Tokens visuais da Enter, extraídos das variáveis CSS de getenter.ai (set/2026).
+ * Seção "Enter": valores originais do site. Seção "Produto": extensões nossas
+ * para estados que o site não cobre (acordo/defesa, alertas).
+ */
+@import '@fontsource-variable/geist/wght.css';
+@import '@fontsource-variable/noto-serif/wght.css';
+
+:root {
+  /* ── Enter · cores sólidas ── */
+  --color-black: #000;
+  --color-white: #fff;
+  --color-neutral-00: #f3f3f3;
+  --color-neutral-20: #cecece;
+  --color-neutral-80: #3c3c3c;
+  --color-neutral-90: #171717;
+  --color-orange: #ffae35;
+
+  /* ── Enter · transparências ── */
+  --black-8: #00000014;
+  --black-10: #0000001a;
+  --black-16: #00000029;
+  --black-20: #00000033;
+  --black-30: #0000004d;
+  --black-50: #00000080;
+  --black-64: #000000a3;
+  --white-8: #ffffff14;
+  --white-16: #ffffff29;
+  --white-20: #ffffff33;
+  --white-64: #ffffffa3;
+
+  /* ── Enter · tokens semânticos ── */
+  --surface-page: var(--color-white);
+  --surface-primary: var(--color-neutral-00);
+  --surface-inverted: var(--color-neutral-90);
+  --text-primary: var(--color-black);
+  --text-body: #333;
+  --text-secondary: var(--black-64);
+  --text-muted: var(--black-50);
+  --text-primary-inverted: var(--color-white);
+  --text-secondary-inverted: var(--white-64);
+  --stroke-primary: var(--black-20);
+  --stroke-secondary: var(--black-10);
+  --stroke-secondary-inverted: var(--white-20);
+  --hover: var(--black-8);
+  --pressed: var(--black-16);
+  --hover-inverted: var(--white-8);
+  --pressed-inverted: var(--white-16);
+  --accent: var(--color-orange);
+
+  /* ── Enter · tipografia ── */
+  --font-heading: 'Noto Serif Variable', Georgia, serif; /* títulos, peso 300 */
+  --font-body: 'Geist Variable', Tahoma, sans-serif;
+  --weight-light: 300;
+  --weight-regular: 400;
+  --lh-tight: 1.2;
+  --lh-body: 1.4;
+  --ls-heading: -0.2px;
+  --ls-text: -0.1px;
+  --ls-label: 0.2px; /* botões e rótulos em caixa alta */
+
+  --text-12: 0.75rem;
+  --text-14: 0.875rem;
+  --text-16: 1rem;
+  --text-18: 1.125rem;
+  --text-20: 1.25rem;
+  --text-24: 1.5rem;
+  --text-32: 2rem;
+  --text-48: 3rem;
+
+  /* ── Enter · raios e espaçamento ── */
+  --radius-4: 0.25rem;
+  --radius-8: 0.5rem; /* botões */
+  --radius-12: 0.75rem; /* cards */
+  --radius-20: 1.25rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-20: 5rem;
+
+  /* ── Produto · extensões (não vêm do site da Enter) ── */
+  --status-positive: #2f7d4f;
+  --status-positive-bg: #e6f2ea;
+  --status-negative: #b3261e;
+  --status-negative-bg: #f9e6e4;
+  --status-warning: #8a5a00;
+  --status-warning-bg: #fff1dc;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--text-body);
+  font-family: var(--font-body);
+  font-size: var(--text-16);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-weight: var(--weight-light);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-heading);
+}
