@@ -1,7 +1,8 @@
 /*
  * Tokens visuais da Enter, extraídos das variáveis CSS de getenter.ai (set/2026).
- * Seção "Enter": valores originais do site. Seção "Produto": extensões nossas
- * para estados que o site não cobre (acordo/defesa, alertas).
+ * Primitivas "Enter": valores originais do site. Tokens semânticos: tema escuro
+ * por padrão (preto + laranja); `data-theme="light"` no <html> volta ao tema do site.
+ * Use sempre os semânticos (--surface-*, --text-*, --stroke-*) nos componentes.
  */
 @import '@fontsource-variable/geist/wght.css';
 @import '@fontsource-variable/noto-serif/wght.css';
@@ -28,25 +29,9 @@
   --white-16: #ffffff29;
   --white-20: #ffffff33;
   --white-64: #ffffffa3;
-
-  /* ── Enter · tokens semânticos ── */
-  --surface-page: var(--color-white);
-  --surface-primary: var(--color-neutral-00);
-  --surface-inverted: var(--color-neutral-90);
-  --text-primary: var(--color-black);
-  --text-body: #333;
-  --text-secondary: var(--black-64);
-  --text-muted: var(--black-50);
-  --text-primary-inverted: var(--color-white);
-  --text-secondary-inverted: var(--white-64);
-  --stroke-primary: var(--black-20);
-  --stroke-secondary: var(--black-10);
-  --stroke-secondary-inverted: var(--white-20);
-  --hover: var(--black-8);
-  --pressed: var(--black-16);
-  --hover-inverted: var(--white-8);
-  --pressed-inverted: var(--white-16);
-  --accent: var(--color-orange);
+  --white-10: #ffffff1a; /* extensão: espelho de black-10 */
+  --white-50: #ffffff80;
+  --white-87: #ffffffde; /* extensão: texto corrido no escuro */
 
   /* ── Enter · tipografia ── */
   --font-heading: 'Noto Serif Variable', Georgia, serif; /* títulos, peso 300 */
@@ -83,7 +68,52 @@
   --space-12: 3rem;
   --space-20: 5rem;
 
-  /* ── Produto · extensões (não vêm do site da Enter) ── */
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* ── Tokens semânticos · tema escuro (padrão do produto) ── */
+  color-scheme: dark;
+  --surface-page: var(--color-black);
+  --surface-primary: var(--color-neutral-90);
+  --surface-raised: var(--color-neutral-80);
+  --surface-contrast: var(--color-white); /* usos pontuais de branco */
+  --text-primary: var(--color-white);
+  --text-body: var(--white-87);
+  --text-secondary: var(--white-64);
+  --text-muted: var(--white-50);
+  --text-on-contrast: var(--color-black);
+  --stroke-primary: var(--white-20);
+  --stroke-secondary: var(--white-10);
+  --hover: var(--white-8);
+  --pressed: var(--white-16);
+  --accent: var(--color-orange);
+  --accent-soft: #ffae3529;
+  --text-on-accent: var(--color-black);
+
+  /* ── Produto · status (não vêm do site da Enter) ── */
+  --status-positive: #6fcf97;
+  --status-positive-bg: #6fcf9724;
+  --status-negative: #ff7a70;
+  --status-negative-bg: #ff7a7024;
+  --status-warning: var(--color-orange);
+  --status-warning-bg: var(--accent-soft);
+}
+
+/* Tema claro opcional: valores originais do site da Enter. */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --surface-page: var(--color-white);
+  --surface-primary: var(--color-neutral-00);
+  --surface-raised: var(--color-neutral-20);
+  --surface-contrast: var(--color-neutral-90);
+  --text-primary: var(--color-black);
+  --text-body: #333;
+  --text-secondary: var(--black-64);
+  --text-muted: var(--black-50);
+  --text-on-contrast: var(--color-white);
+  --stroke-primary: var(--black-20);
+  --stroke-secondary: var(--black-10);
+  --hover: var(--black-8);
+  --pressed: var(--black-16);
   --status-positive: #2f7d4f;
   --status-positive-bg: #e6f2ea;
   --status-negative: #b3261e;
@@ -107,6 +137,19 @@ body {
   line-height: var(--lh-body);
   letter-spacing: var(--ls-text);
   -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 h1,
