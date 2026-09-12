@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "enter-decision-platform"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = ["fastapi>=0.115,<1", "uvicorn>=0.34,<1", "pydantic>=2.10,<3"]
+
+[tool.setuptools.packages.find]
+where = ["src/api", "src/pipeline", "src/contracts"]
+include = ["app*", "decision_engine*", "contracts*"]

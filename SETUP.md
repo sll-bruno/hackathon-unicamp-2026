@@ -1,51 +1,54 @@
-# Setup e Execução
+# Setup e execução
 
-> Preencha este arquivo com as instruções específicas da sua solução.
-
----
+Base mínima para desenvolver as três frentes. Não há dados simulados, modelo treinado, banco configurado ou fluxo de negócio implementado.
 
 ## Pré-requisitos
 
-Liste aqui as dependências necessárias para rodar a solução:
+- Python 3.11 ou superior.
+- Node.js 22 ou superior e npm.
 
-- [ ] ...
-- [ ] ...
+Execute os comandos a partir da raiz do repositório.
 
-## Variáveis de Ambiente
-
-Crie um arquivo `.env` na raiz do projeto com as variáveis necessárias:
-
-```env
-# Exemplo — adapte conforme sua solução
-OPENAI_API_KEY=sua_chave_aqui
-```
-
-> **Nunca commite o arquivo `.env` com credenciais reais.**  
-> Um arquivo `.env.example` com as variáveis (sem valores) já está incluído neste repo.
-
-## Instalação
+## Backend e engine
 
 ```bash
-# Descreva aqui os passos de instalação
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
+uvicorn app.main:app --reload
 ```
 
-## Execução
+API: http://127.0.0.1:8000/api/health
+
+Documentação: http://127.0.0.1:8000/docs
+
+A engine é importável com `from decision_engine import run_pipeline`, mas a função lança `NotImplementedError` até ser implementada. Os contratos ficam em `contracts.pipeline`.
+
+## Frontend
+
+Em outro terminal:
 
 ```bash
-# Descreva aqui como rodar a solução
+cd src/web
+npm ci
+npm run dev
 ```
 
-## Dados
+Frontend: http://localhost:5173. O Vite encaminha `/api` para a API local.
 
-Coloque os arquivos de dados fornecidos na pasta `data/`. Consulte [`data/README.md`](./data/README.md) para instruções detalhadas.
-
-## Estrutura do Projeto
-
+```bash
+npm run build
 ```
-├── src/          # código-fonte
-├── data/         # dados (não versionados — ver .gitignore)
-├── docs/         # apresentação e documentação
-├── .env.example  # variáveis de ambiente necessárias
-├── SETUP.md      # este arquivo
-└── README.md     # descrição do desafio
-```
+
+O build verifica TypeScript e gera os arquivos em `src/web/dist/`.
+
+## Organização
+
+- `src/pipeline/`: extração, risco, financeiro e treinamento — duas pessoas.
+- `src/api/`: API, serviços, modelos e monitoramento — uma pessoa.
+- `src/web/`: frontend — duas pessoas.
+- `src/contracts/`: contratos compartilhados; alinhar alterações entre as frentes.
+
+`requirements.txt` mantém as dependências da análise exploratória anterior. Para a base da aplicação, use `pip install -e .`.
+
+Nenhuma chave externa é necessária para iniciar a base. A configuração de OpenAI, banco e armazenamento será adicionada pelas frentes quando essas integrações forem implementadas. Não versionar `.env`, dados privados ou dependências instaladas.

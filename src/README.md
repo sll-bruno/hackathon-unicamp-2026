@@ -1,14 +1,10 @@
-# Coloque aqui o código-fonte da sua solução.
+# Código-fonte
 
-Não há restrição de linguagem ou tecnologia — use o que sua equipe domina melhor.
+| Frente | Pasta | Pessoas |
+|---|---|---:|
+| Engine | `pipeline/` | 2 |
+| Backend e dados | `api/` | 1 |
+| Frontend | `web/` | 2 |
+| Contratos da engine | `contracts/` | Compartilhado |
 
-## Sugestões de organização
-
-```
-src/
-├── policy/        # lógica da política de acordos (regras de decisão, sugestão de valor)
-├── interface/     # interface de acesso do advogado à recomendação
-└── utils/         # utilitários compartilhados
-```
-
-> Sinta-se livre para reorganizar conforme a arquitetura da sua solução.
+Consulte [SETUP.md](../SETUP.md) para executar e [divisão de trabalho](../docs/DIVISAO_TRABALHO.md) para responsabilidades. Esta base contém apenas pontos de entrada e contratos; as funcionalidades ficam para cada frente.
