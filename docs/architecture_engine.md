@@ -242,7 +242,7 @@ Para cada cenário probatório:
 
 ### Processamento
 
-Um classificador supervisionado treinado nos resultados históricos estima quatro classes. As probabilidades passam por calibração antes do uso financeiro.
+Um classificador supervisionado treinado nos resultados históricos estima quatro classes, usadas pelo motor financeiro.
 
 ### Saída
 
@@ -254,8 +254,7 @@ Um classificador supervisionado treinado nos resultados históricos estima quatr
     "dismissal": 0.45,
     "partial": 0.25,
     "judgment_for_claimant": 0.15
-  },
-  "calibration_confidence": "medium"
+  }
 }
 ```
 
@@ -470,7 +469,7 @@ Cada recomendação deve persistir:
 - justificativa estruturada para divergência;
 - resultado da negociação ou do processo.
 
-Esses registros permitem medir aderência, efetividade, calibração e arrependimento econômico sem alterar silenciosamente a política em produção.
+Esses registros permitem medir aderência e efetividade e alimentar o retreino periódico sem alterar silenciosamente a política em produção.
 
 ## 8. Limitações assumidas
 

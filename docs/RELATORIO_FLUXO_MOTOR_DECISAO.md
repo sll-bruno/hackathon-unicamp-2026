@@ -119,7 +119,6 @@ Dados tabulares do pacote
         │               ↓
         │     P(extinção, improcedência,
         │       parcial e procedência)
-        │     + confiança calibrada
         │
         └──→ Modelo de Severidade
               treinado com as condenações históricas
@@ -262,7 +261,7 @@ P(procedência parcial)
 P(procedência)
 ```
 
-A saída deve ser calibrada e acompanhada de incerteza. Uma simples classe “ganha/perde” eliminaria diferenças relevantes entre parcial e procedência total.
+A saída deve ser acompanhada de incerteza. Uma simples classe “ganha/perde” eliminaria diferenças relevantes entre parcial e procedência total.
 
 O resultado macro atual não deve ser o alvo principal porque mistura resultado jurídico com interpretação de êxito e classifica acordo como “Não Êxito”.
 
@@ -282,7 +281,7 @@ Uma abordagem inicial adequada:
 1. baseline por subassunto e faixa de valor da causa;
 2. modelo tabular, como CatBoost ou LightGBM;
 3. estimativas de média e quantis;
-4. intervalo calibrado ou conformal.
+4. intervalo de valores.
 
 O motor financeiro usa a média esperada. A interface também apresenta P50/P80 ou intervalo para comunicar risco de cauda.
 
@@ -444,7 +443,6 @@ Eficiência mede custo, tempo e qualidade do fluxo. Efetividade mede se a polít
 
 ### Métricas dos modelos
 
-- calibração das probabilidades;
 - log loss ou Brier score;
 - MAE/erro da severidade;
 - cobertura dos intervalos;
@@ -509,7 +507,7 @@ Existe viés de seleção: casos acordados não revelam qual seria o resultado d
 ## 11. Sequência recomendada de desenvolvimento
 
 1. Definir o contrato único do JSON de caso, evidências e versões.
-2. Construir baseline e modelo calibrado de risco por desfecho.
+2. Construir baseline e modelo de risco por desfecho.
 3. Construir baseline e modelo de severidade com intervalos.
 4. Implementar motor financeiro determinístico com parâmetros configuráveis.
 5. Implementar política das três ações e respectivos reason codes.

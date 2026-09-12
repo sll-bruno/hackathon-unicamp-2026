@@ -79,7 +79,7 @@ flowchart TB
 | **Processos** | Cadastro, upload e status. Registra a decisão do advogado (aceitou/divergiu) e o desfecho |
 | **Pipeline de IA** | Recebe autos + subsídios e devolve recomendação, faixa de valor, confiança e evidências (§5) |
 | **Motor de aderência** | Lê as decisões e calcula quanto a política é seguida e os motivos de divergência (§7) |
-| **Motor de efetividade** | Lê os desfechos e calcula economia prevista vs. realizada, aceite e calibração (§8) |
+| **Motor de efetividade** | Lê os desfechos e calcula economia prevista vs. realizada e aceite de acordos (§8) |
 | **SQLite + Storage** | Volumes Docker com o banco e os PDFs |
 
 ## 4. Userflow → máquina de estados do processo
@@ -118,7 +118,7 @@ Regras:
 | **2. Cadastrar + documentos** | dados do processo, upload múltiplo, checklist dos 6 subsídios, salvar rascunho, avaliar | `POST /api/cases`, `PATCH /api/cases/{id}`, `POST /api/cases/{id}/documents`, `PATCH /api/documents/{id}` (trocar tipo), `POST /api/cases/{id}/analyze`, `GET /api/cases/{id}/analysis` (polling) |
 | **3. Área de trabalho** | cartão de recomendação, evidências com citação, PDF viewer, chatbot, aceitar/não aceitar, negociação, histórico | `GET /api/cases/{id}/workspace`, `GET /api/documents/{id}/file`, `POST /api/evidences/{id}/feedback` (confirmar/corrigir), `POST /api/cases/{id}/decision`, `POST /api/cases/{id}/negotiation-rounds`, `POST /api/cases/{id}/chat` |
 | **4. Encerrar caso** | como terminou, valores, resumo automático, comentário | `GET /api/cases/{id}/closure-preview`, `POST /api/cases/{id}/closure` |
-| **5. Dashboard do banco** (na demo, acessível pelo menu do advogado) | KPIs, economia prevista vs. realizada, motivos de divergência, aderência por escritório, calibração, alertas | `GET /api/dashboard/kpis`, `/economy-timeseries`, `/divergence-reasons`, `/adherence-by-office`, `/calibration`, `/alerts` (todos com os filtros `period, uf, office_id, thesis, confidence, policy_version`) |
+| **5. Dashboard do banco** (na demo, acessível pelo menu do advogado) | KPIs, economia prevista vs. realizada, motivos de divergência, aderência por escritório, alertas | `GET /api/dashboard/kpis`, `/economy-timeseries`, `/divergence-reasons`, `/adherence-by-office`, `/alerts` (todos com os filtros `period, uf, office_id, thesis, confidence, policy_version`) |
 
 ## 5. Pipeline de IA — contrato (caixa-preta)
 
@@ -169,7 +169,6 @@ def run_pipeline(case: CaseInput) -> PipelineOutput: ...
   "recommendation": {
     "action": "ACORDO" | "DEFESA",
     "confidence": "alta" | "media" | "baixa",
-    "confidence_score": 0.83,        // usado na calibração (Tela 5)
     "reason_codes": ["BAIXA_CONFIANCA", "EVIDENCIA_CONTRADITORIA", …], // alertas exibidos no cartão, não mudam a ação
     "summary": "prova — contrato ausente, assinatura divergente · risco — perda 78% …",
     "what_changes": ["contrato válido → DEFESA", "pedido acima de R$ 9.800 → DEFESA"]
@@ -179,7 +178,7 @@ def run_pipeline(case: CaseInput) -> PipelineOutput: ...
 ```
 
 - O pipeline sempre devolve `ACORDO` ou `DEFESA`. Casos incertos (evidência contraditória, lacunas, intervalos sobrepostos) saem com `confidence: baixa` e `reason_codes` visíveis no cartão. Quem decide é o advogado, que pode aceitar ou divergir.
-- A saída inteira é persistida como snapshot imutável em `recommendations.payload_json`, junto com as `versions`. Isso garante a auditoria e o backtest.
+- A saída inteira é persistida como snapshot imutável em `recommendations.payload_json`, junto com as `versions`. Isso garante a auditoria e alimenta o retreino.
 - O chatbot (`POST /cases/{id}/chat`) recebe o snapshot e os trechos dos documentos. Toda resposta tem que citar documento e página.
 - Execução assíncrona: `POST /analyze` cria um `analysis_jobs` com status `queued`, e o pipeline vai atualizando `progress` e `stage` (OCR, extração, validação, risco, motor financeiro). A Tela 1/2 faz polling.
 
@@ -209,8 +208,8 @@ erDiagram
 | `case_status_history` | case_id, from_status, to_status, at, actor | histórico (Tela 3), tempo por etapa |
 | `documents` | id, case_id, path, filename, declared_type, detected_type, legible, illegible_pages_json | checklist (Tela 2) |
 | `analysis_jobs` | id, case_id, status, stage, progress, error, started_at, finished_at | loading/polling |
-| `policy_versions` | id (`v1.0`), params_json, created_at, active | filtro "versão da política", backtest |
-| `recommendations` | id, case_id, policy_version_id, action, confidence, confidence_score, range_opening/target/ceiling, expected_defense_cost, expected_savings, reason_codes_json, payload_json, created_at | **aderência + efetividade** |
+| `policy_versions` | id (`v1.0`), params_json, created_at, active | filtro "versão da política" |
+| `recommendations` | id, case_id, policy_version_id, action, confidence, range_opening/target/ceiling, expected_defense_cost, expected_savings, reason_codes_json, payload_json, created_at | **aderência + efetividade** |
 | `evidences` | id, recommendation_id, kind, text, sources_json, confidence | cards (Tela 3) |
 | `evidence_feedback` | evidence_id, lawyer_id, verdict (`confirmado`/`corrigido`), correction | erro de extração |
 | `lawyer_decisions` | recommendation_id, lawyer_id, accepted (bool), chosen_action, divergence_reason, divergence_note, decided_at | **motor de aderência** |
@@ -241,7 +240,7 @@ Enums:
 | Tempo até decisão | `decided_at − AGUARDANDO_DECISAO.at` |
 | Aderência por confiança | aderência agrupada por `confidence`. Divergência alta em `alta` indica problema na política ou na extração |
 
-**Alertas de padrão:** um job simples, que roda sob demanda ou quando o dashboard carrega, procura coortes (UF × tese × flags de subsídios) com `n ≥ N_MIN` e divergência `≥ X%`. Ele retorna o motivo dominante e aponta pra "abrir backtest". Exemplo do Figma: *AM + Golpe com contrato: 40% de divergência, motivo documento inválido*.
+**Alertas de padrão:** um job simples, que roda sob demanda ou quando o dashboard carrega, procura coortes (UF × tese × flags de subsídios) com `n ≥ N_MIN` e divergência `≥ X%`. Ele retorna o motivo dominante e a lista de casos, como insumo para o próximo retreino. Exemplo do Figma: *AM + Golpe com contrato: 40% de divergência, motivo documento inválido*.
 
 ## 8. Motor de efetividade
 
@@ -257,24 +256,19 @@ Enums:
 | Erro do motor financeiro | prevista − realizada por mês (área sombreada do gráfico) |
 | Aceite de acordos | `acordos fechados / casos que foram para negociação` |
 | Taxa de êxito / não êxito | por UF, tese, documentos, escritório (Fluxo C) |
-| Calibração da confiança | para cada faixa `alta/media/baixa`: % em que a ação recomendada se mostrou correta vs. o esperado (≥90%, 70–90%, <70%) |
-
-> ⚠️ **"Ação correta" precisa de definição fechada** (ver §11). Casos acordados não revelam o resultado da defesa, e vice-versa (viés de seleção, conforme o relatório §10).
 
 ## 9. Retroalimentação (Fluxo C)
 
 ```mermaid
 flowchart LR
   A[case_outcomes<br/>lawyer_decisions<br/>evidence_feedback] --> B[Filtros<br/>UF · tese · documentos · escritório · êxito]
-  B --> C{Retreino periódico<br/>processo interno}
-  C --> D[Backtest nova policy_version<br/>vs. versão ativa]
-  D -->|promovida| E[policy_versions.active]
+  B --> C[Retreino periódico<br/>processo interno]
+  C --> E[Nova policy_version ativa]
   E --> F[Dashboards de efetividade<br/>filtráveis por versão]
 ```
 
-- O retreino é **offline e em lote** (notebook/script em `src/pipeline/training/`). Não roda na API.
+- A retroalimentação é **apenas retreino periódico**, offline e em lote (notebook/script em `src/pipeline/training/`). Não roda na API.
 - Toda recomendação guarda sua `policy_version`. Uma versão nova não reescreve as recomendações antigas.
-- Backtest: roda a versão candidata sobre os snapshots de casos encerrados e compara com a economia realizada.
 
 ## 10. Estrutura de pastas
 
@@ -302,13 +296,13 @@ src/
 │   │   ├── services/             # cases (máquina de estados), analysis_jobs
 │   │   ├── pipeline/             # 🔲 caixa-preta — run_pipeline()
 │   │   ├── adherence/            # métricas + alertas
-│   │   └── effectiveness/        # métricas + calibração
+│   │   └── effectiveness/        # métricas de efetividade
 │   ├── migrations/               # Alembic
 │   ├── seeds/                    # casos de exemplo (data/Caso_01, Caso_02) + escritórios
 │   ├── tests/
 │   └── Dockerfile
 └── pipeline/
-    └── training/                 # retreino/backtest offline
+    └── training/                 # retreino periódico offline
 docker-compose.yml
 ```
 
@@ -354,9 +348,8 @@ POLICY_VERSION=v1.0
 
 | # | Decisão | Impacto |
 |---|---|---|
-| 1 | Definição de "recomendação correta" para calibração (acordo fechado ≤ teto? defesa com improcedência/extinção?) | Tela 5, calibração |
-| 2 | Baseline de "economia": custo esperado da defesa (modelo) ou valor da causa (sticky do Fluxo C)? | Economia prevista/realizada |
-| 3 | ~~Perfis `advogado` e `banco`~~ **Demo:** perfil único e dashboard visível ao advogado. **Pós-demo:** `lawyers.role` (`advogado`/`banco`) + guarda nas rotas `/api/dashboard/*` e no menu | Tela 5 |
-| 4 | Período e gatilho do retreino (Fluxo C: "definir períodos") | §9 |
-| 6 | Limites `N_MIN` e `X%` dos alertas de padrão | §7 |
-| 7 | Fluxo de negociação: o advogado registra cada rodada ou só o valor final? | `negotiation_rounds` |
+| 1 | Baseline de "economia": custo esperado da defesa (modelo) ou valor da causa (sticky do Fluxo C)? | Economia prevista/realizada |
+| 2 | ~~Perfis `advogado` e `banco`~~ **Demo:** perfil único e dashboard visível ao advogado. **Pós-demo:** `lawyers.role` (`advogado`/`banco`) + guarda nas rotas `/api/dashboard/*` e no menu | Tela 5 |
+| 3 | Período do retreino periódico (Fluxo C: "definir períodos") | §9 |
+| 4 | Limites `N_MIN` e `X%` dos alertas de padrão | §7 |
+| 5 | Fluxo de negociação: o advogado registra cada rodada ou só o valor final? | `negotiation_rounds` |
