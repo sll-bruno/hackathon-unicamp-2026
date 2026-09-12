@@ -38,17 +38,3 @@ export const useCasesSummary = () =>
     queryFn: () => (USE_MOCKS ? simulateLatency(summarize(mockCases)) : apiGet<CasesSummary>('/cases/summary')),
   });
 
-const byDeadlineAsc = (a: CaseListItem, b: CaseListItem) => {
-  if (a.deadline_at === b.deadline_at) return 0;
-  if (a.deadline_at === null) return 1;
-  if (b.deadline_at === null) return -1;
-  return a.deadline_at.localeCompare(b.deadline_at);
-};
-
-// Caso mais urgente (prazo mais próximo) de um recorte — usado como "espiada" nos
-// cards de pendência, pra dar um exemplo concreto além do número.
-export function mostUrgent(cases: CaseListItem[] | undefined, predicate: (c: CaseListItem) => boolean): CaseListItem | null {
-  if (!cases) return null;
-  const match = cases.filter((c) => isOpen(c) && predicate(c)).sort(byDeadlineAsc);
-  return match[0] ?? null;
-}

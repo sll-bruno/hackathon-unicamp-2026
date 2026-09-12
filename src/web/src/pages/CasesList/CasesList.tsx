@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isDeadlineSoon, mostUrgent, useCases, useCasesSummary } from '../../api/cases';
+import { isDeadlineSoon, useCases, useCasesSummary } from '../../api/cases';
 import { RecommendationTag, StatusBadge } from '../../components/Badges/Badges';
 import { ButtonLink } from '../../components/Button/Button';
 import { Deadline } from '../../components/Deadline/Deadline';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
-import { StatCard } from '../../components/StatCard/StatCard';
+import { PendencyFeed } from '../../components/PendencyFeed/PendencyFeed';
 import { formatBRL } from '../../lib/format';
+import { buildPendencyFeed } from '../../lib/pendencies';
 import { toDisplayStatus, type DisplayStatus } from '../../lib/status';
 import type { CaseListItem } from '../../types/case';
 import { STATUS_LABEL, THESIS_LABEL } from '../../types/labels';
@@ -116,7 +117,7 @@ export default function CasesList() {
   }, [cases.data, query, status, rec, onlySoon, onlyAlert]);
 
   const s = summary.data;
-  const peek = (c: CaseListItem | null) => c?.plaintiff_name;
+  const feed = useMemo(() => buildPendencyFeed(cases.data), [cases.data]);
 
   return (
     <div className={styles.page}>
@@ -130,38 +131,31 @@ export default function CasesList() {
         actions={<ButtonLink to="/processos/novo">Novo processo</ButtonLink>}
       />
 
-      <section className={styles.stats} aria-label="Pendências">
-        <StatCard
-          label="Documento com erro de leitura"
-          value={s?.document_errors}
-          hint={peek(mostUrgent(cases.data, (c) => c.alert !== null))}
-          active={onlyAlert}
-          onClick={toggleAlert}
-        />
-        <StatCard
-          label="Revisar recomendação"
-          value={s?.awaiting_decision}
-          hint={peek(mostUrgent(cases.data, (c) => c.status === 'AGUARDANDO_DECISAO'))}
-          active={isDecisao}
-          onClick={() => toggleQuickStatus('AGUARDANDO_DECISAO', isDecisao)}
-        />
-        <StatCard
-          label="Falta registrar o desfecho"
-          value={s?.pending_outcome}
-          hint={peek(mostUrgent(cases.data, (c) => toDisplayStatus(c.status) === 'AGUARDANDO_ENCERRAMENTO'))}
-          active={isEncerramento}
-          onClick={() => toggleQuickStatus('AGUARDANDO_ENCERRAMENTO', isEncerramento)}
-        />
-        <StatCard
-          label="Prazo encerra em até 5 dias"
-          value={s?.deadline_soon}
-          hint={peek(mostUrgent(cases.data, isDeadlineSoon))}
-          active={onlySoon}
-          onClick={toggleSoon}
-        />
-      </section>
+      <PendencyFeed items={feed} />
 
       <section className={styles.filters} aria-label="Filtros">
+        <div className={styles.chips}>
+          <button type="button" className={`${styles.chip} ${onlyAlert ? styles.chipActive : ''}`} onClick={toggleAlert}>
+            Erro de leitura · {s?.document_errors ?? '–'}
+          </button>
+          <button
+            type="button"
+            className={`${styles.chip} ${isDecisao ? styles.chipActive : ''}`}
+            onClick={() => toggleQuickStatus('AGUARDANDO_DECISAO', isDecisao)}
+          >
+            Revisar recomendação · {s?.awaiting_decision ?? '–'}
+          </button>
+          <button
+            type="button"
+            className={`${styles.chip} ${isEncerramento ? styles.chipActive : ''}`}
+            onClick={() => toggleQuickStatus('AGUARDANDO_ENCERRAMENTO', isEncerramento)}
+          >
+            Falta desfecho · {s?.pending_outcome ?? '–'}
+          </button>
+          <button type="button" className={`${styles.chip} ${onlySoon ? styles.chipActive : ''}`} onClick={toggleSoon}>
+            Prazo curto · {s?.deadline_soon ?? '–'}
+          </button>
+        </div>
         <input
           className={styles.search}
           type="search"

@@ -1,0 +1,107 @@
+.panel {
+  padding: var(--space-5) var(--space-5) var(--space-2);
+  border: 1px solid var(--stroke-secondary);
+  border-radius: var(--radius-12);
+  background: var(--surface-primary);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  color: var(--text-primary);
+  font-size: var(--text-20);
+}
+
+.subtitle {
+  margin-top: var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--text-14);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-4) var(--space-2);
+  border: none;
+  border-bottom: 1px solid var(--stroke-secondary);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 100ms;
+}
+
+.list .row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background: var(--hover);
+}
+
+.bar {
+  align-self: stretch;
+  width: 3px;
+  border-radius: var(--radius-4);
+  background: var(--kind-color);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.kindLabel {
+  color: var(--kind-color);
+  font-size: var(--text-12);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+}
+
+.plaintiff {
+  overflow: hidden;
+  color: var(--text-primary);
+  font-size: var(--text-16);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cnj {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+}
+
+.badge {
+  flex-shrink: 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-8);
+  background: var(--kind-color-bg);
+  color: var(--kind-color);
+  font-size: var(--text-12);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+}
+
+.empty {
+  padding: var(--space-8) var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-14);
+  text-align: center;
+}
