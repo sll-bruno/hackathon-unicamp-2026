@@ -6,7 +6,7 @@
 .stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
 
 @media (max-width: 900px) {
@@ -90,11 +90,11 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--text-14);
+  font-size: var(--text-16);
 }
 
 .table th {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
   border-bottom: 1px solid var(--stroke-secondary);
   color: var(--text-muted);
   font-size: var(--text-12);
@@ -106,7 +106,7 @@
 }
 
 .table td {
-  padding: var(--space-4);
+  padding: var(--space-5);
   border-bottom: 1px solid var(--stroke-secondary);
   vertical-align: middle;
 }
@@ -131,12 +131,13 @@
 .plaintiff {
   display: block;
   color: var(--text-primary);
-  font-size: var(--text-14);
+  font-size: var(--text-16);
   white-space: nowrap;
 }
 
 .cnj {
   display: block;
+  margin-top: 0.125rem;
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: var(--text-12);
@@ -148,12 +149,6 @@
   text-align: right !important;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-}
-
-.groupRow td {
-  padding: var(--space-2) var(--space-4) 0;
-  border-bottom: none;
-  background: var(--surface-raised);
 }
 
 /* ── Alternador de visualização ── */
@@ -184,17 +179,11 @@
   color: var(--text-on-accent) !important;
 }
 
-/* ── Cartões agrupados ── */
-.groups {
-  display: grid;
-  gap: var(--space-6);
-}
-
+/* ── Cartões ── */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
   gap: var(--space-4);
-  margin-top: var(--space-2);
 }
 
 .message {

@@ -19,17 +19,7 @@ button.card {
 }
 
 button.card:hover {
-  background: var(--hover);
-}
-
-button.card.active:not(.accent) {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
-button.card.accent.active {
-  outline: 2px solid var(--surface-page);
-  outline-offset: -4px;
+  border-color: var(--stroke-primary);
 }
 
 .label {
@@ -48,12 +38,13 @@ button.card.accent.active {
   font-variant-numeric: tabular-nums;
 }
 
-.accent {
+/* Filtro ativo — preenchimento sólido, sem meio-termo. */
+.active {
   border-color: transparent;
   background: var(--accent);
 }
 
-.accent .label,
-.accent .value {
+.active .label,
+.active .value {
   color: var(--text-on-accent);
 }

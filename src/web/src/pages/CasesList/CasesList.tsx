@@ -1,15 +1,13 @@
-import { Fragment, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { isDeadlineSoon, useCases, useCasesSummary } from '../../api/cases';
 import { RecommendationTag, StatusBadge } from '../../components/Badges/Badges';
 import { ButtonLink } from '../../components/Button/Button';
 import { CaseCard } from '../../components/CaseCard/CaseCard';
 import { Deadline } from '../../components/Deadline/Deadline';
-import { GroupHeader } from '../../components/GroupHeader/GroupHeader';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { StatCard } from '../../components/StatCard/StatCard';
 import { formatBRL } from '../../lib/format';
-import { DEFAULT_EXPANDED, groupByUrgency, type UrgencyKey } from '../../lib/urgency';
 import type { CaseListItem, CaseStatus } from '../../types/case';
 import { STATUS_LABEL, THESIS_LABEL } from '../../types/labels';
 import styles from './CasesList.module.css';
@@ -61,7 +59,6 @@ export default function CasesList() {
   const [onlySoon, setOnlySoon] = useState(false);
   const [showClosed, setShowClosed] = useState(false);
   const [view, setView] = useState<ViewMode>('tabela');
-  const [expanded, setExpanded] = useState(DEFAULT_EXPANDED);
 
   // Estado dos cards de resumo, que também funcionam como atalho de filtro.
   const isAberto = status === 'TODOS' && !onlySoon && !showClosed;
@@ -85,8 +82,6 @@ export default function CasesList() {
     setStatus('TODOS');
     setShowClosed(false);
   };
-  const toggleGroup = (key: UrgencyKey) => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
-
   const rows = useMemo(() => {
     const digits = query.replace(/\D/g, '');
     const text = normalize(query.trim());
@@ -107,8 +102,6 @@ export default function CasesList() {
       .sort(byDeadline);
   }, [cases.data, query, status, rec, onlySoon, showClosed]);
 
-  const groups = useMemo(() => groupByUrgency(rows), [rows]);
-
   const s = summary.data;
 
   return (
@@ -124,12 +117,11 @@ export default function CasesList() {
         <StatCard
           label="Aguardando decisão"
           value={s?.awaiting_decision}
-          accent
           active={isDecisao}
           onClick={() => toggleQuickStatus('AGUARDANDO_DECISAO', isDecisao)}
         />
         <StatCard label="Em análise" value={s?.in_analysis} active={isAnalise} onClick={() => toggleQuickStatus('EM_ANALISE', isAnalise)} />
-        <StatCard label="Prazo ≤ 5 dias" value={s?.deadline_soon} active={onlySoon} onClick={toggleSoon} />
+        <StatCard label="Prazo encerra em até 5 dias" value={s?.deadline_soon} active={onlySoon} onClick={toggleSoon} />
       </section>
 
       <section className={styles.filters} aria-label="Filtros">
@@ -189,15 +181,8 @@ export default function CasesList() {
               </tr>
             </thead>
             <tbody>
-              {groups.map((g) => (
-                <Fragment key={g.key}>
-                  <tr className={styles.groupRow}>
-                    <td colSpan={7}>
-                      <GroupHeader label={g.label} count={g.items.length} expanded={expanded[g.key]} onToggle={() => toggleGroup(g.key)} />
-                    </td>
-                  </tr>
-                  {expanded[g.key] && g.items.map((c) => <CaseRow key={c.id} item={c} />)}
-                </Fragment>
+              {rows.map((c) => (
+                <CaseRow key={c.id} item={c} />
               ))}
             </tbody>
           </table>
@@ -205,18 +190,9 @@ export default function CasesList() {
       )}
 
       {cases.isSuccess && rows.length > 0 && view === 'cartoes' && (
-        <div className={styles.groups}>
-          {groups.map((g) => (
-            <section key={g.key}>
-              <GroupHeader label={g.label} count={g.items.length} expanded={expanded[g.key]} onToggle={() => toggleGroup(g.key)} />
-              {expanded[g.key] && (
-                <div className={styles.grid}>
-                  {g.items.map((c) => (
-                    <CaseCard key={c.id} item={c} />
-                  ))}
-                </div>
-              )}
-            </section>
+        <div className={styles.grid}>
+          {rows.map((c) => (
+            <CaseCard key={c.id} item={c} />
           ))}
         </div>
       )}

@@ -38,6 +38,7 @@
   --font-body: 'Geist Variable', Tahoma, sans-serif;
   --weight-light: 300;
   --weight-regular: 400;
+  --weight-medium: 500; /* extensão: ênfase em status e recomendação */
   --lh-tight: 1.2;
   --lh-body: 1.4;
   --ls-heading: -0.2px;
