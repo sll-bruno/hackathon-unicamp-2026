@@ -1,0 +1,44 @@
+import { NavLink, Outlet } from 'react-router-dom';
+import { USE_MOCKS } from '../../api/client';
+import { EnterLogo } from '../EnterLogo';
+import styles from './AppLayout.module.css';
+
+const NAV = [
+  { to: '/processos', label: 'Processos', end: false },
+  { to: '/historico', label: 'Histórico', end: false },
+  { to: '/dashboard', label: 'Dashboard', end: false },
+];
+
+export function AppLayout() {
+  return (
+    <div className={styles.shell}>
+      <header className={styles.topbar}>
+        <NavLink to="/processos" className={styles.brand} aria-label="Início">
+          <EnterLogo />
+        </NavLink>
+        <nav className={styles.nav}>
+          {NAV.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) => [styles.link, isActive && styles.active].filter(Boolean).join(' ')}
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+        <div className={styles.right}>
+          {USE_MOCKS && (
+            <span className={styles.mockBadge} title="Front usando dados de exemplo; não são resultados reais">
+              Dados simulados
+            </span>
+          )}
+        </div>
+      </header>
+      <main className={styles.content}>
+        <Outlet />
+      </main>
+    </div>
+  );
+}
