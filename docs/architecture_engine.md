@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-A solução recomenda uma de duas ações para cada processo, sempre acompanhada de um nível de confiança:
+A solução recomenda uma de duas ações para cada processo, sempre acompanhada de uma confiança percentual de 0 a 100:
 
 - **ACORDO**;
 - **DEFESA**.
@@ -13,7 +13,7 @@ A recomendação não é produzida por um classificador de acordo versus defesa.
 2. risco judicial estimado a partir do histórico de 60 mil processos;
 3. custo possível de cada desfecho, usando os valores do processo;
 4. comparação econômica entre acordo e defesa;
-5. controles de incerteza do modelo, qualidade da extração e alçada, que definem o nível de confiança.
+5. controles de incerteza do modelo, qualidade da extração e alçada, considerados no cálculo da confiança percentual final.
 
 **Escopo atual — disponibilidade binária:** o modelo recebe apenas os metadados do processo e os seis indicadores de subsídios disponibilizados. `1` significa disponível e `0` indisponível, conforme o inventário de entrada. O sistema não contesta nem valida a existência, autenticidade, validade ou força probatória de um documento. Não existem cenários documental, verificado ou adverso que alterem essas flags. A extração com fontes apoia a explicação e os valores financeiros; não reclassifica a disponibilidade.
 
@@ -24,6 +24,8 @@ flowchart LR
     docs[Autos e subsídios] --> extraction[Motor de extração probatória]
     extraction --> evidence[Mapa de pretensões, fatos e evidências]
     extraction --> monetary[Fatos monetários do processo]
+    evidence --> weights[Pesos por categoria de fato]
+    weight_config[Tabela versionada de pesos] --> weights
 
     inventory[Inventário de disponibilidade binária] --> risk
     history[(Histórico de 60 mil processos)] --> risk[Modelo de risco judicial]
@@ -39,7 +41,8 @@ flowchart LR
     policy[Custos, alçadas, margem e regras] --> finance
     finance --> decision[Política de decisão]
     decision --> action[Acordo ou defesa]
-    decision --> confidence[Confiança: alta, média ou baixa]
+    decision --> confidence[Confiança final: 0 a 100 por cento]
+    weights --> explanation
 ```
 
 ## 1. Motor de extração probatória
@@ -55,12 +58,13 @@ flowchart LR
 1. classifica a qualidade de cada página e decide se precisa de OCR;
 2. preserva documento, página e trecho de origem;
 3. identifica pretensões e alegações da parte autora;
-4. extrai fatos probatórios atômicos;
+4. extrai fatos probatórios atômicos e classifica cada fato em uma categoria;
 5. extrai fatos monetários;
 6. liga cada fato às alegações que ele sustenta ou refuta;
 7. deduplica fatos repetidos em documentos diferentes;
 8. registra divergências de conteúdo para leitura humana e inconsistências aritméticas;
-9. confere o formato dos dados extraídos e recalcula parcelas e somas, sem validar documentos ou alterar flags.
+9. confere o formato dos dados extraídos e recalcula parcelas e somas, sem validar documentos ou alterar flags;
+10. aplica deterministicamente o peso configurado para a categoria de cada fato, após a classificação e deduplicação.
 
 ### Ontologia probatória
 
@@ -82,18 +86,33 @@ As pretensões são separadas em:
 - danos morais;
 - pedidos processuais e acessórios.
 
-### Confianças separadas
+### Pesos por categoria de fato
 
-O sistema não produz um único “score de força”. Ele registra:
+A LLM extrai e classifica os fatos. Ela não atribui notas de confiança aos fatos ou às relações probatórias. O sistema aplica os pesos por consulta a uma tabela de configuração versionada, mantida pela equipe.
 
 | Campo | Significado |
 |---|---|
-| `extraction_confidence` | confiança de que o texto ou valor foi extraído corretamente |
+| `fact_type` | categoria do fato classificada pela LLM |
+| `weight` | importância relativa da categoria, obtida da configuração pelo sistema |
+| `weights_version` | versão da tabela usada para atribuir os pesos |
 | `relation` | se o fato sustenta, refuta ou é neutro em relação à alegação |
-| `relation_confidence` | confiança de que essa relação foi identificada corretamente |
-| `source_grade` | natureza da fonte: primária, secundária, declaratória ou ausente |
+| `source_grade` | natureza da fonte, sem representar confiança ou autenticidade |
 
-`relation_confidence` não representa probabilidade de vitória. Ela mede apenas a confiança na ligação semântica entre o fato e a alegação.
+Catálogo inicial de categorias para configuração dos pesos:
+
+| `fact_type` | Categoria | Peso |
+|---|---|---|
+| `contracting_statement` | Informação sobre a contratação | A definir pela equipe |
+| `credit_transfer` | Informação sobre liberação do crédito | A definir pela equipe |
+| `installment_payments` | Parcelas e descontos registrados | A definir pela equipe |
+| `debt_balance` | Saldo e evolução da dívida | A definir pela equipe |
+| `material_damage_claim` | Pedido de restituição ou dano material | A definir pela equipe |
+| `moral_damage_claim` | Pedido de dano moral | A definir pela equipe |
+| `contract_cancellation_claim` | Pedido de cancelamento contratual | A definir pela equipe |
+
+Os pesos expressam importância relativa dos fatos para a apresentação da análise; não são probabilidades de extração correta ou de vitória. A relação sustenta/refuta continua separada do peso. A LLM não escolhe nem altera o valor do peso. Categorias desconhecidas ficam sinalizadas como não mapeadas, sem peso inventado ou conversão silenciosa para zero.
+
+Fatos duplicados conservam suas fontes, mas não acumulam peso por repetição. Nesta alteração, os pesos não modificam as seis flags nem as probabilidades do modelo tabular. Uma regra que use pesos no cálculo financeiro ou na confiança final precisa ser definida explicitamente; não se presume essa conversão.
 
 ### Saída
 
@@ -111,7 +130,9 @@ O sistema não produz um único “score de força”. Ele registra:
     {
       "id": "FAT-031",
       "description": "Foram descontadas oito parcelas de R$ 180",
-      "extraction_confidence": 0.99,
+      "fact_type": "installment_payments",
+      "weight": 3,
+      "weights_version": "example-v1",
       "source": {
         "document": "demonstrativo_divida.pdf",
         "page": 1,
@@ -124,7 +145,6 @@ O sistema não produz um único “score de força”. Ele registra:
       "fact_id": "FAT-031",
       "claim_id": "MAT-001",
       "relation": "supports",
-      "relation_confidence": 0.97,
       "source_grade": "primary_internal"
     }
   ],
@@ -133,6 +153,8 @@ O sistema não produz um único “score de força”. Ele registra:
   "monetary_facts": {}
 }
 ```
+
+O peso `3` acima é apenas ilustrativo do contrato de saída, preenchido pelo sistema após a extração. Os valores operacionais da tabela ainda precisam ser definidos pela equipe. Não existem campos `extraction_confidence` ou `relation_confidence` no contrato vigente.
 
 ## 2. Disponibilidade binária dos subsídios
 
@@ -288,7 +310,7 @@ Os números acima ilustram o contrato de saída; não são estimativas dos casos
 - custo operacional da negociação;
 - efeitos do acordo sobre restituição, saldo e contrato;
 - margem de segurança e alçadas configuradas;
-- dados necessários ao cálculo e confiança de extração.
+- dados necessários ao cálculo e indicadores de falha de extração.
 
 ### Custo do acordo
 
@@ -320,7 +342,7 @@ A incerteza financeira deve refletir a estimação de custos e as premissas econ
 
 ### Regra de decisão
 
-A ação é sempre **ACORDO** ou **DEFESA**, acompanhada de um nível de confiança (alta, média ou baixa):
+A ação é sempre **ACORDO** ou **DEFESA**, acompanhada de uma confiança percentual (`confidence_percent`, de 0 a 100):
 
 ```text
 Se o acordo é economicamente preferível e respeita as alçadas:
@@ -330,14 +352,24 @@ Senão:
     DEFESA
 ```
 
-Incerteza do modelo, qualidade da extração e premissas econômicas são comunicadas no nível de confiança, com os motivos exibidos ao advogado. O critério exato de confiança ainda está em definição. A política usa um único vetor de disponibilidade; não testa concordância entre cenários probatórios.
+Incerteza do modelo, falhas observadas na extração e premissas econômicas são consideradas na confiança percentual, com os motivos exibidos ao advogado. A fórmula exata permanece em definição; esta especificação fixa a representação percentual e não inventa um cálculo. A política usa um único vetor de disponibilidade; não testa concordância entre cenários probatórios.
+
+### Confiança final em porcentagem
+
+- Campo de saída: `confidence_percent`, número finito entre `0` e `100` (inclusive).
+- Exibição: por exemplo, `75%`, sem substituir o número por alta/média/baixa.
+- Origem: cálculo do sistema com método identificado em `confidence_method_version`, nunca uma nota livre emitida pela LLM.
+- Não calcular por média dos pesos dos fatos nem usar automaticamente a maior probabilidade de desfecho: o modelo prevê resultados judiciais, enquanto a política recomenda uma ação econômica.
+- A interpretação estatística depende da definição e avaliação do método. Até lá, o número ilustrativo não representa uma probabilidade comprovada de acerto ou de vitória.
+- Se o cálculo não estiver disponível, usar `confidence_percent: null` e informar o motivo; não fabricar uma porcentagem nem usar zero para representar ausência.
 
 ### Saída para o advogado
 
 ```json
 {
   "action": "AGREEMENT",
-  "confidence": "low",
+  "confidence_percent": 75,
+  "confidence_method_version": "example-v1",
   "reason": "A comparação econômica depende de premissas de custo ainda não confirmadas",
   "defense_cost": {
     "central": 6100.0,
@@ -353,6 +385,8 @@ Incerteza do modelo, qualidade da extração e premissas econômicas são comuni
 }
 ```
 
+A confiança de `75%` é ilustrativa do formato, não um resultado calculado para o caso. O campo `confidence_method_version` deve identificar o método real quando implementado.
+
 ## 6. Papel da extração e das divergências de conteúdo
 
 A extração conserva fatos, alegações e fontes para o advogado consultar. Divergências textuais podem ser apresentadas como observações, sem declarar um documento válido, inválido ou inexistente. Elas não alteram os indicadores, não geram cenários probatórios e não recebem pesos de risco.
@@ -365,7 +399,8 @@ Cada recomendação deve persistir:
 
 - versão dos modelos e da política;
 - documentos e páginas utilizados;
-- fatos extraídos e respectivas confianças;
+- fatos extraídos, categorias, pesos aplicados e versão da tabela de pesos;
+- confiança final percentual, método de cálculo e motivos;
 - vetor de disponibilidade binária utilizado;
 - probabilidades de desfecho, custos e premissas;
 - ação recomendada e teto de acordo;
@@ -380,5 +415,5 @@ Esses registros permitem medir aderência e efetividade e alimentar o retreino p
 - Os 60 mil registros contêm disponibilidade binária, não qualidade documental. O modelo aprende associações com disponibilidade; não avalia validade da prova nem efeitos causais.
 - O valor histórico de condenação é agregado e pode não separar dano material, moral, honorários e outros componentes.
 - Custos de defesa, negociação, alçadas e curva de aceitação não foram fornecidos; são parâmetros explícitos da política.
-- Somente dois casos completos foram disponibilizados. Eles demonstram a extração e a decisão, mas não validam estatisticamente os scores semânticos.
-- Scores da LLM não são probabilidades judiciais e não devem ser apresentados como tais.
+- Somente dois casos completos foram disponibilizados. Eles demonstram a extração e a decisão, mas não validam estatisticamente os pesos por categoria nem a confiança final.
+- A LLM não atribui scores de confiança por fato. Pesos são parâmetros da equipe; confiança final é uma saída percentual cujo método de cálculo ainda precisa ser definido.
