@@ -93,7 +93,7 @@ function WorkspaceView({
   const { case: c, recommendation: rec } = data;
 
   return (
-    <div className="ws-shell">
+    <div className={`ws-shell${chatOpen ? ' ws-shell--split' : ''}`}>
     <main className={`ws${chatOpen ? ' ws--split' : ''}`}>
       {isSample && (
         <div className="sample-banner" role="note">
