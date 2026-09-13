@@ -10,11 +10,11 @@ recomendação com motivo registrado.
 
 ## Acessos rápidos
 
-> Substitua os três links abaixo antes da entrega final.
+> Substitua o link dos slides abaixo antes da entrega final.
 
-- [Assistir à demonstração no YouTube](https://www.youtube.com/watch?v=SUBSTITUIR)
+- [Assistir à demonstração no YouTube](https://youtu.be/1ZYb-6MXH5U)
 - [Abrir os slides da apresentação](https://SUBSTITUIR-PELO-LINK-DOS-SLIDES)
-- [Acessar a aplicação publicada](https://SUBSTITUIR-PELO-LINK-DO-DEPLOY)
+- [Acessar a aplicação publicada](https://enter-claudios.vercel.app)
 
 Para executar o projeto localmente, consulte o [guia de setup](SETUP.md).
 
