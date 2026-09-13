@@ -1,5 +1,6 @@
 import { toDisplayStatus, type DisplayStatus } from '../../lib/status';
 import type { CaseStatus, RecommendationSummary } from '../../types/case';
+import type { HistoricalMacroResult, HistoricalOutcome } from '../../types/history';
 import { ACTION_LABEL, STATUS_LABEL } from '../../types/labels';
 import styles from './Badges.module.css';
 
@@ -13,6 +14,14 @@ const STATUS_TONE: Record<DisplayStatus, Tone> = {
   ENCERRADO: 'muted',
 };
 
+const OUTCOME_LABEL: Record<HistoricalOutcome, string> = {
+  IMPROCEDENCIA: 'Improcedência',
+  EXTINCAO: 'Extinção',
+  PARCIAL: 'Parcial',
+  PROCEDENCIA: 'Procedência',
+  ACORDO: 'Acordo',
+};
+
 export function StatusBadge({ status }: { status: CaseStatus }) {
   const display = toDisplayStatus(status);
   return (
@@ -23,7 +32,11 @@ export function StatusBadge({ status }: { status: CaseStatus }) {
   );
 }
 
-export function RecommendationTag({ recommendation }: { recommendation: RecommendationSummary | null }) {
+export function RecommendationTag({
+  recommendation,
+}: {
+  recommendation: Pick<RecommendationSummary, 'action' | 'confidence_percent'> | null;
+}) {
   if (!recommendation) return <span className={styles.empty}>—</span>;
   const { action, confidence_percent } = recommendation;
   return (
@@ -34,4 +47,16 @@ export function RecommendationTag({ recommendation }: { recommendation: Recommen
       </span>
     </span>
   );
+}
+
+export function MacroResultBadge({ result }: { result: HistoricalMacroResult }) {
+  return (
+    <span className={`${styles.badge} ${result === 'EXITO' ? styles.positive : styles.negative}`}>
+      {result === 'EXITO' ? 'Êxito' : 'Não êxito'}
+    </span>
+  );
+}
+
+export function OutcomeBadge({ outcome }: { outcome: HistoricalOutcome }) {
+  return <span className={`${styles.badge} ${styles.muted}`}>{OUTCOME_LABEL[outcome]}</span>;
 }

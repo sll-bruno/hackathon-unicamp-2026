@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { USE_MOCKS } from '../../api/client';
+import { HISTORICAL_CASES_ARE_SIMULATED } from '../../api/history';
 import { EnterLogo } from '../EnterLogo';
 import styles from './AppLayout.module.css';
 
@@ -10,6 +11,9 @@ const NAV = [
 ];
 
 export function AppLayout() {
+  const location = useLocation();
+  const usesSimulatedData = USE_MOCKS || (HISTORICAL_CASES_ARE_SIMULATED && location.pathname.startsWith('/historico'));
+
   return (
     <div className={styles.shell}>
       <header className={styles.topbar}>
@@ -30,7 +34,7 @@ export function AppLayout() {
           ))}
         </nav>
         <div className={styles.right}>
-          {USE_MOCKS && (
+          {usesSimulatedData && (
             <span className={styles.mockBadge} title="Front usando dados de exemplo; não são resultados reais">
               Dados simulados
             </span>
