@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import type { CaseDocument, Contradiction, Fact, FactRelation, Gap, Source } from '../types/workspace';
 import { documentTypeLabel, factTypeLabel, relationLabel } from '../pages/Workspace/format';
 
@@ -44,7 +43,6 @@ export function EvidenceCard({ evidence, documents, activeCitation, onSelectCita
       </div>
 
       <CitationChips
-        kind={kind}
         citations={groupSources(item.sources)}
         documents={documents}
         activeCitation={activeCitation}
@@ -95,13 +93,11 @@ function WeightBadge({ weight, version }: { weight: number | null; version: stri
 }
 
 function CitationChips({
-  kind,
   citations,
   documents,
   activeCitation,
   onSelect,
 }: {
-  kind: EvidenceKind;
   citations: Citation[];
   documents: Map<string, CaseDocument>;
   activeCitation: Citation | null;
@@ -113,27 +109,21 @@ function CitationChips({
 
   return (
     <div className="sources">
-      {citations.map((c, i) => {
+      {citations.map((c) => {
         const doc = documents.get(c.document_id);
         const isActive = activeCitation?.document_id === c.document_id && activeCitation.page === c.page;
         return (
-          <Fragment key={`${c.document_id}-${c.page}`}>
-            {kind === 'contradicao' && i > 0 && (
-              <span className="sources__versus" aria-hidden="true">
-                ⇄
-              </span>
-            )}
-            <button
-              type="button"
-              className="source-chip"
-              aria-pressed={isActive}
-              title={c.excerpts.join('\n')}
-              onClick={() => onSelect(c)}
-            >
-              <DocIcon />
-              {doc ? documentTypeLabel[doc.type] : c.document_id} · p. {c.page}
-            </button>
-          </Fragment>
+          <button
+            key={`${c.document_id}-${c.page}`}
+            type="button"
+            className="source-chip"
+            aria-pressed={isActive}
+            title={c.excerpts.join('\n')}
+            onClick={() => onSelect(c)}
+          >
+            <DocIcon />
+            {doc ? documentTypeLabel[doc.type] : c.document_id} · p. {c.page}
+          </button>
         );
       })}
     </div>
