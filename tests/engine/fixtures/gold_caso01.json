@@ -1,0 +1,194 @@
+{
+  "caso": "caso01",
+  "pasta": "Caso_01_0801234-56-2024-8-10-0001",
+  "cnj": "0801234-56.2024.8.10.0001",
+  "observacao": "Anotação manual de referência. Trechos conferidos literalmente nas páginas indicadas. O seed atual do backend usa valor da causa 10.000; a petição informa 20.000.",
+  "documentos": [
+    {"arquivo": "01_Autos_Processo_0801234-56-2024-8-10-0001.pdf", "tipo": "AUTOS", "paginas": 8},
+    {"arquivo": "02_Contrato_502348719.pdf", "tipo": "CONTRATO", "paginas": 2},
+    {"arquivo": "03_Extrato_Bancario.pdf", "tipo": "EXTRATO", "paginas": 1},
+    {"arquivo": "04_Comprovante_de_Credito_BACEN.pdf", "tipo": "COMPROVANTE_CREDITO", "paginas": 2},
+    {"arquivo": "05_Dossie_Veritas.pdf", "tipo": "DOSSIE", "paginas": 2},
+    {"arquivo": "06_Demonstrativo_Evolucao_Divida.pdf", "tipo": "DEMONSTRATIVO_DIVIDA", "paginas": 3},
+    {"arquivo": "07_Laudo_Referenciado.pdf", "tipo": "LAUDO_REFERENCIADO", "paginas": 2}
+  ],
+  "segmentacao_autos": {
+    "peticao_inicial": [1, 2, 3, 4, 5],
+    "procuracao": [6],
+    "documento_pessoal": [7],
+    "comprovante_residencia": [8]
+  },
+  "features_esperadas": {
+    "uf": "MA",
+    "valor_causa": 20000.0,
+    "sub_assunto": "GENERICO",
+    "sub_assunto_pode_ser_ambiguo": true,
+    "no_escopo": true,
+    "flags": {
+      "contrato": true,
+      "extrato": true,
+      "comprovante_credito": true,
+      "dossie": true,
+      "demonstrativo_divida": true,
+      "laudo_referenciado": true
+    },
+    "referencia_valor_causa": {"arquivo": "01_Autos_Processo_0801234-56-2024-8-10-0001.pdf", "pagina": 4, "trecho": "Dá-se à causa o valor de R$ 20.000,00"}
+  },
+  "valores_esperados": {
+    "parcelas_pagas": 21,
+    "parcelas_totais": 72,
+    "valor_parcela": 120.0,
+    "saldo_apos_ultima_paga": 4326.0,
+    "saldo_informado_no_resumo": 1037.66,
+    "parcela_price_recalculada": 126.94,
+    "restituicao_simples": 2520.0,
+    "restituicao_dobro": 5040.0,
+    "referencia_resumo": {"arquivo": "06_Demonstrativo_Evolucao_Divida.pdf", "pagina": 3, "trecho": "21 de 72 parcelas liquidadas"}
+  },
+  "acusacoes_esperadas": [
+    {
+      "tipo": "inexistencia_contratacao",
+      "forma_pedido": "sem_valor_monetario",
+      "valor": null,
+      "referencia": {"arquivo": "01_Autos_Processo_0801234-56-2024-8-10-0001.pdf", "pagina": 4, "trecho": "declarar a inexistência do débito relativo ao contrato nº 502348719"}
+    },
+    {
+      "tipo": "dano_material",
+      "forma_pedido": "dobro_dos_descontos",
+      "valor": null,
+      "referencia": {"arquivo": "01_Autos_Processo_0801234-56-2024-8-10-0001.pdf", "pagina": 4, "trecho": "condenar o Banco Réu à restituição em dobro dos valores indevidamente descontados"}
+    },
+    {
+      "tipo": "dano_moral",
+      "forma_pedido": "valor_explicito",
+      "valor": 15000.0,
+      "referencia": {"arquivo": "01_Autos_Processo_0801234-56-2024-8-10-0001.pdf", "pagina": 4, "trecho": "danos morais no valor de R$ 15.000,00"}
+    }
+  ],
+  "pedidos_processuais_esperados": ["gratuidade", "inversao_onus", "tutela_urgencia", "citacao", "custas_honorarios", "producao_provas"],
+  "embasamentos_obrigatorios": [
+    {
+      "id": "G01-01",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["provas_contratacao"],
+      "descricao": "Cédula assinada manualmente pela autora em 10/05/2022",
+      "referencias": [{"arquivo": "02_Contrato_502348719.pdf", "pagina": 2, "trecho": "o TOMADOR firma a presente Cédula de forma manual, em 10/05/2022"}]
+    },
+    {
+      "id": "G01-02",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["provas_contratacao"],
+      "descricao": "Gravação de voz do atendimento telefônico com 7m42s",
+      "referencias": [{"arquivo": "07_Laudo_Referenciado.pdf", "pagina": 1, "trecho": "Gravação de voz do atendimento telefônico: arquivo MP3 armazenado em cofre digital (duração 07m42s)"}]
+    },
+    {
+      "id": "G01-03",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["provas_contratacao"],
+      "descricao": "Autorização de consignação com retorno do INSS em 11/05/2022",
+      "referencias": [{"arquivo": "07_Laudo_Referenciado.pdf", "pagina": 2, "trecho": "Autorização de consignação enviada ao INSS com ACK de retorno em 11/05/2022"}]
+    },
+    {
+      "id": "G01-04",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["autenticacao_forte"],
+      "descricao": "Perícia grafotécnica com compatibilidade de 91%",
+      "referencias": [{"arquivo": "05_Dossie_Veritas.pdf", "pagina": 1, "trecho": "A análise grafotécnica apontou compatibilidade elevada (91%)"}]
+    },
+    {
+      "id": "G01-05",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["autenticacao_forte"],
+      "descricao": "Liveness com match facial de 97,3%",
+      "referencias": [{"arquivo": "05_Dossie_Veritas.pdf", "pagina": 1, "trecho": "match facial de 97,3%"}]
+    },
+    {
+      "id": "G01-06",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["credito_em_conta_do_autor"],
+      "descricao": "R$ 5.000 creditados na conta da autora no Banco UFMG",
+      "referencias": [
+        {"arquivo": "03_Extrato_Bancario.pdf", "pagina": 1, "trecho": "CRÉDITO - EMPRÉSTIMO CONSIGNADO"},
+        {"arquivo": "04_Comprovante_de_Credito_BACEN.pdf", "pagina": 1, "trecho": "Banco UFMG S.A. - Ag. 0001 - CC 20.348.719-5"}
+      ]
+    },
+    {
+      "id": "G01-07",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["uso_do_credito_pelo_autor"],
+      "descricao": "TED para conta de mesma titularidade após o crédito",
+      "referencias": [{"arquivo": "03_Extrato_Bancario.pdf", "pagina": 1, "trecho": "TED ENVIADA - CTA TITULARIDADE"}]
+    },
+    {
+      "id": "G01-08",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["uso_do_credito_pelo_autor"],
+      "descricao": "PIX enviado para familiar após o crédito",
+      "pode_mesclar_com": ["G01-07", "G01-09"],
+      "referencias": [{"arquivo": "03_Extrato_Bancario.pdf", "pagina": 1, "trecho": "TRANSFERÊNCIA PIX - ENVIADA"}]
+    },
+    {
+      "id": "G01-09",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["uso_do_credito_pelo_autor"],
+      "descricao": "Saque em caixa eletrônico em São Luís após o crédito",
+      "pode_mesclar_com": ["G01-07", "G01-08"],
+      "referencias": [{"arquivo": "03_Extrato_Bancario.pdf", "pagina": 1, "trecho": "SAQUE ATM REDE 24H - SÃO LUÍS"}]
+    },
+    {
+      "id": "G01-10",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["contradicoes_do_autor"],
+      "descricao": "Autora diz não haver movimentação do crédito; o extrato mostra TED, PIX e saque",
+      "referencias": [
+        {"arquivo": "01_Autos_Processo_0801234-56-2024-8-10-0001.pdf", "pagina": 2, "trecho": "inexistindo nos extratos de sua conta corrente qualquer movimentação compatível com depósito ou saque"},
+        {"arquivo": "03_Extrato_Bancario.pdf", "pagina": 1, "trecho": "TED ENVIADA - CTA TITULARIDADE"}
+      ]
+    },
+    {
+      "id": "G01-11",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["inconsistencias_documentos_banco"],
+      "descricao": "Dossiê cita selfie de liveness numa contratação feita por telemarketing",
+      "referencias": [
+        {"arquivo": "05_Dossie_Veritas.pdf", "pagina": 1, "trecho": "Captura fotográfica do tomador no momento da contratação (selfie liveness)"},
+        {"arquivo": "02_Contrato_502348719.pdf", "pagina": 2, "trecho": "Correspondente bancário - Canal Telefônico (Telemarketing)"}
+      ]
+    },
+    {
+      "id": "G01-12",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["inconsistencias_documentos_banco"],
+      "descricao": "Resumo do demonstrativo informa como saldo o resíduo após a parcela 72, divergente da tabela",
+      "referencias": [{"arquivo": "06_Demonstrativo_Evolucao_Divida.pdf", "pagina": 3, "trecho": "Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66"}]
+    },
+    {
+      "id": "G01-13",
+      "acusacoes_aceitas": ["dano_moral"],
+      "categorias_aceitas": ["vulnerabilidade_autor"],
+      "descricao": "Autora é pessoa idosa e aposentada",
+      "referencias": [{"arquivo": "01_Autos_Processo_0801234-56-2024-8-10-0001.pdf", "pagina": 1, "trecho": "A Autora é pessoa idosa"}]
+    },
+    {
+      "id": "G01-14",
+      "acusacoes_aceitas": ["inexistencia_contratacao", "dano_moral"],
+      "categorias_aceitas": ["comportamento_do_autor", "atenuantes_dano_moral"],
+      "descricao": "Descontos desde junho de 2022 só questionados em janeiro de 2024",
+      "referencias": [{"arquivo": "01_Autos_Processo_0801234-56-2024-8-10-0001.pdf", "pagina": 1, "trecho": "efetuados desde Junho/2022"}]
+    },
+    {
+      "id": "G01-15",
+      "acusacoes_aceitas": ["dano_material"],
+      "categorias_aceitas": ["fatos_comprovados_autor"],
+      "descricao": "21 parcelas de R$ 120 foram descontadas",
+      "referencias": [{"arquivo": "06_Demonstrativo_Evolucao_Divida.pdf", "pagina": 3, "trecho": "21 de 72 parcelas liquidadas"}]
+    },
+    {
+      "id": "G01-16",
+      "acusacoes_aceitas": ["dano_material"],
+      "categorias_aceitas": ["compensacao_valor_creditado"],
+      "descricao": "A autora recebeu e usou o crédito de R$ 5.000, passível de compensação",
+      "referencias": [{"arquivo": "03_Extrato_Bancario.pdf", "pagina": 1, "trecho": "+5.000,00"}]
+    }
+  ]
+}

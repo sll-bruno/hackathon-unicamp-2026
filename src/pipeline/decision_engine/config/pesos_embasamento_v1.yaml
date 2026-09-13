@@ -1,0 +1,99 @@
+# Pesos por categoria de embasamento — versão pesos_embasamento_v1.
+# peso > 0 favorece o banco; peso < 0 favorece a parte autora.
+# A LLM classifica itens nas categorias; os pesos são aplicados pelo sistema e
+# nunca aparecem nos prompts de extração. Valores iniciais a calibrar.
+version: pesos_embasamento_v1
+
+tipos_acusacao:
+  inexistencia_contratacao:
+    principal: true
+    categorias:
+      provas_contratacao:
+        peso: 3
+        definicao: "Instrumento contratual assinado, gravação de atendimento com aceite, autorização de consignação com retorno do INSS."
+      autenticacao_forte:
+        peso: 3
+        definicao: "Perícia grafotécnica compatível, biometria ou liveness confirmada, documentos pessoais validados em bases oficiais."
+      registros_digitais:
+        peso: 1
+        definicao: "Aceite eletrônico, senha, IP, device fingerprint ou geolocalização, sem biometria confirmada."
+      credito_em_conta_do_autor:
+        peso: 2
+        definicao: "Crédito liberado em conta de titularidade comprovada da parte autora."
+      uso_do_credito_pelo_autor:
+        peso: 2
+        definicao: "Saques, transferências para conta de mesma titularidade ou familiares, pagamentos feitos com o crédito."
+      contradicoes_do_autor:
+        peso: 2
+        definicao: "Alegação da parte autora desmentida por documento do processo."
+      lacunas_argumentativas_autor:
+        peso: 1
+        definicao: "Alegação relevante da parte autora sem prova: documento citado e não juntado, negativa sem extrato próprio, perfil alegado sem prova, cronologia incoerente."
+      comportamento_do_autor:
+        peso: 1
+        definicao: "Inércia longa diante dos descontos ou parcelas pagas sem contestação."
+      questoes_processuais:
+        peso: 2
+        definicao: "Prescrição, inépcia, ilegitimidade ou falta de documento indispensável."
+      fatos_comprovados_autor:
+        peso: -2
+        definicao: "Fato favorável à parte autora comprovado por documento: boletim de ocorrência juntado, reclamação comprovada, prova de conta em outro banco."
+      lacunas_probatorias_banco:
+        peso: -3
+        definicao: "Prova que o banco deveria ter e não tem: contrato ausente, assinatura sem perícia, liveness ausente ou não localizado, gravação ausente."
+      indicios_de_fraude:
+        peso: -3
+        definicao: "Crédito em conta não reconhecida, dados cadastrais divergentes, canal incompatível com o perfil, geolocalização distante."
+      inconsistencias_documentos_banco:
+        peso: -2
+        definicao: "Divergência entre subsídios do banco, documento interno que cita prova não disponibilizada, forma de assinatura incompatível com o canal."
+
+  dano_material:
+    principal: false
+    categorias:
+      fatos_comprovados_autor:
+        peso: -2
+        definicao: "Descontos comprovados por documento (demonstrativo, extrato do benefício)."
+      lacunas_argumentativas_autor:
+        peso: 1
+        definicao: "Período ou valor dos descontos sem prova; pedido em dobro sem fundamento fático."
+      compensacao_valor_creditado:
+        peso: 2
+        definicao: "Crédito recebido e usado pela parte autora, passível de compensação."
+      questoes_processuais:
+        peso: 2
+        definicao: "Prescrição de parte das parcelas."
+
+  dano_moral:
+    principal: false
+    categorias:
+      agravantes_dano_moral:
+        peso: -2
+        definicao: "Negativação, renda comprometida, descontos mantidos após reclamação, longa duração."
+      vulnerabilidade_autor:
+        peso: -1
+        definicao: "Pessoa idosa, analfabeta ou com renda exclusiva do benefício."
+      atenuantes_dano_moral:
+        peso: 2
+        definicao: "Desconto de baixo valor relativo, ausência de negativação, crédito usado pela parte autora, cessação rápida dos descontos."
+      lacunas_argumentativas_autor:
+        peso: 1
+        definicao: "Abalo moral descrito de forma genérica, sem fato concreto."
+
+  outro_pedido_monetario:
+    principal: false
+    categorias:
+      fatos_comprovados_autor:
+        peso: -2
+        definicao: "Cobrança ou desconto do item pedido comprovado por documento."
+      lacunas_probatorias_banco:
+        peso: -3
+        definicao: "Ausência de prova da contratação ou autorização do item cobrado."
+      lacunas_argumentativas_autor:
+        peso: 1
+        definicao: "Pedido sem demonstração do valor ou da cobrança."
+
+# Projeção das categorias nos blocos da Tela 3 (src/web/src/types/workspace.ts).
+projecao_workspace:
+  contradictions: [contradicoes_do_autor, inconsistencias_documentos_banco]
+  gaps: [lacunas_argumentativas_autor, lacunas_probatorias_banco]

@@ -14,6 +14,17 @@ dependencies = [
     "python-multipart>=0.0.20,<1",
     "sqlmodel>=0.0.24,<1",
     "uvicorn>=0.34,<1",
+    # engine de decisão
+    "joblib>=1.4,<2",
+    "numpy>=2.0,<3",
+    "pdfplumber>=0.11.10,<1",
+    "pypdfium2>=5.9,<6",
+    "pytesseract>=0.3.13,<1",  # requer o binário do Tesseract (Apache-2.0) com o idioma "por"
+    "pyyaml>=6.0,<7",
+    "rapidfuzz>=3.10,<4",
+    "scikit-learn>=1.5,<2",
+    "tiktoken>=0.8,<1",
+    "xgboost>=2.1,<4",
 ]
 
 [project.optional-dependencies]
@@ -22,10 +33,17 @@ dev = [
     "pytest>=8.3,<10",
     "ruff>=0.9,<1",
 ]
+training = [
+    "openpyxl>=3.1,<4",
+    "pandas>=2.2,<4",
+]
 
 [tool.setuptools.packages.find]
 where = ["src/api", "src/pipeline", "src/contracts"]
 include = ["app*", "decision_engine*", "contracts*"]
+
+[tool.setuptools.package-data]
+decision_engine = ["config/*.yaml", "config/prompts/*.md", "artifacts/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

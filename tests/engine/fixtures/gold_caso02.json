@@ -1,0 +1,177 @@
+{
+  "caso": "caso02",
+  "pasta": "Caso_02_0654321-09-2024-8-04-0001",
+  "cnj": "0654321-09.2024.8.04.0001",
+  "observacao": "Anotação manual de referência. Trechos conferidos literalmente nas páginas indicadas. O seed atual do backend usa valor da causa 8.000; a petição informa 25.000.",
+  "documentos": [
+    {"arquivo": "01_Autos_Processo_0654321-09-2024-8-04-0001.pdf", "tipo": "AUTOS", "paginas": 8},
+    {"arquivo": "02_Comprovante_de_Credito_BACEN.pdf", "tipo": "COMPROVANTE_CREDITO", "paginas": 2},
+    {"arquivo": "03_Demonstrativo_Evolucao_Divida.pdf", "tipo": "DEMONSTRATIVO_DIVIDA", "paginas": 3},
+    {"arquivo": "04_Laudo_Referenciado.pdf", "tipo": "LAUDO_REFERENCIADO", "paginas": 2}
+  ],
+  "segmentacao_autos": {
+    "peticao_inicial": [1, 2, 3, 4, 5],
+    "procuracao": [6],
+    "documento_pessoal": [7],
+    "comprovante_residencia": [8]
+  },
+  "features_esperadas": {
+    "uf": "AM",
+    "valor_causa": 25000.0,
+    "sub_assunto": "GOLPE",
+    "sub_assunto_pode_ser_ambiguo": false,
+    "no_escopo": true,
+    "flags": {
+      "contrato": false,
+      "extrato": false,
+      "comprovante_credito": true,
+      "dossie": false,
+      "demonstrativo_divida": true,
+      "laudo_referenciado": true
+    },
+    "referencia_sub_assunto": {"arquivo": "01_Autos_Processo_0654321-09-2024-8-04-0001.pdf", "pagina": 1, "trecho": "configurando evidente caso de contratação fraudulenta em seu nome"},
+    "referencia_valor_causa": {"arquivo": "01_Autos_Processo_0654321-09-2024-8-04-0001.pdf", "pagina": 4, "trecho": "Dá-se à causa o valor de R$ 25.000,00"}
+  },
+  "valores_esperados": {
+    "parcelas_pagas": 8,
+    "parcelas_totais": 84,
+    "valor_parcela": 180.0,
+    "saldo_apos_ultima_paga": 8241.28,
+    "saldo_informado_no_resumo": 2748.38,
+    "parcela_price_recalculada": 194.53,
+    "restituicao_simples": 1440.0,
+    "restituicao_dobro": 2880.0,
+    "referencia_resumo": {"arquivo": "03_Demonstrativo_Evolucao_Divida.pdf", "pagina": 3, "trecho": "8 de 84 parcelas liquidadas"}
+  },
+  "acusacoes_esperadas": [
+    {
+      "tipo": "inexistencia_contratacao",
+      "forma_pedido": "sem_valor_monetario",
+      "valor": null,
+      "referencia": {"arquivo": "01_Autos_Processo_0654321-09-2024-8-04-0001.pdf", "pagina": 4, "trecho": "declarar a inexistência do débito e do próprio contrato nº 603827451"}
+    },
+    {
+      "tipo": "dano_material",
+      "forma_pedido": "dobro_dos_descontos",
+      "valor": null,
+      "referencia": {"arquivo": "01_Autos_Processo_0654321-09-2024-8-04-0001.pdf", "pagina": 4, "trecho": "condenar o Banco Réu à restituição em dobro dos valores indevidamente descontados"}
+    },
+    {
+      "tipo": "dano_moral",
+      "forma_pedido": "valor_explicito",
+      "valor": 18000.0,
+      "referencia": {"arquivo": "01_Autos_Processo_0654321-09-2024-8-04-0001.pdf", "pagina": 4, "trecho": "danos morais no valor de R$ 18.000,00"}
+    }
+  ],
+  "pedidos_processuais_esperados": ["gratuidade", "inversao_onus", "tutela_urgencia", "citacao", "custas_honorarios", "producao_provas"],
+  "embasamentos_obrigatorios": [
+    {
+      "id": "G02-01",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["registros_digitais"],
+      "descricao": "Contratação pelo aplicativo mobile (self-service)",
+      "referencias": [{"arquivo": "04_Laudo_Referenciado.pdf", "pagina": 1, "trecho": "Canal: Digital - Aplicativo Mobile (self-service)"}]
+    },
+    {
+      "id": "G02-02",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["registros_digitais"],
+      "descricao": "Dispositivo identificado por device fingerprint",
+      "referencias": [{"arquivo": "04_Laudo_Referenciado.pdf", "pagina": 1, "trecho": "Dispositivo: identificado por device fingerprint (hash DFP-9A43E1B7)"}]
+    },
+    {
+      "id": "G02-03",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["registros_digitais"],
+      "descricao": "Aceite eletrônico das condições via Termo de Ciência",
+      "referencias": [{"arquivo": "04_Laudo_Referenciado.pdf", "pagina": 2, "trecho": "Aceite eletrônico das condições contratuais via Termo de Ciência"}]
+    },
+    {
+      "id": "G02-04",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["lacunas_probatorias_banco", "inconsistencias_documentos_banco"],
+      "descricao": "Laudo declara autenticação por liveness, mas o vídeo não foi localizado",
+      "referencias": [
+        {"arquivo": "04_Laudo_Referenciado.pdf", "pagina": 2, "trecho": "não foi localizado nos arquivos digitais o vídeo de liveness"},
+        {"arquivo": "04_Laudo_Referenciado.pdf", "pagina": 1, "trecho": "Autenticação: biometria facial (liveness) + senha eletrônica 6 dígitos"}
+      ]
+    },
+    {
+      "id": "G02-05",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["lacunas_probatorias_banco"],
+      "descricao": "Nenhuma perícia grafotécnica complementar foi feita",
+      "referencias": [{"arquivo": "04_Laudo_Referenciado.pdf", "pagina": 2, "trecho": "Não foi providenciada, até o momento, verificação grafotécnica complementar por empresa terceira."}]
+    },
+    {
+      "id": "G02-06",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["lacunas_probatorias_banco"],
+      "descricao": "Contrato ausente do pacote de subsídios",
+      "referencias": [{"tipo": "ausencia_documental", "documentos_esperados": ["contrato"]}]
+    },
+    {
+      "id": "G02-07",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["indicios_de_fraude"],
+      "descricao": "Crédito liberado em conta da Caixa Econômica Federal que o autor diz não possuir",
+      "referencias": [
+        {"arquivo": "02_Comprovante_de_Credito_BACEN.pdf", "pagina": 1, "trecho": "Caixa Econômica Federal - Ag. 3245 - CC 00012345-6"},
+        {"arquivo": "01_Autos_Processo_0654321-09-2024-8-04-0001.pdf", "pagina": 2, "trecho": "o Autor não possui conta corrente na referida instituição"}
+      ]
+    },
+    {
+      "id": "G02-08",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["lacunas_argumentativas_autor"],
+      "descricao": "Boletim de ocorrência citado como anexo e não juntado",
+      "referencias": [
+        {"arquivo": "01_Autos_Processo_0654321-09-2024-8-04-0001.pdf", "pagina": 2, "trecho": "Boletim de Ocorrência nº 2024.005432 - cópia em anexo"},
+        {"tipo": "ausencia_documental", "documentos_esperados": ["boletim_ocorrencia"]}
+      ]
+    },
+    {
+      "id": "G02-09",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["lacunas_argumentativas_autor"],
+      "descricao": "Reclamação no Banco Central citada sem comprovante juntado",
+      "pode_mesclar_com": ["G02-08"],
+      "referencias": [{"arquivo": "01_Autos_Processo_0654321-09-2024-8-04-0001.pdf", "pagina": 2, "trecho": "(RDR nº 12345678-9)"}]
+    },
+    {
+      "id": "G02-10",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["inconsistencias_documentos_banco"],
+      "descricao": "Laudo cita TED identificada em extrato que não foi disponibilizado",
+      "referencias": [{"arquivo": "04_Laudo_Referenciado.pdf", "pagina": 2, "trecho": "identificada na fatura/extrato do período"}]
+    },
+    {
+      "id": "G02-11",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["inconsistencias_documentos_banco"],
+      "descricao": "Resumo do demonstrativo informa como saldo o resíduo após a parcela 84, divergente da tabela",
+      "referencias": [{"arquivo": "03_Demonstrativo_Evolucao_Divida.pdf", "pagina": 3, "trecho": "Saldo devedor em aberto na data de referência: aproximadamente R$ 2.748,38"}]
+    },
+    {
+      "id": "G02-12",
+      "acusacoes_aceitas": ["inexistencia_contratacao"],
+      "categorias_aceitas": ["lacunas_argumentativas_autor", "contradicoes_do_autor"],
+      "descricao": "Autor alega não ter smartphone compatível, sem prova",
+      "referencias": [{"arquivo": "01_Autos_Processo_0654321-09-2024-8-04-0001.pdf", "pagina": 1, "trecho": "não possuindo sequer smartphone compatível"}]
+    },
+    {
+      "id": "G02-13",
+      "acusacoes_aceitas": ["dano_moral"],
+      "categorias_aceitas": ["vulnerabilidade_autor"],
+      "descricao": "Autor é pessoa idosa e aposentado",
+      "referencias": [{"arquivo": "01_Autos_Processo_0654321-09-2024-8-04-0001.pdf", "pagina": 1, "trecho": "O Autor é pessoa idosa"}]
+    },
+    {
+      "id": "G02-14",
+      "acusacoes_aceitas": ["dano_material"],
+      "categorias_aceitas": ["fatos_comprovados_autor"],
+      "descricao": "8 parcelas de R$ 180 foram descontadas",
+      "referencias": [{"arquivo": "03_Demonstrativo_Evolucao_Divida.pdf", "pagina": 3, "trecho": "8 de 84 parcelas liquidadas"}]
+    }
+  ]
+}

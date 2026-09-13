@@ -1,0 +1,98 @@
+# Parâmetros da engine — versão engine_v1.
+# Valores iniciais a calibrar. Origem de cada número em docs/PLANO_ENGINE_IA_V2.md
+# e docs/PLANO_IMPLEMENTACAO_ENGINE.md. A decisão final é da LLM decisora (P7);
+# nenhum parâmetro abaixo é gatilho de ACORDO/DEFESA.
+version: engine_v1
+
+combinacao:
+  alfa: 0.6                     # peso do subfluxo histórico; beta = 1 - alfa
+  alfa_min: 0.4
+  alfa_max: 1.0
+  ajustes:
+    subfluxo_conteudo_indisponivel: {alfa: 1.0}
+    validador_reprovacao_alta: {limiar: 0.30, delta_alfa: 0.2}
+    ocr_baixa_qualidade: {delta_alfa: 0.2}
+    coorte_pequena_ou_fora_distribuicao: {delta_alfa: -0.1}
+  divergencia:
+    p_derrota: 0.30
+    perda_se_condenado_sobre_valor_causa: 0.25
+
+severidade:                     # média condenação / valor da causa na base histórica
+  parcial: 0.62
+  procedencia: 0.90
+  procedencia_p90: 0.98         # pior caso da defesa
+  escala_valor_pedido_llm: 0.90 # deixa cond_llm na mesma escala de cond_xgb e de k
+
+custos:
+  custo_defesa_percentual: 0.05
+  custo_defesa_minimo: 0.0
+  custo_negociacao: 500.0       # premissa ilustrativa
+  alcada_sobre_valor_causa: 0.6 # limite da faixa de acordo, não gatilho
+
+acordo_k:                       # k = valor do acordo / perda se condenado (280 acordos)
+  p10: 0.30
+  p25: 0.35                     # abertura
+  p50: 0.41                     # alvo
+  p75: 0.49
+  p90: 0.54                     # máximo (limitado pela alçada)
+
+scoring:
+  temperatura_T: 5.0
+  p0_principal: 0.70
+  q_condicional:                # P(banco vence a dependente | principal perdida)
+    dano_material: 0.10
+    dano_moral: 0.40
+    outro_pedido_monetario: 0.30
+  max_itens_por_categoria: 3
+  clip: [0.02, 0.98]
+
+simulacao:
+  n: 1000
+  seed: 42
+  alfa: [0.4, 0.8]
+  fator_pesos: [0.7, 1.3]
+  temperatura_T: [4.0, 6.0]
+  dirichlet_concentracao_max: 500
+  dirichlet_concentracao_extra: 10
+
+confianca:
+  metodo: mc-economic-agreement-v1
+  tetos:
+    FORA_DA_DISTRIBUICAO: 60
+    COORTE_PEQUENA: 70
+    DIVERGENCIA_SUBFLUXOS: 70
+    VALIDADOR_REPROVACAO_ALTA: 60
+    VALOR_PEDIDO_ESTIMADO: 70
+
+alertas:
+  coorte_minima: 30
+  reconciliacao_pedidos_valor_causa: 0.25
+  similaridade_referencia_min: 90
+  valor_causa_treino: [1000.0, 30979.20]
+
+chunking:
+  tokens_alvo: 1000
+  tokens_max: 1500
+  overlap_max_tokens: 150
+  limite_contexto_integral_tokens: 40000
+  lote_map_tokens: 10000
+
+ocr:                            # Tesseract via pytesseract, só nas páginas detectadas
+  motor: tesseract
+  idioma: por
+  dpi: 300                      # renderização da página com pypdfium2
+  min_caracteres_uteis: 50      # abaixo disso a página é tratada como sem texto
+  max_area_imagem: 0.80
+  min_confianca_media: 60       # confiança média das palavras (0–100); abaixo gera alerta de qualidade
+
+llm:
+  temperatura: 0
+  tentativas_decisora: 2
+  max_caracteres_trecho: 300
+
+premissas:
+  - "O aceite do acordo no valor alvo é assumido; não há histórico de recusas."
+  - "k foi calibrado em 280 acordos históricos, assumindo que a coluna de valor nas linhas de Acordo é o valor pago."
+  - "O custo de negociação de R$ 500 é uma premissa ilustrativa."
+  - "Honorários e custas não entram na perda estimada, porque a base histórica não os separa."
+  - "A base histórica é sintética: UF com amostra uniforme e processos de 2025."
