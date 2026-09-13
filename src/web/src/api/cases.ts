@@ -20,6 +20,7 @@ const draftToCaseListItem = (d: DraftRecord): CaseListItem => ({
   recommendation: null,
   followed_recommendation: null,
   outcome: null,
+  final_value: null,
   alert: null,
 });
 

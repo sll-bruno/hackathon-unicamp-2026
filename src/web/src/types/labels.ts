@@ -1,4 +1,4 @@
-import type { CaseStatus, RecommendedAction, Thesis } from './case';
+import type { CaseOutcome, CaseStatus, RecommendedAction, Thesis } from './case';
 import type { DocumentType, SubsidyType } from './workspace';
 
 export const STATUS_LABEL: Record<CaseStatus, string> = {
@@ -20,6 +20,12 @@ export const THESIS_LABEL: Record<Thesis, string> = {
 export const ACTION_LABEL: Record<RecommendedAction, string> = {
   ACORDO: 'Acordo',
   DEFESA: 'Defesa',
+};
+
+export const OUTCOME_LABEL: Record<CaseOutcome, string> = {
+  FAVORAVEL: 'Êxito',
+  PARCIAL: 'Parcial',
+  DESFAVORAVEL: 'Não êxito',
 };
 
 export const SUBSIDY_LABEL: Record<SubsidyType, string> = {
