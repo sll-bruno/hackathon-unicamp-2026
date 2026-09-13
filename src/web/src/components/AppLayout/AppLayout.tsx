@@ -17,6 +17,7 @@ const NAV = [
 export function AppLayout() {
   const location = useLocation();
   const [demoReady, setDemoReady] = useState(USE_MOCKS);
+  const [resettingDemo, setResettingDemo] = useState(false);
 
   useEffect(() => {
     if (USE_MOCKS) return;
@@ -34,6 +35,18 @@ export function AppLayout() {
     USE_MOCKS ||
     (HISTORICAL_CASES_ARE_SIMULATED && location.pathname.startsWith('/historico')) ||
     (DASHBOARD_DATA_ARE_SIMULATED && location.pathname.startsWith('/dashboard'));
+
+  const restartDemo = async () => {
+    if (!window.confirm('Reiniciar o Caso 2 e apagar a análise atual da demo?')) return;
+    setResettingDemo(true);
+    try {
+      await resetDemoCaseTwo();
+      window.location.assign('/processos');
+    } catch {
+      window.alert('Não foi possível reiniciar a demo. Tente novamente.');
+      setResettingDemo(false);
+    }
+  };
 
   return (
     <div className={styles.shell}>
@@ -55,6 +68,16 @@ export function AppLayout() {
           ))}
         </nav>
         <div className={styles.right}>
+          {!USE_MOCKS && (
+            <button
+              type="button"
+              className={styles.demoReset}
+              disabled={resettingDemo}
+              onClick={() => void restartDemo()}
+            >
+              {resettingDemo ? 'Reiniciando…' : 'Reiniciar demo'}
+            </button>
+          )}
           {usesSimulatedData && (
             <span className={styles.mockBadge} title="Front usando dados de exemplo; não são resultados reais">
               Dados simulados
