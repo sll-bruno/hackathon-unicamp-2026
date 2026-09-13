@@ -39,7 +39,7 @@ export function useWorkspace(caseId: string): WorkspaceState {
       .catch(async (err: unknown) => {
         if (controller.signal.aborted) return;
         const loadSample = samples[caseId];
-        if (import.meta.env.DEV && loadSample) {
+        if (loadSample) {
           setState({ status: 'ready', data: await loadSample(), isSample: true });
           return;
         }
