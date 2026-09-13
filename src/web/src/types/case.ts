@@ -1,7 +1,6 @@
 // Estados do processo (docs/ARCHITECTURE.md §4).
 export type CaseStatus =
   | 'RASCUNHO'
-  | 'DOCUMENTOS_ENVIADOS'
   | 'EM_ANALISE'
   | 'AGUARDANDO_DECISAO'
   | 'PROPOSTA_ACEITA'
@@ -55,6 +54,18 @@ export interface CaseListItem {
   // casos uma vez que o caso chega em AGUARDANDO_ENCERRAMENTO/ENCERRADO).
   followed_recommendation: boolean | null;
   outcome: CaseOutcome | null; // só preenchido quando status === 'ENCERRADO'
+}
+
+// Dados básicos do processo extraídos por OCR a partir do auto (docs/architecture_engine.md).
+// O advogado revisa/corrige antes de salvar — nunca são gravados sem confirmação.
+export interface ExtractedCaseData {
+  cnj: string;
+  uf: string;
+  thesis: Thesis;
+  claim_value: number;
+  plaintiff_name: string;
+  court: string;
+  contract_number: string;
 }
 
 export interface CasesSummary {

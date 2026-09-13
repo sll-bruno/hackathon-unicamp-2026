@@ -7,7 +7,7 @@ import type { CaseAlert, CaseListItem, CaseOutcome, CaseStatus, RecommendationSu
 const DAY_MS = 86_400_000;
 const daysAgo = (d: number) => new Date(Date.now() - d * DAY_MS).toISOString();
 
-const MY_OFFICE = 'Silva & Associados';
+export const MY_OFFICE = 'Silva & Associados';
 
 const acordo = (confidence: number | null, range: [number, number], ceiling: number, defense: number): RecommendationSummary => ({
   action: 'ACORDO',
@@ -56,7 +56,7 @@ const rows: Row[] = [
     'RJ',
     'GOLPE',
     9500,
-    'DOCUMENTOS_ENVIADOS',
+    'RASCUNHO',
     9,
     0.3,
     null,
