@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import {
   createChatMessage,
   getChatMessages,
+  type ChatRuntime,
 } from '../api/chat';
 import { documentTypeLabel } from '../pages/Workspace/format';
 import type { CaseDocument, Source, Workspace } from '../types/workspace';
@@ -15,6 +16,13 @@ interface Props {
   onSelectCitation: (citation: Citation) => void;
   onClose: () => void;
 }
+
+const SUGGESTED_QUESTIONS = [
+  'Quais são os 3 fatos que mais favorecem o banco?',
+  'Quais pontos favorecem a parte autora?',
+  'Por que essa recomendação foi escolhida?',
+  'Quais lacunas podem mudar a decisão?',
+];
 
 /**
  * Painel do chatbot de explicações, aberto ao lado da área de trabalho (não é
@@ -59,6 +67,7 @@ export function ChatPanel({ data, isSample, onSelectCitation, onClose }: Props) 
   const [loadingHistory, setLoadingHistory] = useState(!isSample);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [runtime, setRuntime] = useState<ChatRuntime | null>(null);
   const threadEndRef = useRef<HTMLDivElement>(null);
 
   const documents = useMemo(() => new Map(data.documents.map((d) => [d.document_id, d])), [data.documents]);
@@ -82,9 +91,10 @@ export function ChatPanel({ data, isSample, onSelectCitation, onClose }: Props) 
     setLoadingHistory(true);
     setError(null);
     getChatMessages(data.case.case_id, controller.signal)
-      .then(({ items }) => {
+      .then(({ items, runtime: apiRuntime }) => {
         if (!controller.signal.aborted) {
           setMessages(items.map((message) => fromApiMessage(message, evidenceSources)));
+          setRuntime(apiRuntime);
         }
       })
       .catch((reason: unknown) => {
@@ -103,9 +113,8 @@ export function ChatPanel({ data, isSample, onSelectCitation, onClose }: Props) 
     threadEndRef.current?.scrollIntoView({ block: 'end' });
   }, [messages]);
 
-  const send = async (e: FormEvent) => {
-    e.preventDefault();
-    const text = draft.trim();
+  const sendText = async (rawText: string) => {
+    const text = rawText.trim();
     if (!text || sending || loadingHistory) return;
 
     if (isSample) {
@@ -130,6 +139,7 @@ export function ChatPanel({ data, isSample, onSelectCitation, onClose }: Props) 
 
     try {
       const response = await createChatMessage(data.case.case_id, text);
+      setRuntime(response.runtime);
       setMessages((current) => [
         ...current.filter((message) => message.id !== pendingId),
         fromApiMessage(response.user_message, evidenceSources),
@@ -142,11 +152,23 @@ export function ChatPanel({ data, isSample, onSelectCitation, onClose }: Props) 
     }
   };
 
+  const send = (e: FormEvent) => {
+    e.preventDefault();
+    void sendText(draft);
+  };
+
   return (
     <aside className="chat-panel side-panel" aria-label="Chatbot da análise">
       <header className="chat-panel__header">
         <div>
-          <span className="eyebrow">Chatbot da análise</span>
+          <div className="chat-panel__meta">
+            <span className="eyebrow">Chatbot da análise</span>
+            {!isSample && runtime && (
+              <span className="chat-panel__model" title={`${runtime.provider} · ${runtime.model}`}>
+                {formatRuntime(runtime)}
+              </span>
+            )}
+          </div>
           <h2 className="chat-panel__title">{data.case.plaintiff ?? data.case.cnj}</h2>
         </div>
         <button type="button" className="chat-panel__close" onClick={onClose} aria-label="Fechar chatbot">
@@ -187,6 +209,21 @@ export function ChatPanel({ data, isSample, onSelectCitation, onClose }: Props) 
 
       <form className="chat-panel__composer" onSubmit={send}>
         {error && <p className="chat-panel__error" role="alert">{error}</p>}
+        {!loadingHistory && (
+          <div className="chat-panel__suggestions" aria-label="Perguntas sugeridas">
+            {SUGGESTED_QUESTIONS.map((question) => (
+              <button
+                key={question}
+                type="button"
+                className="chat-panel__suggestion"
+                disabled={sending}
+                onClick={() => void sendText(question)}
+              >
+                {question}
+              </button>
+            ))}
+          </div>
+        )}
         <input
           type="text"
           value={draft}
@@ -203,6 +240,18 @@ export function ChatPanel({ data, isSample, onSelectCitation, onClose }: Props) 
   );
 }
 
+function formatRuntime(runtime: ChatRuntime): string {
+  const model = runtime.model
+    .replace(/^gpt-/i, 'GPT-')
+    .replace(/-luna$/i, ' Luna')
+    .replace(/-terra$/i, ' Terra')
+    .replace(/-sol$/i, ' Sol');
+  const effort = runtime.reasoning_effort.toLowerCase() === 'medium'
+    ? 'Medium'
+    : runtime.reasoning_effort;
+  return `${model} · ${effort}`;
+}
+
 function ChatBubble({
   message,
   documents,
@@ -212,29 +261,79 @@ function ChatBubble({
   documents: Map<string, CaseDocument>;
   onSelectCitation: (citation: Citation) => void;
 }) {
+  if (message.structured) {
+    return (
+      <div className="chat-bubble chat-bubble--assistant chat-bubble--structured">
+        <p className="chat-answer__summary">{message.structured.summary}</p>
+        <div className="chat-answer__points">
+          {message.structured.points.map((point, index) => (
+            <section className="chat-answer__point" key={`${message.id}-${index}`}>
+              <strong>{point.title}</strong>
+              <p>{point.text}</p>
+              <CitationButtons
+                messageId={`${message.id}-${index}`}
+                sources={point.sources}
+                documents={documents}
+                onSelectCitation={onSelectCitation}
+              />
+            </section>
+          ))}
+        </div>
+        {message.structured.caveat && (
+          <p className="chat-answer__caveat">
+            <strong>Atenção:</strong> {message.structured.caveat}
+          </p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={`chat-bubble chat-bubble--${message.role}${message.failed ? ' chat-bubble--failed' : ''}`}>
       <p className="chat-bubble__text">{message.text}</p>
-      {message.sources && message.sources.length > 0 && (
-        <div className="chat-citations">
-          {message.sources.map((s, i) => {
-            const key = `${message.id}-${i}`;
-            const doc = documents.get(s.document_id);
-            return (
-              <div key={key} className="chat-citation-wrap">
-                <button
-                  type="button"
-                  className="chat-citation"
-                  title="Abrir a fonte no visualizador"
-                  onClick={() => onSelectCitation({ document_id: s.document_id, page: s.page, excerpts: [s.excerpt] })}
-                >
-                  {doc ? documentTypeLabel[doc.type] : s.document_id} · p. {s.page}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <CitationButtons
+        messageId={message.id}
+        sources={message.sources ?? []}
+        documents={documents}
+        onSelectCitation={onSelectCitation}
+      />
+    </div>
+  );
+}
+
+function CitationButtons({
+  messageId,
+  sources,
+  documents,
+  onSelectCitation,
+}: {
+  messageId: string;
+  sources: Source[];
+  documents: Map<string, CaseDocument>;
+  onSelectCitation: (citation: Citation) => void;
+}) {
+  if (sources.length === 0) return null;
+  return (
+    <div className="chat-citations">
+      {sources.map((source, index) => {
+        const doc = documents.get(source.document_id);
+        return (
+          <div key={`${messageId}-${index}`} className="chat-citation-wrap">
+            <button
+              type="button"
+              className="chat-citation"
+              title="Abrir a fonte no visualizador"
+              onClick={() => onSelectCitation({
+                document_id: source.document_id,
+                page: source.page,
+                excerpts: [source.excerpt],
+              })}
+            >
+              {doc ? documentTypeLabel[doc.type] : source.document_id} · p. {source.page}
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 }

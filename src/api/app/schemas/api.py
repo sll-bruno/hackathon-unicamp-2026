@@ -144,9 +144,16 @@ class ChatCreate(APIModel):
         return value
 
 
+class ChatAnswerPoint(APIModel):
+    title: str = Field(max_length=80)
+    text: str = Field(max_length=320)
+    evidence_ids: list[str] = Field(default_factory=list, max_length=3)
+
+
 class ChatAnswer(APIModel):
-    answer: str
-    evidence_ids: list[str] = Field(default_factory=list)
+    summary: str = Field(max_length=280)
+    points: list[ChatAnswerPoint] = Field(min_length=1, max_length=4)
+    caveat: str | None = Field(default=None, max_length=280)
 
 
 class HealthResponse(APIModel):

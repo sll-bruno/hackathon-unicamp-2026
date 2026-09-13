@@ -1,11 +1,24 @@
 import type { Source } from '../types/workspace';
 import { apiFetch, apiGet } from './client';
 
+export interface ChatStructuredPoint {
+  title: string;
+  text: string;
+  evidence_ids: string[];
+}
+
+export interface ChatStructuredAnswer {
+  summary: string;
+  points: ChatStructuredPoint[];
+  caveat: string | null;
+}
+
 export interface ChatApiMessage {
   id: string;
   role: 'USER' | 'ASSISTANT';
   content: string;
   evidence_ids: string[];
+  structured_answer?: ChatStructuredAnswer | null;
   status: 'COMPLETED' | 'FAILED';
   created_at: string;
 }
@@ -18,15 +31,23 @@ export interface ChatEvidence {
   sources: Source[];
 }
 
+export interface ChatRuntime {
+  provider: string;
+  model: string;
+  reasoning_effort: string;
+}
+
 export interface ChatMessagesResponse {
   items: ChatApiMessage[];
   total: number;
+  runtime: ChatRuntime;
 }
 
 export interface ChatCreateResponse {
   user_message: ChatApiMessage;
   assistant_message: ChatApiMessage;
   sources: ChatEvidence[];
+  runtime: ChatRuntime;
 }
 
 interface ApiErrorPayload {

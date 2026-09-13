@@ -6,6 +6,11 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   text: string;
   sources?: Source[];
+  structured?: {
+    summary: string;
+    points: Array<{ title: string; text: string; sources: Source[] }>;
+    caveat: string | null;
+  };
   failed?: boolean;
 }
 
@@ -25,6 +30,21 @@ export function fromApiMessage(
     role: message.role.toLowerCase() as ChatMessage['role'],
     text: message.content,
     sources,
+    structured: message.structured_answer
+      ? {
+          summary: message.structured_answer.summary,
+          points: message.structured_answer.points.map((point) => ({
+            title: point.title,
+            text: point.text,
+            sources: uniqueSources(
+              point.evidence_ids.flatMap(
+                (evidenceId) => responseSources.get(evidenceId) ?? workspaceSources.get(evidenceId) ?? [],
+              ),
+            ),
+          })),
+          caveat: message.structured_answer.caveat,
+        }
+      : undefined,
     failed: message.status === 'FAILED',
   };
 }

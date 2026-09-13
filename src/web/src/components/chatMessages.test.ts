@@ -22,4 +22,35 @@ describe('chat message citations', () => {
 
     expect(fromApiMessage(message, workspaceSources).sources).toEqual([source]);
   });
+
+  it('maps citations into each structured answer point', () => {
+    const source: Source = {
+      document_id: 'contract-document',
+      page: 2,
+      excerpt: 'Contrato assinado pela autora.',
+    };
+    const message: ChatApiMessage = {
+      id: 'structured-assistant',
+      role: 'ASSISTANT',
+      content: 'A contratação está documentada.',
+      evidence_ids: ['evidence-1'],
+      structured_answer: {
+        summary: 'A contratação está documentada.',
+        points: [
+          {
+            title: 'Assinatura',
+            text: 'O contrato possui assinatura manual.',
+            evidence_ids: ['evidence-1'],
+          },
+        ],
+        caveat: 'A autenticidade ainda pode ser questionada.',
+      },
+      status: 'COMPLETED',
+      created_at: '2026-09-13T05:52:14Z',
+    };
+
+    const converted = fromApiMessage(message, new Map([['evidence-1', [source]]]));
+    expect(converted.structured?.points[0].sources).toEqual([source]);
+    expect(converted.structured?.caveat).toBe('A autenticidade ainda pode ser questionada.');
+  });
 });

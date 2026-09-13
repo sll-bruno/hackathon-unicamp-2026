@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     demo_replay_seconds: float = 35.0
     openai_api_key: str = ""
     openai_model: str = "gpt-5"
+    openai_chat_model: str = "gpt-5.6-luna"
+    openai_chat_reasoning_effort: str = "medium"
     cors_origins: str = "http://localhost:5173"
     max_upload_bytes: int = 20 * 1024 * 1024
 
