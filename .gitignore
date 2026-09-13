@@ -48,3 +48,12 @@ Thumbs.db
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Brainstorming visual companion
+.superpowers/
+
+# Superpowers planning docs (local process artifacts, not project deliverables)
+docs/superpowers/
+
+# Config local do Claude Code 
+.claude/
