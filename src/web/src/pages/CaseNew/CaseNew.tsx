@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { analyzeCase, classifyDocument, extractFromAuto, saveCaseDraft } from '../../api/caseNew';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { analyzeCase, classifyDocument, extractFromAuto, resolveDraftFormData, saveCaseDraft } from '../../api/caseNew';
 import { Button } from '../../components/Button/Button';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import type { ExtractedCaseData, Thesis } from '../../types/case';
@@ -30,11 +30,24 @@ interface UploadedDoc {
 
 export default function CaseNew() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const draftId = searchParams.get('id');
 
   const [documents, setDocuments] = useState<UploadedDoc[]>([]);
+  // Documentos de um rascunho retomado — só temos o nome (não o File original), então
+  // aparecem no checklist como já enviados, sem poder ser reabertos/reprocessados.
+  const [resumedFilenames, setResumedFilenames] = useState<Partial<Record<DocumentType, string>>>({});
   const [extracting, setExtracting] = useState(false);
   const [form, setForm] = useState<ExtractedCaseData>(EMPTY_FORM);
   const [saving, setSaving] = useState<Saving>('idle');
+
+  useEffect(() => {
+    if (!draftId) return;
+    const resolved = resolveDraftFormData(draftId);
+    if (!resolved) return;
+    setForm(resolved.data);
+    setResumedFilenames(Object.fromEntries(resolved.documents.map((d) => [d.type, d.filename])));
+  }, [draftId]);
 
   const set = <K extends keyof ExtractedCaseData>(key: K, value: ExtractedCaseData[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -86,7 +99,13 @@ export default function CaseNew() {
   const submit = async (mode: Saving) => {
     setSaving(mode);
     try {
-      const { id } = await saveCaseDraft(form);
+      const docList = ALL_TYPES.flatMap((type) => {
+        const uploaded = docByType(type);
+        if (uploaded) return [{ type, filename: uploaded.file.name }];
+        const resumed = resumedFilenames[type];
+        return resumed ? [{ type, filename: resumed }] : [];
+      });
+      const { id } = await saveCaseDraft(draftId, form, docList);
       if (mode === 'analyze') await analyzeCase(id);
       navigate(`/processos/${id}`);
     } finally {
@@ -111,11 +130,12 @@ export default function CaseNew() {
         <ul className={styles.checklist}>
           {ALL_TYPES.map((type) => {
             const doc = docByType(type);
+            const filename = doc?.file.name ?? resumedFilenames[type];
             return (
               <li key={type} className={styles.checklistItem}>
-                <span className={doc ? styles.checkOk : styles.checkPending}>{doc ? '✓' : '–'}</span>
+                <span className={filename ? styles.checkOk : styles.checkPending}>{filename ? '✓' : '–'}</span>
                 <span className={styles.checklistLabel}>{DOCUMENT_LABEL[type]}</span>
-                {doc && <span className={styles.filename}>{doc.file.name}</span>}
+                {filename && <span className={styles.filename}>{filename}</span>}
               </li>
             );
           })}

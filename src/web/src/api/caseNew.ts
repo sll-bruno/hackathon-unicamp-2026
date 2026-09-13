@@ -1,6 +1,8 @@
 import type { ExtractedCaseData } from '../types/case';
 import type { DocumentType } from '../types/workspace';
 import { simulateLatency } from './client';
+import { type DraftDocument, getDraft, saveDraft } from './mocks/draftStore';
+import { mockCases } from './mocks/cases';
 
 const normalize = (s: string) =>
   s
@@ -79,9 +81,39 @@ export async function extractFromAuto(file: File): Promise<ExtractedCaseData> {
   return simulateLatency(match ? match.data : FALLBACK_DATA, 1000);
 }
 
-// POST /api/cases — cria o rascunho e devolve o id gerado.
-export async function saveCaseDraft(_data: ExtractedCaseData): Promise<{ id: string }> {
-  return simulateLatency({ id: crypto.randomUUID() }, 400);
+// POST /api/cases — cria ou atualiza o rascunho (persistido em localStorage, ver
+// api/mocks/draftStore.ts) e devolve o id.
+export async function saveCaseDraft(
+  id: string | null,
+  data: ExtractedCaseData,
+  documents: DraftDocument[],
+): Promise<{ id: string }> {
+  const draftId = id ?? crypto.randomUUID();
+  saveDraft(draftId, data, documents);
+  return simulateLatency({ id: draftId }, 400);
+}
+
+// Recupera os dados de um rascunho pra retomar o cadastro em CaseNew: primeiro tenta um
+// DraftRecord persistido; senão cai pros dados básicos do CaseListItem (ex. o rascunho de
+// exemplo que nunca passou pelo formulário), preenchendo o resto vazio.
+export function resolveDraftFormData(id: string): { data: ExtractedCaseData; documents: DraftDocument[] } | null {
+  const draft = getDraft(id);
+  if (draft) return { data: draft.data, documents: draft.documents };
+
+  const item = mockCases.find((c) => c.id === id);
+  if (!item) return null;
+  return {
+    data: {
+      cnj: item.cnj,
+      uf: item.uf,
+      thesis: item.thesis,
+      claim_value: item.claim_value,
+      plaintiff_name: item.plaintiff_name,
+      court: '',
+      contract_number: '',
+    },
+    documents: [],
+  };
 }
 
 // POST /api/cases/{id}/analyze — dispara a análise (assíncrona no contrato real; aqui
