@@ -4,8 +4,8 @@
 }
 
 .filters {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(18rem, 1fr) auto 14rem 10rem;
   align-items: center;
   gap: var(--space-3);
 }
@@ -28,7 +28,8 @@
 }
 
 .search {
-  flex: 1 1 21rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .search::placeholder {
@@ -36,6 +37,8 @@
 }
 
 .select {
+  width: 100%;
+  min-width: 0;
   cursor: pointer;
 }
 
@@ -80,25 +83,79 @@
 
 .table {
   width: 100%;
-  min-width: 94rem;
+  table-layout: fixed;
   border-collapse: collapse;
-  font-size: var(--text-14);
+  font-size: var(--text-12);
+}
+
+.table th:nth-child(1),
+.table td:nth-child(1) {
+  width: 17%;
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 4%;
+}
+
+.table th:nth-child(3),
+.table td:nth-child(3) {
+  width: 10%;
+}
+
+.table th:nth-child(4),
+.table td:nth-child(4) {
+  width: 9%;
+}
+
+.table th:nth-child(5),
+.table td:nth-child(5) {
+  width: 10%;
+}
+
+.table th:nth-child(6),
+.table td:nth-child(6) {
+  width: 9%;
+}
+
+.table th:nth-child(7),
+.table td:nth-child(7) {
+  width: 11%;
+}
+
+.table th:nth-child(8),
+.table td:nth-child(8) {
+  width: 13%;
+}
+
+.table th:nth-child(9),
+.table td:nth-child(9) {
+  width: 10%;
+}
+
+.table th:nth-child(10),
+.table td:nth-child(10) {
+  width: 7%;
 }
 
 .table th {
-  padding: var(--space-4) var(--space-5);
+  padding: var(--space-3) var(--space-2);
   border-bottom: 1px solid var(--stroke-secondary);
   color: var(--text-muted);
-  font-size: var(--text-12);
+  font-size: 0.625rem;
   font-weight: var(--weight-regular);
   letter-spacing: var(--ls-label);
   text-align: left;
   text-transform: uppercase;
-  white-space: nowrap;
+  line-height: 1.25;
+}
+
+.table th.num {
+  white-space: normal;
 }
 
 .table td {
-  padding: var(--space-4) var(--space-5);
+  padding: var(--space-3) var(--space-2);
   border-bottom: 1px solid var(--stroke-secondary);
   vertical-align: middle;
 }
@@ -116,7 +173,7 @@
 }
 
 .processCell {
-  min-width: 15rem;
+  min-width: 0;
 }
 
 .processLink {
@@ -135,8 +192,8 @@
 .plaintiff {
   display: block;
   color: var(--text-primary);
-  font-size: var(--text-16);
-  white-space: nowrap;
+  font-size: var(--text-14);
+  line-height: 1.25;
 }
 
 .cnj {
@@ -233,6 +290,11 @@
 }
 
 @media (max-width: 720px) {
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
   .search,
   .select,
   .segmented {
