@@ -2,7 +2,7 @@ from pathlib import Path
 
 from app.core.config import get_settings
 from app.core.database import _ensure_case_metadata_columns, get_engine, reset_database_state
-from app.models import AppMetadata, Case, Document, LawyerDecision
+from app.models import AppMetadata, Case, CaseOutcome, Document, OutcomeType
 from app.services.seeds import seed_demo_data
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, inspect, text
@@ -15,7 +15,7 @@ def test_seed_is_idempotent_and_files_are_downloadable(client: TestClient) -> No
     assert first.json()["total"] == 2
     demo = next(item for item in first.json()["items"] if item["is_demo"])
     live = next(item for item in first.json()["items"] if not item["is_demo"])
-    assert demo["status"] == "AGUARDANDO_DECISAO"
+    assert demo["status"] == "AGUARDANDO_ENCERRAMENTO"
     assert demo["recommendation"]["source_kind"] == "ENGINE_PRECOMPUTED"
     assert demo["recommendation"]["action"] == "DEFESA"
     assert demo["valor_causa"] == 20_000
@@ -28,13 +28,14 @@ def test_seed_is_idempotent_and_files_are_downloadable(client: TestClient) -> No
         assert len(session.exec(select(Document)).all()) == 11
         marker = session.get(AppMetadata, "demo_baseline_version")
         assert marker is not None
-        assert marker.value == "real-engine-v1"
+        assert marker.value == "real-engine-v2"
 
     workspace = client.get(f"/api/cases/{demo['id']}/workspace").json()
     assert len(workspace["facts"]) == 17
     assert len(workspace["contradictions"]) == 3
     assert len(workspace["gaps"]) == 7
-    assert workspace["decision"] is None
+    assert workspace["decision"]["action"] == "DEFESA"
+    assert workspace["decision"]["adhered"] is True
     assert workspace["negotiation"] is None
     assert workspace["outcome"] is None
     download = client.get(workspace["documents"][0]["file_url"])
@@ -45,22 +46,50 @@ def test_seed_is_idempotent_and_files_are_downloadable(client: TestClient) -> No
 
 def test_seed_does_not_reset_live_demo_actions_after_baseline(client: TestClient) -> None:
     case = next(item for item in client.get("/api/cases").json()["items"] if item["is_demo"])
-    decision = client.post(
-        f"/api/cases/{case['id']}/decision",
-        json={"action": "DEFESA"},
+    closure = client.post(
+        f"/api/cases/{case['id']}/closure",
+        json={"outcome": "IMPROCEDENCIA", "defense_cost": 900, "legal_costs": 100},
     )
-    assert decision.status_code == 201
+    assert closure.status_code == 201
 
     with Session(get_engine()) as session:
         seed_demo_data(session, get_settings())
         persisted = session.exec(
-            select(LawyerDecision).where(LawyerDecision.case_id == case["id"])
+            select(CaseOutcome).where(CaseOutcome.case_id == case["id"])
         ).first()
         persisted_case = session.get(Case, case["id"])
 
     assert persisted is not None
+    assert persisted.outcome == OutcomeType.IMPROCEDENCIA
     assert persisted_case is not None
-    assert persisted_case.status == "AGUARDANDO_ENCERRAMENTO"
+    assert persisted_case.status == "ENCERRADO"
+
+
+def test_seed_removes_exact_legacy_demo_duplicate(client: TestClient) -> None:
+    duplicate = client.post(
+        "/api/cases",
+        json={
+            "cnj": "0654321-09.2026.8.04.0002",
+            "uf": "AM",
+            "assunto": "Mock antigo",
+            "valor_causa": 25_000,
+            "plaintiff_name": "José Raimundo Oliveira Costa",
+        },
+    )
+    assert duplicate.status_code == 201
+
+    with Session(get_engine()) as session:
+        seed_demo_data(session, get_settings())
+        assert session.exec(
+            select(Case).where(Case.cnj == "0654321-09.2026.8.04.0002")
+        ).first() is None
+
+    page = client.get("/api/cases").json()
+    assert page["total"] == 2
+    assert {item["cnj"] for item in page["items"]} == {
+        "0801234-56.2024.8.10.0001",
+        "0654321-09.2024.8.04.0001",
+    }
 
 
 def test_demo_seed_can_be_disabled(tmp_path: Path, monkeypatch) -> None:

@@ -1,7 +1,9 @@
+import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { USE_MOCKS } from '../../api/client';
 import { DASHBOARD_DATA_ARE_SIMULATED } from '../../api/dashboard';
 import { HISTORICAL_CASES_ARE_SIMULATED } from '../../api/history';
+import { resetDemoCaseTwo } from '../../api/workspace';
 import { EnterLogo } from '../EnterLogo';
 import styles from './AppLayout.module.css';
 
@@ -14,6 +16,20 @@ const NAV = [
 
 export function AppLayout() {
   const location = useLocation();
+  const [demoReady, setDemoReady] = useState(USE_MOCKS);
+
+  useEffect(() => {
+    if (USE_MOCKS) return;
+    let active = true;
+    resetDemoCaseTwo()
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) setDemoReady(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
   const usesSimulatedData =
     USE_MOCKS ||
     (HISTORICAL_CASES_ARE_SIMULATED && location.pathname.startsWith('/historico')) ||
@@ -47,7 +63,7 @@ export function AppLayout() {
         </div>
       </header>
       <main className={styles.content}>
-        <Outlet />
+        {demoReady ? <Outlet /> : null}
       </main>
     </div>
   );

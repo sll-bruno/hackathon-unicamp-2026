@@ -47,6 +47,7 @@ def build_dashboard(session: Session) -> dict[str, Any]:
     agreement_negotiations = [result for result in negotiations]
     accepted = sum(result.accepted for result in agreement_negotiations)
     adhered = sum(decision.adhered for decision in decisions)
+    decision_by_case = {decision.case_id: decision for decision in decisions}
 
     recommendation_by_case = {
         recommendation.case_id: recommendation for recommendation in recommendations
@@ -57,6 +58,8 @@ def build_dashboard(session: Session) -> dict[str, Any]:
     series: dict[str, dict[str, float | int]] = defaultdict(
         lambda: {"closed_cases": 0, "observed_disbursement": 0.0}
     )
+    effectiveness_eligible = 0
+    effectiveness_successful = 0
     for outcome in outcomes:
         observed = _observed_cost(outcome)
         observed_disbursement += observed
@@ -64,6 +67,11 @@ def build_dashboard(session: Session) -> dict[str, Any]:
         series[day]["closed_cases"] += 1
         series[day]["observed_disbursement"] += observed
         recommendation = recommendation_by_case.get(outcome.case_id)
+        decision = decision_by_case.get(outcome.case_id)
+        if decision is not None and decision.adhered:
+            effectiveness_eligible += 1
+            if outcome.outcome in {OutcomeType.IMPROCEDENCIA, OutcomeType.EXTINCAO}:
+                effectiveness_successful += 1
         if recommendation is None:
             continue
         if outcome.outcome == OutcomeType.ACORDO:
@@ -88,6 +96,11 @@ def build_dashboard(session: Session) -> dict[str, Any]:
             "divergence_reasons": {
                 reason.value: divergence_counts[reason.value] for reason in DivergenceReason
             },
+        },
+        "effectiveness": {
+            "eligible": effectiveness_eligible,
+            "successful": effectiveness_successful,
+            "rate": _ratio(effectiveness_successful, effectiveness_eligible),
         },
         "agreements": {
             "negotiations": len(agreement_negotiations),

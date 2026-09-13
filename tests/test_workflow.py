@@ -260,8 +260,10 @@ def test_divergence_negotiation_and_dashboard_are_distinct_events(
 
     dashboard = client.get("/api/dashboard").json()
     assert dashboard["generated_from_persisted_events"] is True
-    assert dashboard["adherence"]["decisions"] == 1
-    assert dashboard["adherence"]["adhered"] == 0
+    assert dashboard["adherence"]["decisions"] == 2
+    assert dashboard["adherence"]["adhered"] == 1
+    assert dashboard["adherence"]["rate"] == 0.5
+    assert dashboard["effectiveness"] == {"eligible": 0, "successful": 0, "rate": None}
     assert dashboard["agreements"]["negotiations"] == 1
     assert dashboard["agreements"]["accepted"] == 1
     assert dashboard["economics"]["observed_disbursement"] == 2800.0
@@ -269,6 +271,56 @@ def test_divergence_negotiation_and_dashboard_are_distinct_events(
     history = client.get("/api/history", params={"case_id": case["id"]}).json()["items"]
     event_types = {event["type"] for event in history}
     assert {"LAWYER_DECISION", "NEGOTIATION_RESULT", "CASE_OUTCOME"} <= event_types
+
+
+def test_case_one_baseline_adherence_and_effectiveness_after_outcome(
+    client: TestClient,
+) -> None:
+    case = next(item for item in client.get("/api/cases").json()["items"] if item["is_demo"])
+    baseline = client.get("/api/dashboard").json()
+    assert baseline["adherence"] == {
+        "decisions": 1,
+        "adhered": 1,
+        "rate": 1.0,
+        "divergence_reasons": {
+            "FATO_NOVO": 0,
+            "ERRO_EXTRACAO": 0,
+            "VALOR_IRREAL": 0,
+            "REGRA_CLIENTE": 0,
+            "OUTRO": 0,
+        },
+    }
+    assert baseline["effectiveness"] == {"eligible": 0, "successful": 0, "rate": None}
+
+    closure = client.post(
+        f"/api/cases/{case['id']}/closure",
+        json={"outcome": "IMPROCEDENCIA", "defense_cost": 900, "legal_costs": 100},
+    )
+    assert closure.status_code == 201
+    dashboard = client.get("/api/dashboard").json()
+    assert dashboard["effectiveness"] == {"eligible": 1, "successful": 1, "rate": 1.0}
+
+
+def test_demo_reset_returns_case_two_to_initial_state(
+    client: TestClient, monkeypatch
+) -> None:
+    case = live_case(client)
+    monkeypatch.setattr(
+        "app.services.analysis.decision_engine.run_pipeline",
+        lambda case_input, **_kwargs: pipeline_result(document_id=case_input.documents[0].id),
+    )
+    assert client.post(f"/api/cases/{case['id']}/analyze").status_code == 202
+    assert client.get(f"/api/cases/{case['id']}/workspace").json()["recommendation"] is not None
+
+    reset = client.post("/api/demo/reset-case-two")
+    assert reset.status_code == 200
+    workspace = reset.json()
+    assert workspace["case"]["case_id"] == case["id"]
+    assert workspace["case"]["status"] == "DOCUMENTOS_ENVIADOS"
+    assert workspace["recommendation"] is None
+    assert workspace["decision"] is None
+    assert workspace["outcome"] is None
+    assert workspace["analysis_job"] is None
 
 
 def test_defense_closure_after_rejected_agreement(client: TestClient, monkeypatch) -> None:

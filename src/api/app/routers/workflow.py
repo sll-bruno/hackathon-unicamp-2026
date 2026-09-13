@@ -1,6 +1,7 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, status
 from sqlmodel import Session, select
 
+from app.core.config import Settings, get_settings
 from app.core.database import get_session
 from app.core.errors import APIError
 from app.models import (
@@ -25,8 +26,19 @@ from app.services.domain import (
     serialize_model,
     transition_case,
 )
+from app.services.seeds import reset_demo_case_two
 
 router = APIRouter(tags=["workflow"])
+
+
+@router.post("/demo/reset-case-two")
+def reset_case_two_for_demo(
+    session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
+) -> dict:
+    if not settings.demo_seed:
+        raise APIError(404, "DEMO_RESET_NOT_AVAILABLE", "O reset da demo não está disponível")
+    return build_workspace(session, reset_demo_case_two(session))
 
 
 @router.post("/cases/{case_id}/analyze", status_code=status.HTTP_202_ACCEPTED)

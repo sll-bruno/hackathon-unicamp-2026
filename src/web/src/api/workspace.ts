@@ -39,6 +39,11 @@ export async function startAnalysis(caseId: string): Promise<NonNullable<Workspa
   return response.json() as Promise<NonNullable<Workspace['analysis_job']>>;
 }
 
+export async function resetDemoCaseTwo(): Promise<void> {
+  const response = await apiFetch('/api/demo/reset-case-two', { method: 'POST' });
+  if (!response.ok) throw new Error(`POST /api/demo/reset-case-two → ${response.status}`);
+}
+
 async function postWorkflow<T>(caseId: string, path: string, body: Record<string, unknown>): Promise<T> {
   const response = await apiFetch(`/api/cases/${encodeURIComponent(caseId)}/${path}`, {
     method: 'POST',

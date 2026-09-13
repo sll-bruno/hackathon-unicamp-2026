@@ -7,6 +7,7 @@ from app.models import (
     AnalysisJob,
     AppMetadata,
     Case,
+    CaseIntake,
     CaseOutcome,
     CaseStatus,
     CaseStatusHistory,
@@ -28,7 +29,9 @@ from app.services.demo_outputs import load_precomputed_output
 OFFICE_NAME = "Amaral Advocacia — Demo"
 LAWYER_EMAIL = "advogado.demo@enter.local"
 DEMO_BASELINE_KEY = "demo_baseline_version"
-DEMO_BASELINE_VERSION = "real-engine-v1"
+DEMO_BASELINE_VERSION = "real-engine-v2"
+LIVE_REPLAY_CNJ = "0654321-09.2024.8.04.0001"
+LEGACY_DEMO_CNJS = {"0654321-09.2026.8.04.0002"}
 
 CASE_SPECS = (
     {
@@ -51,7 +54,7 @@ CASE_SPECS = (
             (DocumentType.LAUDO_REFERENCIADO, "07_Laudo_Referenciado.pdf"),
         ),
         "is_demo": True,
-        "initial_status": CaseStatus.AGUARDANDO_DECISAO,
+        "initial_status": CaseStatus.AGUARDANDO_ENCERRAMENTO,
     },
     {
         "cnj": "0654321-09.2024.8.04.0001",
@@ -196,34 +199,89 @@ def _set_baseline_status(session: Session, case: Case, status: CaseStatus) -> No
 def _reset_demo_baseline(
     session: Session,
     seeded_cases: list[tuple[Case, list[Document], dict]],
+    lawyer: Lawyer,
 ) -> None:
     for case, documents, spec in seeded_cases:
         _clear_case_workflow(session, case)
         _set_baseline_status(session, case, spec["initial_status"])
         if spec["is_demo"]:
-            _persist_case_one_output(session, case, documents)
+            recommendation = _persist_case_one_output(session, case, documents)
+            _ensure_case_one_decision(session, case, lawyer, recommendation)
 
 
 def _persist_case_one_output(
     session: Session, case: Case, documents: list[Document]
-) -> None:
+) -> RecommendationRecord:
     existing = session.exec(
         select(RecommendationRecord).where(
             RecommendationRecord.case_id == case.id,
             RecommendationRecord.is_current.is_(True),
         )
     ).first()
-    if existing is None:
-        output = load_precomputed_output(case.cnj, documents)
-        if output is None:
-            raise ValueError(f"Missing precomputed engine output for {case.cnj}")
-        persist_engine_output(
-            session,
-            None,
-            output,
-            case_id=case.id,
-            source_kind="ENGINE_PRECOMPUTED",
-        )
+    if existing is not None:
+        return existing
+    output = load_precomputed_output(case.cnj, documents)
+    if output is None:
+        raise ValueError(f"Missing precomputed engine output for {case.cnj}")
+    return persist_engine_output(
+        session,
+        None,
+        output,
+        case_id=case.id,
+        source_kind="ENGINE_PRECOMPUTED",
+    )
+
+
+def _ensure_case_one_decision(
+    session: Session,
+    case: Case,
+    lawyer: Lawyer,
+    recommendation: RecommendationRecord,
+) -> LawyerDecision:
+    existing = session.exec(
+        select(LawyerDecision).where(LawyerDecision.case_id == case.id)
+    ).first()
+    if existing is not None:
+        return existing
+    decision = LawyerDecision(
+        case_id=case.id,
+        recommendation_id=recommendation.id,
+        lawyer_id=lawyer.id,
+        action=recommendation.action,
+        adhered=True,
+    )
+    session.add(decision)
+    session.flush()
+    return decision
+
+
+def _remove_legacy_demo_cases(session: Session) -> None:
+    for cnj in LEGACY_DEMO_CNJS:
+        case = session.exec(select(Case).where(Case.cnj == cnj)).first()
+        if case is None:
+            continue
+        _clear_case_workflow(session, case)
+        for intake in session.exec(
+            select(CaseIntake).where(CaseIntake.created_case_id == case.id)
+        ).all():
+            session.delete(intake)
+        for model in (Document, CaseStatusHistory):
+            for record in session.exec(select(model).where(model.case_id == case.id)).all():
+                session.delete(record)
+        session.flush()
+        session.delete(case)
+        session.flush()
+
+
+def reset_demo_case_two(session: Session) -> Case:
+    case = session.exec(select(Case).where(Case.cnj == LIVE_REPLAY_CNJ)).first()
+    if case is None:
+        raise ValueError(f"Missing live replay case {LIVE_REPLAY_CNJ}")
+    _clear_case_workflow(session, case)
+    _set_baseline_status(session, case, CaseStatus.DOCUMENTOS_ENVIADOS)
+    session.commit()
+    session.refresh(case)
+    return case
 
 
 def _baseline_marker(session: Session) -> AppMetadata | None:
@@ -233,7 +291,8 @@ def _baseline_marker(session: Session) -> AppMetadata | None:
 def seed_demo_data(session: Session, settings: Settings) -> None:
     if not settings.demo_seed:
         return
-    _get_or_create_profile(session)
+    lawyer = _get_or_create_profile(session)
+    _remove_legacy_demo_cases(session)
     seeded_cases: list[tuple[Case, list[Document], dict]] = []
     for spec in CASE_SPECS:
         case, _created = _create_case(session, spec)
@@ -242,7 +301,7 @@ def seed_demo_data(session: Session, settings: Settings) -> None:
 
     marker = _baseline_marker(session)
     if marker is None or marker.value != DEMO_BASELINE_VERSION:
-        _reset_demo_baseline(session, seeded_cases)
+        _reset_demo_baseline(session, seeded_cases, lawyer)
         if marker is None:
             marker = AppMetadata(key=DEMO_BASELINE_KEY, value=DEMO_BASELINE_VERSION)
         else:
@@ -251,5 +310,7 @@ def seed_demo_data(session: Session, settings: Settings) -> None:
         session.add(marker)
     else:
         case_one, case_one_documents, _spec = seeded_cases[0]
-        _persist_case_one_output(session, case_one, case_one_documents)
+        recommendation = _persist_case_one_output(session, case_one, case_one_documents)
+        if case_one.status == CaseStatus.AGUARDANDO_ENCERRAMENTO:
+            _ensure_case_one_decision(session, case_one, lawyer, recommendation)
     session.commit()

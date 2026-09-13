@@ -55,6 +55,7 @@ interface ApiPage<T> {
 
 interface ApiDashboard {
   adherence: { rate: number | null };
+  effectiveness: { rate: number | null };
 }
 
 function apiCaseToListItem(item: ApiCase): CaseListItem {
@@ -138,6 +139,8 @@ export const useCasesSummary = () =>
       const summary = summarize(cases);
       summary.adherence_percent =
         dashboard.adherence.rate === null ? null : dashboard.adherence.rate * 100;
+      summary.effectiveness_percent =
+        dashboard.effectiveness.rate === null ? null : dashboard.effectiveness.rate * 100;
       return summary;
     },
   });
