@@ -3,9 +3,16 @@ import { CONFIDENCE_BAND_LABEL } from '../../types/labels';
 import type { AdherenceOverview } from '../../types/adherence';
 import styles from './AdherenceByConfidence.module.css';
 
-export function AdherenceByConfidence({ data }: { data: AdherenceOverview['by_confidence'] }) {
+export interface AdherenceByConfidenceProps {
+  data: AdherenceOverview['by_confidence'];
+  totalDecisions?: number; // overview.data.total_decisions — usado só pra apontar decisões sem confiança calculada
+}
+
+export function AdherenceByConfidence({ data, totalDecisions }: AdherenceByConfidenceProps) {
   const rows = data.map((d) => ({ name: CONFIDENCE_BAND_LABEL[d.band], Aceito: d.accepted, Divergiu: d.diverged }));
   const hasData = data.some((d) => d.accepted + d.diverged > 0);
+  const bucketed = data.reduce((sum, d) => sum + d.accepted + d.diverged, 0);
+  const semConfianca = totalDecisions !== undefined ? totalDecisions - bucketed : 0;
 
   return (
     <div className={styles.card}>
@@ -23,6 +30,13 @@ export function AdherenceByConfidence({ data }: { data: AdherenceOverview['by_co
         </ResponsiveContainer>
       ) : (
         <p className={styles.empty}>Sem decisões no período.</p>
+      )}
+      {semConfianca > 0 && (
+        <p className={styles.note}>
+          {semConfianca === 1
+            ? '1 decisão sem confiança calculada.'
+            : `${semConfianca} decisões sem confiança calculada.`}
+        </p>
       )}
     </div>
   );

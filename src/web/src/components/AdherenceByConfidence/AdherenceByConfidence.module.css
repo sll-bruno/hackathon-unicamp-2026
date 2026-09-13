@@ -21,3 +21,8 @@
   text-align: center;
   padding: var(--space-8) 0;
 }
+
+.note {
+  color: var(--text-muted);
+  font-size: var(--text-14);
+}

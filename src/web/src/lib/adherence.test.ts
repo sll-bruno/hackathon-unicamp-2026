@@ -103,6 +103,16 @@ describe('buildAdherenceOverview', () => {
     expect(overview.overall_percent).toBeCloseTo(75, 5); // 3 aceitos de 4 (o1/ACORDO, o2/DEFESA, o3/ACORDO)
   });
 
+  it('não soma em nenhuma banda de confiança um registro com confidence_percent null (comportamento intencional)', () => {
+    const overview = buildAdherenceOverview(records, { period: 'all' }, NOW);
+    // o registro o3/ACORDO tem confidence_percent: null — total_decisions inclui ele,
+    // mas a soma das bandas de confiança fica menor que total_decisions.
+    const bucketed = overview.by_confidence.reduce((sum, d) => sum + d.accepted + d.diverged, 0);
+    expect(overview.total_decisions).toBe(5);
+    expect(bucketed).toBe(4);
+    expect(overview.total_decisions - bucketed).toBe(1);
+  });
+
   it('aplica os filtros de escritório, tese, confiança e versão de política', () => {
     expect(buildAdherenceOverview(records, { period: 'all', officeId: 'o1' }, NOW).total_decisions).toBe(2);
     expect(buildAdherenceOverview(records, { period: 'all', thesis: 'GENERICO' }, NOW).total_decisions).toBe(1);

@@ -44,7 +44,7 @@ export default function BankDashboard() {
               valueFormat="percent"
               rows={overview.data.by_action.map((a) => ({
                 name: ACTION_LABEL[a.action],
-                value: a.adherence_percent ?? 0,
+                value: a.adherence_percent,
                 total: a.total,
               }))}
             />
@@ -64,11 +64,11 @@ export default function BankDashboard() {
               valueFormat="percent"
               rows={overview.data.by_office.map((o) => ({
                 name: o.office_name,
-                value: o.adherence_percent ?? 0,
+                value: o.adherence_percent,
                 total: o.total,
               }))}
             />
-            <AdherenceByConfidence data={overview.data.by_confidence} />
+            <AdherenceByConfidence data={overview.data.by_confidence} totalDecisions={overview.data.total_decisions} />
           </div>
         </>
       )}
