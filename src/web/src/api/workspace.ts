@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { Workspace } from '../types/workspace';
+import { USE_MOCKS } from './client';
+import { mockCases } from './mocks/cases';
+import { buildMockWorkspace } from './mocks/workspace';
 
 export type WorkspaceState =
   | { status: 'loading' }
@@ -33,6 +36,17 @@ export function useWorkspace(caseId: string): WorkspaceState {
   useEffect(() => {
     const controller = new AbortController();
     setState({ status: 'loading' });
+
+    if (USE_MOCKS) {
+      const loadSample = samples[caseId];
+      const item = mockCases.find((c) => c.id === caseId);
+      (loadSample ? loadSample() : Promise.resolve(item && buildMockWorkspace(item))).then((data) => {
+        if (controller.signal.aborted) return;
+        if (data) setState({ status: 'ready', data, isSample: true });
+        else setState({ status: 'error', message: `Processo "${caseId}" não encontrado.` });
+      });
+      return () => controller.abort();
+    }
 
     fetchWorkspace(caseId, controller.signal)
       .then((data) => setState({ status: 'ready', data, isSample: false }))
