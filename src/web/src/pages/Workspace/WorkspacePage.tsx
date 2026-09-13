@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { sampleCaseIds, useWorkspace } from '../../api/workspace';
+import { ChatPanel } from '../../components/ChatPanel';
 import { EvidenceCard, KindIcon, type Citation, type Evidence, type EvidenceKind } from '../../components/EvidenceCard';
 import { RecommendationCard } from '../../components/RecommendationCard';
 import { RiskCard } from '../../components/RiskCard';
@@ -13,10 +14,13 @@ import './workspace.css';
 interface Props {
   caseId: string;
   onSelectSampleCase?: (caseId: string) => void;
+  chatOpen?: boolean;
+  onOpenChat?: () => void;
+  onCloseChat?: () => void;
 }
 
 /** Tela 3 · Área de trabalho de um processo. */
-export function WorkspacePage({ caseId, onSelectSampleCase }: Props) {
+export function WorkspacePage({ caseId, onSelectSampleCase, chatOpen = false, onOpenChat, onCloseChat }: Props) {
   const state = useWorkspace(caseId);
 
   if (state.status === 'loading') {
@@ -37,7 +41,15 @@ export function WorkspacePage({ caseId, onSelectSampleCase }: Props) {
   }
 
   return (
-    <WorkspaceView key={caseId} data={state.data} isSample={state.isSample} onSelectSampleCase={onSelectSampleCase} />
+    <WorkspaceView
+      key={caseId}
+      data={state.data}
+      isSample={state.isSample}
+      onSelectSampleCase={onSelectSampleCase}
+      chatOpen={chatOpen}
+      onOpenChat={onOpenChat}
+      onCloseChat={onCloseChat}
+    />
   );
 }
 
@@ -51,10 +63,16 @@ function WorkspaceView({
   data,
   isSample,
   onSelectSampleCase,
+  chatOpen,
+  onOpenChat,
+  onCloseChat,
 }: {
   data: Workspace;
   isSample: boolean;
   onSelectSampleCase?: (caseId: string) => void;
+  chatOpen: boolean;
+  onOpenChat?: () => void;
+  onCloseChat?: () => void;
 }) {
   const [tab, setTab] = useState<EvidenceKind>('fato');
   const [activeCitation, setActiveCitation] = useState<Citation | null>(null);
@@ -75,7 +93,8 @@ function WorkspaceView({
   const { case: c, recommendation: rec } = data;
 
   return (
-    <main className="ws">
+    <div className="ws-shell">
+    <main className={`ws${chatOpen ? ' ws--split' : ''}`}>
       {isSample && (
         <div className="sample-banner" role="note">
           <span className="sample-banner__label">Dados de exemplo</span>
@@ -100,15 +119,15 @@ function WorkspaceView({
 
       <RecommendationCard recommendation={rec} caseInfo={c} />
 
-      <div className="ws-body">
-        <section className="explain" aria-labelledby="explain-title">
-          <header className="section-header">
-            <h2 id="explain-title" className="section-title">
-              Motivos da decisão
-            </h2>
-            <p className="section-subtitle">Clique em um documento para ler o trecho citado.</p>
-          </header>
+      <section className="explain" aria-labelledby="explain-title">
+        <header className="section-header">
+          <h2 id="explain-title" className="section-title">
+            Motivos da decisão
+          </h2>
+          {/* <p className="section-subtitle">Clique em um documento para ler o trecho citado.</p> */}
+        </header>
 
+        <div className="evidence-toolbar">
           <div className="evidence-tabs" aria-label="Tipo de evidência">
             {tabs.map((t) => (
               <button
@@ -129,31 +148,42 @@ function WorkspaceView({
             ))}
           </div>
 
-          {evidences[tab].length === 0 ? (
-            <p className="evidence-empty">Nenhum item nesta categoria.</p>
-          ) : (
-            <div className="evidence-list">
-              {evidences[tab].map((ev) => (
-                <EvidenceCard
-                  key={ev.item.id}
-                  evidence={ev}
-                  documents={documents}
-                  activeCitation={activeCitation}
-                  onSelectCitation={setActiveCitation}
-                />
-              ))}
-            </div>
+          {onOpenChat && (
+            <button type="button" className="chatbot-cta" onClick={onOpenChat}>
+              <ChatIcon />
+              Perguntar ao chatbot
+            </button>
           )}
-        </section>
+        </div>
 
-        <SourcePanel
-          documents={data.documents}
-          flags={data.subsidy_flags}
-          activeCitation={activeCitation}
-          isSample={isSample}
-          onClear={() => setActiveCitation(null)}
-        />
-      </div>
+        <div className="ws-body">
+          <div className="evidence-column">
+            {evidences[tab].length === 0 ? (
+              <p className="evidence-empty">Nenhum item nesta categoria.</p>
+            ) : (
+              <div className="evidence-list">
+                {evidences[tab].map((ev) => (
+                  <EvidenceCard
+                    key={ev.item.id}
+                    evidence={ev}
+                    documents={documents}
+                    activeCitation={activeCitation}
+                    onSelectCitation={setActiveCitation}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <SourcePanel
+            documents={data.documents}
+            flags={data.subsidy_flags}
+            activeCitation={activeCitation}
+            isSample={isSample}
+            onClear={() => setActiveCitation(null)}
+          />
+        </div>
+      </section>
 
       <section className="financials" aria-labelledby="financials-title">
         <header className="section-header">
@@ -178,5 +208,21 @@ function WorkspaceView({
         {Object.entries(data.versions).map(([k, v]) => `${k} ${v}`).join(' · ')}
       </footer>
     </main>
+    {chatOpen && onCloseChat && <ChatPanel data={data} isSample={isSample} onClose={onCloseChat} />}
+    </div>
+  );
+}
+
+function ChatIcon() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M2 3.5h12v7H6.2L3 13.2V10.5H2z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
