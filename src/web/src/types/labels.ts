@@ -1,8 +1,8 @@
 import type { CaseStatus, RecommendedAction, Thesis } from './case';
+import type { DocumentType, SubsidyType } from './workspace';
 
 export const STATUS_LABEL: Record<CaseStatus, string> = {
   RASCUNHO: 'Rascunho',
-  DOCUMENTOS_ENVIADOS: 'Documentos enviados',
   EM_ANALISE: 'Em análise',
   AGUARDANDO_DECISAO: 'Revisar recomendação',
   PROPOSTA_ACEITA: 'Proposta aceita',
@@ -21,3 +21,23 @@ export const ACTION_LABEL: Record<RecommendedAction, string> = {
   ACORDO: 'Acordo',
   DEFESA: 'Defesa',
 };
+
+export const SUBSIDY_LABEL: Record<SubsidyType, string> = {
+  contrato: 'Contrato',
+  extrato: 'Extrato bancário',
+  comprovante_credito: 'Comprovante de crédito',
+  dossie: 'Dossiê',
+  demonstrativo_divida: 'Demonstrativo de evolução da dívida',
+  laudo_referenciado: 'Laudo referenciado',
+};
+
+export const DOCUMENT_LABEL: Record<DocumentType, string> = {
+  autos: 'Auto do processo',
+  ...SUBSIDY_LABEL,
+};
+
+// Unidades federativas do Brasil — usadas no seletor de UF do cadastro de processo.
+export const UF_LIST = [
+  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG',
+  'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
+] as const;
