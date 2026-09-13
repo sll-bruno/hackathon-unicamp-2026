@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { USE_MOCKS } from '../../api/client';
+import { DASHBOARD_DATA_ARE_SIMULATED } from '../../api/dashboard';
 import { HISTORICAL_CASES_ARE_SIMULATED } from '../../api/history';
 import { EnterLogo } from '../EnterLogo';
 import styles from './AppLayout.module.css';
@@ -12,7 +13,10 @@ const NAV = [
 
 export function AppLayout() {
   const location = useLocation();
-  const usesSimulatedData = USE_MOCKS || (HISTORICAL_CASES_ARE_SIMULATED && location.pathname.startsWith('/historico'));
+  const usesSimulatedData =
+    USE_MOCKS ||
+    (HISTORICAL_CASES_ARE_SIMULATED && location.pathname.startsWith('/historico')) ||
+    (DASHBOARD_DATA_ARE_SIMULATED && location.pathname.startsWith('/dashboard'));
 
   return (
     <div className={styles.shell}>

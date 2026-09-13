@@ -16,7 +16,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { useCases } from '../../api/cases';
+import { useEffectivenessCases } from '../../api/dashboard';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { formatBRL, formatPercent } from '../../lib/format';
 import {
@@ -110,7 +110,7 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle: string })
 }
 
 export default function EffectivenessDashboard() {
-  const { data: cases } = useCases();
+  const { data: cases } = useEffectivenessCases();
   const all = cases ?? [];
 
   const outcomes = useMemo(() => outcomeDistribution(all), [all]);

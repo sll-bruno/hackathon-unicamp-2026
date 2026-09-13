@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { buildAdherenceOverview } from '../lib/adherence';
 import type { AdherenceFilters, AdherenceOverview } from '../types/adherence';
 import { USE_MOCKS, apiGet, simulateLatency } from './client';
+import { DASHBOARD_DATA_ARE_SIMULATED } from './dashboard';
 import { mockAdherenceRecords } from './mocks/adherence';
 
 function toQueryString(filters: AdherenceFilters): string {
@@ -18,7 +19,7 @@ export const useAdherenceOverview = (filters: AdherenceFilters) =>
   useQuery({
     queryKey: ['adherence', filters],
     queryFn: () =>
-      USE_MOCKS
+      USE_MOCKS || DASHBOARD_DATA_ARE_SIMULATED
         ? simulateLatency(buildAdherenceOverview(mockAdherenceRecords, filters))
         : apiGet<AdherenceOverview>(`/dashboard/adherence?${toQueryString(filters)}`),
   });
