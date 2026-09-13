@@ -4,8 +4,8 @@ Uso (na raiz do repositório):
     .venv/bin/python src/pipeline/training/train_risk.py
 
 Gera em `decision_engine/artifacts/`:
-- `risco_v1.ubj`: XGBoost multiclasse (extinção, improcedência, parcial, procedência);
-- `risco_v1_meta.json`: UFs, temperatura de calibração, métricas, severidade,
+- `<versão>.ubj`: XGBoost multiclasse (extinção, improcedência, parcial, procedência);
+- `<versão>_meta.json`: UFs, temperatura de calibração, métricas, severidade,
   k do acordo, perfil regional e tamanho das coortes.
 """
 
@@ -34,13 +34,31 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_DATA = ROOT / "data" / "Hackaton_Enter_Base_Candidatos.xlsx"
+DEFAULT_XLSX = ROOT / "data" / "Hackaton_Enter_Base_Candidatos.xlsx"
+DEFAULT_RESULTS_CSV = ROOT / "data" / "Resultados_Dos_Processos.csv"
+DEFAULT_DATA = DEFAULT_RESULTS_CSV if DEFAULT_RESULTS_CSV.is_file() else DEFAULT_XLSX
 SEED = 42
 
 
-def load_dataset(path: Path) -> pd.DataFrame:
-    results = pd.read_excel(path, sheet_name="Resultados dos processos")
-    subsidies = pd.read_excel(path, sheet_name="Subsídios disponibilizados", skiprows=1)
+def _default_subsidies_csv(results_path: Path) -> Path:
+    matches = sorted(results_path.parent.glob("Subsi*dio_Disponibilizado.csv"))
+    if len(matches) != 1:
+        raise ValueError(
+            "não foi possível identificar o CSV de subsídios ao lado da base de resultados; "
+            "informe --subsidies-data"
+        )
+    return matches[0]
+
+
+def load_dataset(path: Path, subsidies_path: Path | None = None) -> pd.DataFrame:
+    if path.suffix.lower() in {".xlsx", ".xls"}:
+        results = pd.read_excel(path, sheet_name="Resultados dos processos")
+        subsidies = pd.read_excel(path, sheet_name="Subsídios disponibilizados", skiprows=1)
+    elif path.suffix.lower() == ".csv":
+        results = pd.read_csv(path, decimal=",", thousands=".")
+        subsidies = pd.read_csv(subsidies_path or _default_subsidies_csv(path), skiprows=1)
+    else:
+        raise ValueError("data deve ser uma planilha .xlsx/.xls ou o CSV de resultados")
     results.columns = ["processo", "uf", "assunto", "sub", "macro", "micro", "vc", "vd"]
     subsidies.columns = ["processo", *FLAG_NAMES]
     return results.merge(subsidies, on="processo", validate="1:1")
@@ -54,11 +72,16 @@ def load_feedback(path: Path) -> pd.DataFrame:
     """
 
     frame = pd.read_csv(path)
-    required = {"processo", "uf", "assunto", "sub", "macro", "micro", "vc", "vd", *FLAG_NAMES}
-    missing = required - set(frame.columns)
+    columns = ["processo", "uf", "assunto", "sub", "macro", "micro", "vc", "vd", *FLAG_NAMES]
+    missing = set(columns) - set(frame.columns)
     if missing:
         raise ValueError(f"feedback_data sem colunas obrigatórias: {sorted(missing)}")
-    return frame[list(required)]
+    invalid_labels = sorted(set(frame["micro"].dropna()) - set(MICRO_TO_CLASS))
+    if invalid_labels:
+        raise ValueError(f"feedback_data com desfechos judiciais inválidos: {invalid_labels}")
+    if frame["processo"].duplicated().any():
+        raise ValueError("feedback_data contém processos duplicados")
+    return frame[columns]
 
 
 def to_cases(frame: pd.DataFrame) -> list[CaseFeatures]:
@@ -101,12 +124,21 @@ def train(
     data_path: Path,
     output_dir: Path,
     *,
+    subsidies_path: Path | None = None,
     version: str = "risco_v1",
     base_version: str | None = None,
     feedback_path: Path | None = None,
     min_feedback_n: int = 0,
 ) -> dict:
-    frame = load_dataset(data_path)
+    if feedback_path is not None:
+        if min_feedback_n <= 0:
+            raise ValueError("min_feedback_n deve ser positivo quando feedback_data é informado")
+        if not base_version:
+            raise ValueError("base_version é obrigatória para retreino com feedback")
+        if version == base_version:
+            raise ValueError("a versão candidata deve ser diferente da versão em produção")
+
+    frame = load_dataset(data_path, subsidies_path)
     feedback_n = 0
     if feedback_path is not None:
         feedback = load_feedback(feedback_path)
@@ -282,6 +314,12 @@ def train(
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data", type=Path, default=DEFAULT_DATA)
+    parser.add_argument(
+        "--subsidies-data",
+        type=Path,
+        default=None,
+        help="CSV de subsídios quando --data apontar para o CSV de resultados",
+    )
     parser.add_argument("--output", type=Path, default=PACKAGE_DIR / "artifacts")
     parser.add_argument("--version", default="risco_v1", help="Nome dos artefatos gerados")
     parser.add_argument(
@@ -305,6 +343,7 @@ def main() -> None:
     meta = train(
         args.data,
         args.output,
+        subsidies_path=args.subsidies_data,
         version=args.version,
         base_version=args.base_version,
         feedback_path=args.feedback_data,

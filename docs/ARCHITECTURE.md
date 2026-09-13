@@ -265,8 +265,9 @@ flowchart LR
   `train_risk.py` concatena esse feedback à base histórica e recusa o retreino abaixo de
   `--min-feedback-n` casos maduros. A candidata é gravada com nome de versão próprio
   (`risco_vN.ubj`/`_meta.json`), nunca sobrescrevendo a versão em produção. Promoção é
-  manual, via `ENGINE_RISK_MODEL_VERSION` (`decision_engine/settings.py`) — troca de env
-  var, sem editar código, com rollback trivial. Detalhes e comandos:
+  manual: primeiro os artefatos aprovados entram na imagem/checkout de produção; depois
+  `ENGINE_RISK_MODEL_VERSION` (`decision_engine/settings.py`) seleciona a versão sem editar
+  código, com rollback trivial. Detalhes e comandos:
   [`src/pipeline/README.md`](../src/pipeline/README.md#retreino-periódico-feedback-de-casos-fechados).
 
 ## 10. Estrutura de pastas

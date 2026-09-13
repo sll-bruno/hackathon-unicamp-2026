@@ -39,7 +39,8 @@ de promovida. Fluxo:
 .venv/bin/python src/pipeline/training/export_feedback.py --matured-days 30
 
 # 2. Treina uma candidata concatenando o feedback à base histórica.
-#    Aborta se houver menos que --min-feedback-n casos maduros.
+#    Aborta se houver menos que --min-feedback-n casos maduros e nunca permite
+#    reutilizar o nome da versão em produção.
 .venv/bin/python src/pipeline/training/train_risk.py \
   --version risco_v2 --base-version risco_v1 \
   --feedback-data data/feedback/feedback_<timestamp>.csv --min-feedback-n 200
@@ -48,14 +49,24 @@ de promovida. Fluxo:
 .venv/bin/python src/pipeline/training/compare_versions.py \
   --production risco_v1 --candidate risco_v2
 
-# 4. Promoção é manual: só depois de revisar a comparação acima
+# 4. Inclua os dois artefatos aprovados (risco_v2.ubj e risco_v2_meta.json)
+#    na imagem/checkout de produção. Só depois promova e reinicie a API.
 export ENGINE_RISK_MODEL_VERSION=risco_v2
 ```
+
+`train_risk.py` aceita a planilha original (`--data arquivo.xlsx`) ou os dois CSVs
+distribuídos no workspace. Para CSV, aponte `--data` para `Resultados_Dos_Processos.csv`;
+o arquivo `Subsídio_Disponibilizado.csv` é detectado na mesma pasta ou pode ser informado
+explicitamente com `--subsidies-data`.
 
 Regras do loop (`docs/RELATORIO_FLUXO_MOTOR_DECISAO.md §10`): retreino é sempre offline e
 em lote, nunca por interação individual; acordo não é desfecho judicial e não entra no
 treino do modelo de risco; recomendações antigas (`recommendations.payload_json`) mantêm a
 `versions.risk_model` com que foram geradas — promover uma versão nova não as reescreve.
+Fixtures de demo e condenações sem `court_award` também não entram no feedback.
+O CSV exportado fica em `data/feedback/`, que é ignorado pelo Git por conter dados
+operacionais. Nunca altere `ENGINE_RISK_MODEL_VERSION` antes de o par de artefatos da
+candidata estar presente no runtime; caso contrário, a API não conseguirá carregar o modelo.
 Cadência recomendada: sob demanda quando `export_feedback.py` acumular casos maduros acima
 do `--min-feedback-n`, no máximo uma vez por semana.
 

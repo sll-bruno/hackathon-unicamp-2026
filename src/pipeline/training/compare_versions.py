@@ -58,6 +58,16 @@ def compare(production: dict, candidate: dict, tolerance: float) -> tuple[dict, 
     return rows, regressed
 
 
+def validate_lineage(production: dict, candidate: dict) -> None:
+    production_version = production.get("versao")
+    candidate_base = candidate.get("base_version")
+    if candidate_base != production_version:
+        raise SystemExit(
+            f"linhagem inválida: candidata declara base_version={candidate_base!r}, "
+            f"mas a produção comparada é {production_version!r}"
+        )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--artifacts-dir", type=Path, default=PACKAGE_DIR / "artifacts")
@@ -73,6 +83,7 @@ def main() -> None:
 
     production = load_meta(args.artifacts_dir, args.production)
     candidate = load_meta(args.artifacts_dir, args.candidate)
+    validate_lineage(production, candidate)
     rows, regressed = compare(production, candidate, args.tolerance)
 
     print(f"produção={args.production} (n_treino={production['metricas_teste']['n_treino']})")
