@@ -48,3 +48,6 @@ Thumbs.db
 
 # Brainstorming visual companion
 .superpowers/
+
+# Superpowers planning docs (local process artifacts, not project deliverables)
+docs/superpowers/
