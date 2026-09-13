@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { sampleCaseIds, useWorkspace } from '../../api/workspace';
+import { ChatPanel } from '../../components/ChatPanel';
 import { EvidenceCard, KindIcon, type Citation, type Evidence, type EvidenceKind } from '../../components/EvidenceCard';
 import { RecommendationCard } from '../../components/RecommendationCard';
 import { RiskCard } from '../../components/RiskCard';
@@ -13,11 +14,13 @@ import './workspace.css';
 interface Props {
   caseId: string;
   onSelectSampleCase?: (caseId: string) => void;
+  chatOpen?: boolean;
   onOpenChat?: () => void;
+  onCloseChat?: () => void;
 }
 
 /** Tela 3 · Área de trabalho de um processo. */
-export function WorkspacePage({ caseId, onSelectSampleCase, onOpenChat }: Props) {
+export function WorkspacePage({ caseId, onSelectSampleCase, chatOpen = false, onOpenChat, onCloseChat }: Props) {
   const state = useWorkspace(caseId);
 
   if (state.status === 'loading') {
@@ -43,7 +46,9 @@ export function WorkspacePage({ caseId, onSelectSampleCase, onOpenChat }: Props)
       data={state.data}
       isSample={state.isSample}
       onSelectSampleCase={onSelectSampleCase}
+      chatOpen={chatOpen}
       onOpenChat={onOpenChat}
+      onCloseChat={onCloseChat}
     />
   );
 }
@@ -58,12 +63,16 @@ function WorkspaceView({
   data,
   isSample,
   onSelectSampleCase,
+  chatOpen,
   onOpenChat,
+  onCloseChat,
 }: {
   data: Workspace;
   isSample: boolean;
   onSelectSampleCase?: (caseId: string) => void;
+  chatOpen: boolean;
   onOpenChat?: () => void;
+  onCloseChat?: () => void;
 }) {
   const [tab, setTab] = useState<EvidenceKind>('fato');
   const [activeCitation, setActiveCitation] = useState<Citation | null>(null);
@@ -84,7 +93,8 @@ function WorkspaceView({
   const { case: c, recommendation: rec } = data;
 
   return (
-    <main className="ws">
+    <div className="ws-shell">
+    <main className={`ws${chatOpen ? ' ws--split' : ''}`}>
       {isSample && (
         <div className="sample-banner" role="note">
           <span className="sample-banner__label">Dados de exemplo</span>
@@ -198,6 +208,8 @@ function WorkspaceView({
         {Object.entries(data.versions).map(([k, v]) => `${k} ${v}`).join(' · ')}
       </footer>
     </main>
+    {chatOpen && onCloseChat && <ChatPanel data={data} isSample={isSample} onClose={onCloseChat} />}
+    </div>
   );
 }
 

@@ -1,13 +1,7 @@
-import { useMemo, useState, type FormEvent } from 'react';
-import { useWorkspace } from '../../api/workspace';
-import type { CaseDocument, Source, Workspace } from '../../types/workspace';
-import { documentTypeLabel } from '../Workspace/format';
-import './chatbot.css';
-
-interface Props {
-  caseId: string;
-  onBack: () => void;
-}
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import type { CaseDocument, Source, Workspace } from '../types/workspace';
+import { documentTypeLabel } from '../pages/Workspace/format';
+import './chat-panel.css';
 
 interface ChatMessage {
   id: string;
@@ -16,38 +10,17 @@ interface ChatMessage {
   sources?: Source[];
 }
 
-/**
- * Tela do chatbot de explicações. Segundo o `architecture_engine.md`, toda
- * resposta recebe o snapshot da recomendação e os trechos dos documentos, e
- * precisa citar documento e página — é isso que os chips abaixo de cada
- * resposta representam.
- */
-export function ChatbotPage({ caseId, onBack }: Props) {
-  const state = useWorkspace(caseId);
-
-  if (state.status === 'loading') {
-    return (
-      <main className="chat chat--state" aria-busy="true">
-        <p>Carregando o chatbot…</p>
-      </main>
-    );
-  }
-
-  if (state.status === 'error') {
-    return (
-      <main className="chat chat--state">
-        <h1>Não foi possível abrir o chatbot</h1>
-        <p>{state.message}</p>
-        <button type="button" className="button button--secondary" onClick={onBack}>
-          Voltar à área de trabalho
-        </button>
-      </main>
-    );
-  }
-
-  return <ChatbotView key={caseId} data={state.data} isSample={state.isSample} onBack={onBack} />;
+interface Props {
+  data: Workspace;
+  isSample: boolean;
+  onClose: () => void;
 }
 
+/**
+ * Painel do chatbot de explicações, aberto ao lado da área de trabalho (não é
+ * mais uma tela separada). Toda resposta cita o documento e a página, como
+ * pede o `architecture_engine.md` para a explicabilidade.
+ */
 function seedMessages(data: Workspace): ChatMessage[] {
   const topFact = [...data.facts].sort((a, b) => (b.weight ?? -1) - (a.weight ?? -1))[0];
   const contradiction = data.contradictions[0];
@@ -77,12 +50,17 @@ function seedMessages(data: Workspace): ChatMessage[] {
   return messages;
 }
 
-function ChatbotView({ data, isSample, onBack }: { data: Workspace; isSample: boolean; onBack: () => void }) {
+export function ChatPanel({ data, isSample, onClose }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>(() => seedMessages(data));
   const [draft, setDraft] = useState('');
   const [openCitation, setOpenCitation] = useState<string | null>(null);
+  const threadEndRef = useRef<HTMLDivElement>(null);
 
   const documents = useMemo(() => new Map(data.documents.map((d) => [d.document_id, d])), [data.documents]);
+
+  useEffect(() => {
+    threadEndRef.current?.scrollIntoView({ block: 'end' });
+  }, [messages]);
 
   const send = (e: FormEvent) => {
     e.preventDefault();
@@ -99,27 +77,25 @@ function ChatbotView({ data, isSample, onBack }: { data: Workspace; isSample: bo
   };
 
   return (
-    <main className="chat">
-      <header className="chat__header">
-        <button type="button" className="link-button" onClick={onBack}>
-          ← Voltar à área de trabalho
-        </button>
+    <aside className="chat-panel" aria-label="Chatbot da análise">
+      <header className="chat-panel__header">
         <div>
           <span className="eyebrow">Chatbot da análise</span>
-          <h1 className="chat__title">{data.case.plaintiff}</h1>
+          <h2 className="chat-panel__title">{data.case.plaintiff}</h2>
         </div>
+        <button type="button" className="chat-panel__close" onClick={onClose} aria-label="Fechar chatbot">
+          <CloseIcon />
+        </button>
       </header>
 
       {isSample && (
-        <div className="sample-banner" role="note">
+        <div className="sample-banner sample-banner--compact" role="note">
           <span className="sample-banner__label">Dados de exemplo</span>
-          <span className="sample-banner__text">As perguntas e respostas abaixo são ilustrativas.</span>
+          <span className="sample-banner__text">Perguntas e respostas ilustrativas.</span>
         </div>
       )}
 
-      <p className="chat__note">Toda resposta cita o documento e a página de onde veio a informação.</p>
-
-      <div className="chat__thread">
+      <div className="chat-panel__thread">
         {messages.map((m) => (
           <ChatBubble
             key={m.id}
@@ -129,9 +105,10 @@ function ChatbotView({ data, isSample, onBack }: { data: Workspace; isSample: bo
             onToggleCitation={setOpenCitation}
           />
         ))}
+        <div ref={threadEndRef} />
       </div>
 
-      <form className="chat__composer" onSubmit={send}>
+      <form className="chat-panel__composer" onSubmit={send}>
         <input
           type="text"
           value={draft}
@@ -143,7 +120,7 @@ function ChatbotView({ data, isSample, onBack }: { data: Workspace; isSample: bo
           Enviar
         </button>
       </form>
-    </main>
+    </aside>
   );
 }
 
@@ -184,5 +161,13 @@ function ChatBubble({
         </div>
       )}
     </div>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
   );
 }

@@ -1,5 +1,11 @@
 /* Tela 3 · Área de trabalho. Usa só tokens de styles/tokens.css (tema escuro). */
 
+:root {
+  /* Altura fixa da barra do app, usada pelo painel do chatbot para encaixar
+     exatamente abaixo dela (ver components/chat-panel.css). */
+  --app-bar-h: 57px;
+}
+
 /* ── Barra do app (provisória até o shell compartilhado) ── */
 .app-bar {
   position: sticky;
@@ -8,7 +14,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  padding: var(--space-4) var(--space-8);
+  height: var(--app-bar-h);
+  padding: 0 var(--space-8);
   border-bottom: 1px solid var(--stroke-secondary);
   background: color-mix(in srgb, var(--surface-page) 88%, transparent);
   backdrop-filter: blur(12px);
@@ -151,6 +158,41 @@
   justify-content: center;
   align-items: center;
   color: var(--text-secondary);
+}
+
+/* Layout com o chatbot aberto: a área de trabalho encolhe para a metade
+   esquerda, o painel de chat ocupa a direita (ver components/ChatPanel.tsx).
+   Cada metade rola por conta própria (altura própria + overflow), então o
+   scroll do mouse só afeta o lado em que o cursor está, e a barra de rolagem
+   da esquerda fica colada na divisa com o chat — não lá no canto da tela. */
+.ws-shell {
+  display: flex;
+  align-items: flex-start;
+}
+.ws--split {
+  flex: 1 1 0%;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  position: sticky;
+  top: var(--app-bar-h);
+  height: calc(100vh - var(--app-bar-h));
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--stroke-primary) transparent;
+}
+.ws--split::-webkit-scrollbar {
+  width: 8px;
+}
+.ws--split::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ws--split::-webkit-scrollbar-thumb {
+  background: var(--stroke-primary);
+  border-radius: 999px;
+}
+.ws--split::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
 
 .sample-banner {
@@ -719,17 +761,19 @@
   border-radius: var(--radius-12);
   background: var(--accent);
   color: var(--color-black);
-  font-size: var(--text-14);
+  font-size: var(--text-20);
+  font-weight: var(--weight-regular);
   white-space: nowrap;
   cursor: pointer;
-  box-shadow: 0 0 20px -6px color-mix(in srgb, var(--accent) 70%, transparent);
+  /* Mesmo brilho do .rec-card (recomendação da política) */
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 0 48px -12px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 .chatbot-cta:hover {
   filter: brightness(1.08);
 }
 .chatbot-cta svg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
 }
 .evidence-tab {
   position: relative;
@@ -1042,4 +1086,39 @@
   .evidence-tab__count {
     font-size: var(--text-32);
   }
+}
+
+/* ── Chatbot aberto: mesmos ajustes do layout estreito, aplicados de
+   propósito (a metade esquerda da tela fica estreita mesmo em telas
+   grandes, então os cards precisam se comportar como no modo compacto). ── */
+.ws--split .decision-row,
+.ws--split .ws-body,
+.ws--split .evidence-toolbar,
+.ws--split .rec-card__body,
+.ws--split .evidence,
+.ws--split .evidence-tabs {
+  grid-template-columns: minmax(0, 1fr);
+}
+.ws--split .change-list--compact li {
+  flex-basis: 100%;
+}
+.ws--split .confidence {
+  padding: var(--space-4) 0 0;
+  border-left: 0;
+  border-top: 1px solid var(--stroke-secondary);
+}
+.ws--split .rec-card__action-title,
+.ws--split .confidence__value,
+.ws--split .big-number {
+  font-size: var(--text-48);
+}
+.ws--split .range__value strong {
+  font-size: var(--text-20);
+}
+.ws--split .sources {
+  justify-content: flex-start;
+  max-width: none;
+}
+.ws--split .evidence-tab__count {
+  font-size: var(--text-32);
 }

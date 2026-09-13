@@ -1,21 +1,18 @@
 import { useState } from 'react';
 import { EnterLogo } from './components/EnterLogo';
-import { ChatbotPage } from './pages/Chatbot/ChatbotPage';
 import { WorkspacePage } from './pages/Workspace/WorkspacePage';
 
-type Screen = 'workspace' | 'chatbot';
-
-// Enquanto não há roteador, o processo aberto vem de ?case= e a tela de ?view=chat.
+// Enquanto não há roteador, o processo aberto vem de ?case= e o chatbot de ?view=chat.
 function initialCaseId() {
   return new URLSearchParams(window.location.search).get('case') ?? 'caso-02';
 }
-function initialScreen(): Screen {
-  return new URLSearchParams(window.location.search).get('view') === 'chat' ? 'chatbot' : 'workspace';
+function initialChatOpen() {
+  return new URLSearchParams(window.location.search).get('view') === 'chat';
 }
 
 export default function App() {
   const [caseId, setCaseId] = useState(initialCaseId);
-  const [screen, setScreen] = useState<Screen>(initialScreen);
+  const [chatOpen, setChatOpen] = useState(initialChatOpen);
 
   const updateUrl = (params: Record<string, string | null>) => {
     const url = new URL(window.location.href);
@@ -33,12 +30,12 @@ export default function App() {
 
   const openChat = () => {
     updateUrl({ view: 'chat' });
-    setScreen('chatbot');
+    setChatOpen(true);
   };
 
   const closeChat = () => {
     updateUrl({ view: null });
-    setScreen('workspace');
+    setChatOpen(false);
   };
 
   return (
@@ -47,11 +44,13 @@ export default function App() {
         <EnterLogo height={16} />
         <span className="app-bar__product">Política de acordos</span>
       </header>
-      {screen === 'chatbot' ? (
-        <ChatbotPage caseId={caseId} onBack={closeChat} />
-      ) : (
-        <WorkspacePage caseId={caseId} onSelectSampleCase={selectCase} onOpenChat={openChat} />
-      )}
+      <WorkspacePage
+        caseId={caseId}
+        onSelectSampleCase={selectCase}
+        chatOpen={chatOpen}
+        onOpenChat={openChat}
+        onCloseChat={closeChat}
+      />
     </>
   );
 }
