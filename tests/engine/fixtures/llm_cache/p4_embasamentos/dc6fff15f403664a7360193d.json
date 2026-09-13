@@ -1,0 +1,343 @@
+{
+ "acusacao_id": "ACU-01",
+ "embasamentos": {
+  "provas_contratacao": [],
+  "autenticacao_forte": [],
+  "registros_digitais": [
+   {
+    "id": "EMB-01-001",
+    "titulo": "Metadados de sessão no app mobile",
+    "descricao": "Laudo indica canal digital, app v8.2.1, device fingerprint DFP-9A43E1B7, geolocalização (-3.1019,-60.0261) e IP 179.218.**.** na contratação.",
+    "justificativa": "Metadados técnicos evidenciam que houve sessão de contratação no aplicativo e ajudam o banco a demonstrar a existência da operação, embora não identifiquem a pessoa que realizou o ato.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p1:c1",
+      "trecho": "(cid:127) Canal: Digital - Aplicativo Mobile (self-service)\n(cid:127) Aplicativo: Banco UFMG Mobile v8.2.1\n(cid:127) Dispositivo: identificado por device fingerprint (hash DFP-9A43E1B7)",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p1:c1",
+      "trecho": "(cid:127) Geolocalização do dispositivo no momento da contratação: latitude -3.1019, longitude -60.0261\n(cid:127) Endereço IP: 179.218.**.**",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-002",
+    "titulo": "Senha eletrônica e aceite eletrônico",
+    "descricao": "Registro de autenticação por senha eletrônica de 6 dígitos e aceite eletrônico via Termo de Ciência.",
+    "justificativa": "Mostra o fluxo de aceite eletrônico e reforça a formalização digital da operação; identifica a sessão e o aceite, embora não comprove a pessoa do autor.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p1:c1",
+      "trecho": "(cid:127) Autenticação: biometria facial (liveness) + senha eletrônica 6 dígitos",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p2:c1",
+      "trecho": "(cid:127) Aceite eletrônico das condições contratuais via Termo de Ciência",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "credito_em_conta_do_autor": [],
+  "uso_do_credito_pelo_autor": [],
+  "contradicoes_do_autor": [],
+  "lacunas_argumentativas_autor": [
+   {
+    "id": "EMB-01-004",
+    "titulo": "BO citado, mas não juntado",
+    "descricao": "Autor informa ter registrado Boletim de Ocorrência nº 2024.005432 e que cópia estaria anexa, porém o documento não consta do pacote.",
+    "justificativa": "A ausência do BO enfraquece a narrativa de fraude e de diligência imediata, o que ajuda o banco nesta acusação.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "boletim_ocorrencia"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p2:c1",
+      "trecho": "(Boletim de Ocorrência nº 2024.005432 - cópia em anexo)",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-005",
+    "titulo": "Reclamação BACEN citada, não juntada",
+    "descricao": "Autor alega ter apresentado RDR nº 12345678-9 ao BACEN e indica como anexa, mas não há comprovação nos autos.",
+    "justificativa": "Sem prova da reclamação administrativa, há menor corroboração externa da tese de fraude, favorecendo o banco.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "comprovante_reclamacao_bacen"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p4:c1",
+      "trecho": "em especial do boletim de ocorrência, da reclamação administrativa no Banco Central e da divergência",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-006",
+    "titulo": "Sem extrato comprovando descontos",
+    "descricao": "Autor relata descontos desde 08/2023, mas não juntou extrato do INSS ou do banco do benefício que os comprove.",
+    "justificativa": "A prova dos descontos estava ao alcance do autor; a ausência fragiliza o pedido de inexistência do débito, beneficiando o banco.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "extrato_inss",
+       "extrato_bancario_beneficio"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p1:c1",
+      "trecho": "identificou descontos mensais realizados desde Agosto/2023, no valor de R$ 180,00, referentes a suposto contrato de empréstimo consignado nº 603827451",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-007",
+    "titulo": "Perfil tecnológico sem prova",
+    "descricao": "Alegação de que o autor não possui smartphone compatível e jamais usou app do banco não veio acompanhada de prova.",
+    "justificativa": "Sem comprovação do perfil tecnológico alegado, fica menos robusta a incompatibilidade com o canal digital, o que ajuda o banco.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "prova_perfil_tecnologico"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p1:c1",
+      "trecho": "Ocorre que o Autor jamais efetuou cadastro, baixou aplicativo ou realizou qualquer interação com a instituição financeira por meio de plataforma digital, não possuindo sequer smartphone compatível",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-008",
+    "titulo": "Conta Bradesco do benefício sem prova",
+    "descricao": "Autor afirma receber o benefício apenas no Bradesco, mas não apresentou comprovante ou extrato dessa conta.",
+    "justificativa": "Sem prova da conta de recebimento do benefício, fica menos sustentada a tese de que o crédito não foi para conta do autor.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "comprovante_conta_beneficio",
+       "extrato_beneficio"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p2:c1",
+      "trecho": "mantendo apenas conta junto ao Banco Bradesco para recebimento de seu benefício previdenciário.",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "comportamento_do_autor": [
+   {
+    "id": "EMB-01-003",
+    "titulo": "Descoberta após 6 meses de descontos",
+    "descricao": "Autor diz ter notado em 02/2024 descontos iniciados em 08/2023 no valor de R$ 180,00, relativos ao contrato 603827451.",
+    "justificativa": "Indica lapso temporal relevante até a contestação dos descontos, o que pode ser interpretado como inércia e favorece o banco nesta acusação.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p1:c1",
+      "trecho": "Em fevereiro de 2024, o Autor, ao conferir o detalhamento de crédito do seu benefício, identificou descontos mensais realizados desde Agosto/2023, no valor de R$ 180,00, referentes a suposto contrato de empréstimo consignado nº 603827451",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "questoes_processuais": [],
+  "fatos_comprovados_autor": [],
+  "lacunas_probatorias_banco": [
+   {
+    "id": "EMB-01-009",
+    "titulo": "Instrumento contratual ausente",
+    "descricao": "Inexistência, no pacote, de cédula/termo de adesão assinado ou equivalente do contrato 603827451.",
+    "justificativa": "Sem o instrumento contratual, falta prova direta da manifestação de vontade, o que favorece o pedido de inexistência.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "contrato"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-010",
+    "titulo": "Extratos bancários não apresentados",
+    "descricao": "Não foram juntados extratos da conta de crédito (CEF) nem do benefício que demonstrem recebimento/uso do valor.",
+    "justificativa": "Sem extratos independentes, não se comprova titularidade ou uso do crédito, favorecendo a tese de inexistência/ fraude.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "extrato_bancario_conta_credito",
+       "extrato_inss"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-011",
+    "titulo": "Dossiê de contratação ausente",
+    "descricao": "Ausência do dossiê integral (artefatos do fluxo, capturas e logs completos) da operação contestada.",
+    "justificativa": "A falta do dossiê completo impede auditoria plena da autenticidade/aceite, o que favorece o autor na tese de inexistência.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "dossie_contratacao"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-012",
+    "titulo": "Retorno do INSS não comprovado",
+    "descricao": "Não há comprovante do retorno/autorização de consignação do INSS referente ao contrato 603827451.",
+    "justificativa": "Em consignado, o retorno do INSS é prova relevante da autorização; sua ausência favorece o autor.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "retorno_inss_autorizacao_consignacao"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-013",
+    "titulo": "Grafotécnica não realizada",
+    "descricao": "Laudo registra que não foi providenciada verificação grafotécnica complementar por empresa terceira.",
+    "justificativa": "Sem perícia, não há confirmação independente de assinatura/biometria, o que favorece o autor nesta acusação.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p2:c1",
+      "trecho": "Não foi providenciada, até o momento, verificação grafotécnica complementar por empresa terceira.",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "indicios_de_fraude": [
+   {
+    "id": "EMB-01-014",
+    "titulo": "Crédito em conta CEF não comprovada",
+    "descricao": "Comprovante indica crédito na CEF Ag. 3245 CC 00012345-6; autor afirma não ter conta na Caixa e receber benefício no Bradesco.",
+    "justificativa": "Destino diverso e titularidade não comprovada por documento independente sugerem contratação por terceiro, favorecendo o autor.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D02:p1:c1",
+      "trecho": "Instituição depositária Caixa Econômica Federal - Ag. 3245 - CC 00012345-6",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p2:c1",
+      "trecho": "Todavia, o Autor não possui conta corrente na referida instituição, mantendo apenas conta junto ao Banco Bradesco para recebimento de seu benefício previdenciário.",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "inconsistencias_documentos_banco": [
+   {
+    "id": "EMB-01-015",
+    "titulo": "Liveness declarado sem vídeo",
+    "descricao": "Laudo indica autenticação por liveness, mas admite que o vídeo de liveness não foi localizado.",
+    "justificativa": "Autenticação forte declarada sem artefato correspondente reduz a força probatória do fluxo digital, favorecendo o autor.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p1:c1",
+      "trecho": "(cid:127) Autenticação: biometria facial (liveness) + senha eletrônica 6 dígitos",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p2:c1",
+      "trecho": "No entanto, não foi localizado nos arquivos digitais o vídeo de liveness (biometria facial) tradicionalmente capturado ao final do fluxo",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-016",
+    "titulo": "TED citada sem extrato juntado",
+    "descricao": "Laudo menciona TED identificada em fatura/extrato, mas tal extrato não foi disponibilizado nos autos.",
+    "justificativa": "Documento do banco referencia prova não juntada, gerando inconsistência interna e favorecendo o autor.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p2:c1",
+      "trecho": "mediante Transferência Eletrônica Disponível (TED) identificada na fatura/extrato do período.",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-017",
+    "titulo": "Resumo do demonstrativo inconsistente",
+    "descricao": "Resumo aponta saldo aprox. R$ 2.748,38 com 8 parcelas pagas, enquanto a 8ª linha da tabela mostra saldo R$ 8.241,28 após 18/03/2024.",
+    "justificativa": "Divergência interna no demonstrativo fragiliza a confiabilidade dos registros do banco, favorecendo o autor.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "8 18/03/2024 8.275,63 145,65 34,35 180,00 8.241,28 PAGA",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p3:c1",
+      "trecho": "Resumo: 8 de 84 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$\n2.748,38 (cálculo meramente indicativo),",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ]
+ }
+}

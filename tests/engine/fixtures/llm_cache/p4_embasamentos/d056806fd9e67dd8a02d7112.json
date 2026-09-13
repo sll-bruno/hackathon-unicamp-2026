@@ -1,0 +1,176 @@
+{
+ "acusacao_id": "ACU-03",
+ "embasamentos": {
+  "agravantes_dano_moral": [
+   {
+    "id": "EMB-03-001",
+    "titulo": "Longa duração dos descontos",
+    "descricao": "Os descontos perduraram por, ao menos, 21 parcelas entre 06/2022 e 02/2024.",
+    "justificativa": "A prolongada manutenção de descontos indevidos em benefício previdenciário tende a agravar o dano moral pela persistência da lesão ao patrimônio de natureza alimentar.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D06:p3:c1",
+      "trecho": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66 (cálculo meramente indicativo),",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "vulnerabilidade_autor": [
+   {
+    "id": "EMB-03-002",
+    "titulo": "Pessoa idosa comprovada no RG",
+    "descricao": "Documento de identidade indica data de nascimento em 15/03/1958, caracterizando idade superior a 60 anos.",
+    "justificativa": "A condição de pessoa idosa aumenta a vulnerabilidade do consumidor e pode influenciar na extensão do dano moral decorrente de descontos indevidos.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p7:c1",
+      "trecho": "DATA DE NASCIMENTO\n15/03/1958",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "atenuantes_dano_moral": [
+   {
+    "id": "EMB-03-003",
+    "titulo": "Crédito recebido e movimentado",
+    "descricao": "Extrato da conta em nome da autora mostra crédito de R$ 5.000,00 referente ao contrato e movimentações subsequentes (TED, PIX e saque).",
+    "justificativa": "Se os valores creditados foram recebidos e utilizados na conta identificada com o nome e CPF da autora, isso pode mitigar a extensão do dano moral mesmo supondo a inexistência do contrato.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "Cliente: MARIA DAS GRAÇAS SILVA PEREIRA\nCPF: 456.789.123-45 Agência: 0001 Conta: 20.348.719-5",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "12/05/2022 CRÉDITO - EMPRÉSTIMO CONSIGNADO Contr. 502348719 +5.000,00 5.000,00",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "13/05/2022 TED ENVIADA - CTA TITULARIDADE Bradesco / Ag 3421 CC 98765-4 -3.000,00 2.000,00",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "15/05/2022 TRANSFERÊNCIA PIX - ENVIADA Chave CPF - beneficiário familiar -1.500,00 500,00",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "17/05/2022 SAQUE ATM REDE 24H - SÃO LUÍS NSU 00128393 -485,00 15,00",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "lacunas_argumentativas_autor": [
+   {
+    "id": "EMB-03-004",
+    "titulo": "Abalo moral genérico, sem provas",
+    "descricao": "A inicial descreve angústia e transtornos sem apresentar fatos concretos ou documentos que demonstrem repercussões específicas.",
+    "justificativa": "Para a condenação em dano moral, a descrição genérica sem elementos objetivos reduz a força probatória do abalo alegado, favorecendo a tese de inexistência ou menor gravidade do dano.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "laudo/atestado médico ou psicológico",
+       "comprovantes de negativa de crédito",
+       "comunicações de constrangimento ou protesto",
+       "documentos de negativação (SERASA/ SPC)"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p3:c1",
+      "trecho": "causou-lhe inegáveis transtornos emocionais, angústia, sentimento de impotência e comprometimento de sua subsistência, extrapolando o mero aborrecimento cotidiano e configurando efetivo dano moral indenizável.",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-03-005",
+    "titulo": "Comprometimento da renda sem comprovação",
+    "descricao": "Não há documentos que indiquem o valor do benefício previdenciário ou demonstração objetiva do impacto do desconto de R$ 120,00 na renda da autora.",
+    "justificativa": "O agravante de comprometimento relevante da renda depende de prova do valor dos rendimentos e da proporção afetada; sua ausência enfraquece a pretensão de maior indenização.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "extrato de pagamento do benefício do INSS",
+       "comprovante de rendimentos/margem consignável",
+       "demonstrativo de consignações do benefício"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p4:c1",
+      "trecho": "os descontos recaem sobre verba alimentar destinada ao sustento da Autora, pessoa idosa, comprometendo sua subsistência e dignidade.",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-03-006",
+    "titulo": "Reclamação administrativa sem comprovação",
+    "descricao": "Alegada busca de solução administrativa não veio acompanhada de protocolos, respostas do banco, ou registros oficiais do atendimento.",
+    "justificativa": "Para caracterizar agravante de manutenção dos descontos após reclamação, é necessária prova do contato e de sua data; a falta desses documentos favorece o réu.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "protocolos de atendimento do banco",
+       "manifestação na ouvidoria",
+       "reclamação em PROCON ou BACEN",
+       "e-mails/AR de notificação ao banco"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p1:c1",
+      "trecho": "Ao tomar ciência dos descontos, a Autora procurou, de forma administrativa, o Banco Réu, solicitando esclarecimentos acerca da origem do débito.",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-03-007",
+    "titulo": "Ausência de extratos pessoais da autora",
+    "descricao": "A autora afirma não ter recebido ou utilizado os valores, mas não juntou extratos de sua conta onde recebe o benefício para demonstrar a inexistência de depósitos/saques correlatos.",
+    "justificativa": "A prova de que não recebeu/usar valores poderia afastar atenuante do banco; a falta de extratos pessoais mantém dúvida e beneficia o réu nesta acusação.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "extratos da conta em que recebe o benefício",
+       "extratos bancários do período de 05/2022 a 06/2022"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p2:c1",
+      "trecho": "inexistindo nos extratos de sua conta corrente qualquer movimentação compatível com depósito ou saque dos montantes alegadamente contratados.",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ]
+ }
+}

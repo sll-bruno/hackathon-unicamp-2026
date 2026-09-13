@@ -86,14 +86,16 @@ def build_analysis(
             "perda_esperada": brl(finance.perda_esperada),
             "custo_defesa": brl(finance.custo_defesa),
             "custo_defesa_esperado": brl(finance.custo_defesa_esperado),
-            "faixa_acordo": {name: brl(value) for name, value in finance.faixa.items()},
+            "faixa_acordo_valor_a_pagar": {
+                name: brl(value) for name, value in finance.faixa.items()
+            },
             "alcada": brl(finance.alcada),
             "custo_negociacao": brl(finance.custo_negociacao),
-            "custo_acordo_alvo": brl(finance.custo_acordo_alvo),
+            "custo_total_acordo_no_alvo": brl(finance.custo_acordo_alvo),
             "vantagem_economica_acordo": brl(finance.vantagem_economica_acordo),
             "simulacoes_em_que_acordo_sai_mais_barato": pct(finance.p_acordo_mais_barato),
             "p_derrota_de_equilibrio": pct(finance.p_derrota_equilibrio),
-            "cenarios": {
+            "cenarios_custo_total": {
                 option: {name: brl(value) for name, value in values.items()}
                 for option, values in finance.cenarios.items()
             },

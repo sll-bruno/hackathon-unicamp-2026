@@ -90,7 +90,7 @@ def estimate_content(
         }
         scores[accusation.id] = float(
             sum(
-                spec["peso"] * min(counts[accusation.id][name], limit)
+                spec["peso"] * min(counts[accusation.id][name], spec.get("max_itens", limit))
                 for name, spec in categories.items()
             )
         )

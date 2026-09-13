@@ -1,0 +1,114 @@
+{
+ "acusacao_id": "ACU-03",
+ "embasamentos": {
+  "agravantes_dano_moral": [
+   {
+    "id": "EMB-03-001",
+    "titulo": "Longa duração dos descontos",
+    "descricao": "Demonstrativo do banco indica 8 parcelas pagas entre 18/08/2023 e 18/03/2024.",
+    "justificativa": "A manutenção de descontos por vários meses em benefício previdenciário tende a agravar o dano moral, por prolongar a afetação de verba alimentar.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p3:c1",
+      "trecho": "Resumo: 8 de 84 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 2.748,38 (cálculo meramente indicativo),",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "vulnerabilidade_autor": [
+   {
+    "id": "EMB-03-002",
+    "titulo": "Pessoa idosa comprovada",
+    "descricao": "Documento de identidade informa nascimento em 22/08/1962, caracterizando o autor como idoso.",
+    "justificativa": "A condição de idoso evidencia maior vulnerabilidade do autor, o que, em tese, reforça a configuração de dano moral por descontos indevidos.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p7:c1",
+      "trecho": "DATA DE NASCIMENTO NATURALIDADE\n22/08/1962 Manaus/AM",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "atenuantes_dano_moral": [],
+  "lacunas_argumentativas_autor": [
+   {
+    "id": "EMB-03-003",
+    "titulo": "Reclamações não comprovadas",
+    "descricao": "Alegada reclamação ao banco e ao BACEN sem juntada de RDR ou protocolos, impedindo comprovar que os descontos persistiram após ciência formal.",
+    "justificativa": "Sem prova de reclamação prévia, não se demonstra o agravante de manutenção de descontos após reclamação, o que favorece o banco na análise do dano moral.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "comprovante_reclamacao_BACEN_RDR",
+       "protocolos_SAC_ouvidoria",
+       "resposta_formal_do_banco"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p2:c1",
+      "trecho": "bem como apresentou reclamação administrativa junto ao Banco Réu e ao Banco Central do Brasil (RDR nº 12345678-9).",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-03-004",
+    "titulo": "Abalo moral genérico",
+    "descricao": "Descrição de angústia e sofrimento psíquico sem indicação de fatos concretos ou documentos que demonstrem consequências específicas.",
+    "justificativa": "A generalidade da narrativa reduz o suporte probatório do dano moral e pode mitigar ou afastar a indenização pretendida.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "documentos_medicos",
+       "provas_de_recusa_de_servico",
+       "comprovantes_de_despesas_urgentes_afetadas",
+       "testemunhos_detalhados",
+       "notificacao_de_negativacao"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p3:c1",
+      "trecho": "gerou ao Autor angústia, sofrimento psíquico e comprometimento de sua subsistência, extrapolando o mero aborrecimento cotidiano.",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-03-005",
+    "titulo": "Comprometimento da renda não provado",
+    "descricao": "Não há nos autos prova do valor do benefício previdenciário para aferir a relevância do desconto mensal de R$ 180,00.",
+    "justificativa": "Sem quantificar a renda, o agravante de comprometimento relevante da renda não fica demonstrado, o que favorece o banco na discussão do dano moral.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "extrato_do_beneficio_INSS",
+       "comprovante_do_valor_do_beneficio",
+       "demonstrativo_orcamentario_familiar"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p3:c1",
+      "trecho": "gerou ao Autor angústia, sofrimento psíquico e comprometimento de sua subsistência, extrapolando o mero aborrecimento cotidiano.",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ]
+ }
+}

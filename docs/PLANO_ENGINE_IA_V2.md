@@ -314,24 +314,26 @@ Exemplo com trechos reais do Caso 02, abreviado:
 
 ### 4.4 Taxonomia de acusações e embasamentos, com pesos iniciais
 
-Peso positivo favorece o banco; negativo favorece o autor. No máximo 3 itens contam por categoria.
+Peso positivo favorece o banco; negativo favorece o autor. No máximo 3 itens contam por categoria, salvo `max_itens` menor na categoria. As definições completas, usadas nos prompts P4 e P6, estão em `pesos_embasamento_v1.yaml`.
+
+**Princípio da calibração (Etapa 4):** classificar pela prova, não pela versão das partes. Quando o autor atribui a contratação a terceiro, os registros internos do banco sobre a operação contestada (canal, dispositivo, conta de destino, aceite) mostram que a operação existiu, não quem a fez. As acusações dependentes são avaliadas supondo a principal perdida e não repetem fatos sobre a existência da contratação.
 
 **A0 · `inexistencia_contratacao`** — acusação principal. Valor monetário 0; o saldo devedor é informado à parte.
 
 | Categoria | Peso | O que entra |
 |---|---:|---|
-| `provas_contratacao` | +3 | Instrumento assinado, gravação com aceite, autorização de consignação com retorno do INSS |
+| `provas_contratacao` | +3 | Instrumento no pacote com assinatura do autor, gravação com aceite descrita como preservada, autorização de consignação com retorno do INSS |
 | `autenticacao_forte` | +3 | Grafotécnica compatível, biometria/liveness confirmada, documentos validados em bases oficiais |
-| `registros_digitais` | +1 | Aceite eletrônico, senha, IP, device fingerprint, geolocalização sem biometria |
-| `credito_em_conta_do_autor` | +2 | Crédito em conta de titularidade comprovada do autor |
+| `registros_digitais` | +1 | Aceite eletrônico, senha, IP, device fingerprint, geolocalização sem biometria. Metadados da mesma sessão formam um item |
+| `credito_em_conta_do_autor` | +2 | Crédito em conta de titularidade comprovada por documento independente da declaração do banco |
 | `uso_do_credito_pelo_autor` | +2 | Saques, transferências para mesma titularidade ou familiares, pagamentos |
-| `contradicoes_do_autor` | +2 | Alegação desmentida por documento |
+| `contradicoes_do_autor` | +2 | Alegação desmentida por prova que não dependa da versão do banco sobre a operação contestada (extrato com uso, perícia, biometria confirmada) |
 | `lacunas_argumentativas_autor` | +1 | Alegação relevante sem prova (lista abaixo) |
 | `comportamento_do_autor` | +1 | Inércia longa, parcelas pagas sem contestação |
 | `questoes_processuais` | +2 | Prescrição, inépcia, ilegitimidade, falta de documento indispensável |
 | `fatos_comprovados_autor` | −2 | B.O. juntado, reclamação comprovada, prova de conta em outro banco |
-| `lacunas_probatorias_banco` | −3 | Contrato ausente, assinatura não periciada, liveness ausente ou não localizado, gravação ausente |
-| `indicios_de_fraude` | −3 | Crédito em conta não reconhecida, dados cadastrais divergentes, canal incompatível com o perfil, geolocalização distante |
+| `lacunas_probatorias_banco` | −3 | Subsídio ausente do pacote, prova que o banco declara não localizada, perícia não realizada. Prova descrita como preservada não é lacuna |
+| `indicios_de_fraude` | −3 | Crédito em conta que o autor nega ter, sem prova independente de titularidade; dados cadastrais divergentes; canal incompatível com o perfil; geolocalização distante |
 | `inconsistencias_documentos_banco` | −2 | Divergência entre subsídios, documento citado e não disponibilizado, forma de assinatura incompatível com o canal |
 
 **A1 · `dano_material`** — depende de A0.
@@ -339,8 +341,8 @@ Peso positivo favorece o banco; negativo favorece o autor. No máximo 3 itens co
 | Categoria | Peso | O que entra |
 |---|---:|---|
 | `fatos_comprovados_autor` | −2 | Descontos comprovados (demonstrativo, extrato do benefício) |
-| `lacunas_argumentativas_autor` | +1 | Período ou valor dos descontos sem prova; pedido em dobro sem fundamento fático |
-| `compensacao_valor_creditado` | +2 | Crédito recebido e usado pelo autor, passível de compensação |
+| `lacunas_argumentativas_autor` (máx. 1) | +1 | Período ou valor dos descontos sem prova; pedido em dobro sem fundamento fático |
+| `compensacao_valor_creditado` | +2 | Crédito comprovadamente recebido e usado pelo autor, passível de compensação |
 | `questoes_processuais` | +2 | Prescrição de parte das parcelas |
 
 **A2 · `dano_moral`** — depende de A0.
@@ -349,8 +351,8 @@ Peso positivo favorece o banco; negativo favorece o autor. No máximo 3 itens co
 |---|---:|---|
 | `agravantes_dano_moral` | −2 | Negativação, renda comprometida, descontos mantidos após reclamação, longa duração |
 | `vulnerabilidade_autor` | −1 | Idoso, analfabeto, renda exclusiva do benefício |
-| `atenuantes_dano_moral` | +2 | Desconto de baixo valor relativo, sem negativação, crédito usado pelo autor, cessação rápida |
-| `lacunas_argumentativas_autor` | +1 | Abalo descrito de forma genérica, sem fato concreto |
+| `atenuantes_dano_moral` | +2 | Desconto de baixo valor relativo, sem negativação, crédito usado pelo autor, cessação rápida comprovada. Provas da contratação não entram |
+| `lacunas_argumentativas_autor` (máx. 1) | +1 | Abalo descrito de forma genérica, sem fato concreto |
 
 **A3 · `outro_pedido_monetario`** — seguro, tarifas, multa; depende de A0. Categorias: `fatos_comprovados_autor` (−2), `lacunas_probatorias_banco` (−3) e `lacunas_argumentativas_autor` (+1).
 

@@ -32,6 +32,7 @@ def test_full_pipeline_with_recorded_llm_responses(
     recommendation = payload["recommendation"]
     assert recommendation["action"] == expected_action
     assert 0 <= recommendation["confidence_percent"] <= 100
+    assert "DIVERGENCIA_SUBFLUXOS" not in recommendation["reason_codes"]
     assert stages[-1] == "CONCLUIDO"
 
     band = payload["settlement_range"]

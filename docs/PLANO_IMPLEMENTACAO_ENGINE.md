@@ -14,7 +14,7 @@ As outras frentes já avançaram em branches remotas. Este plano:
 
 > **Direção atual (hackathon):** prioridade é o fluxo da engine funcionando de ponta a ponta nos dois casos. Casos de borda, guardrails elaborados, modo map-reduce e a integração com backend e frontend (hoje placeholders) ficam para a fase de produção. PDFs e planilha são considerados corretos.
 
-**Status:** Etapas 0, 1A, 1B, 2A, 2B e 3 implementadas em versão simplificada (`ENGINE_MODE=full`, CLI `python -m decision_engine <pasta>`). Resultado real com `gpt-5`: Caso 01 → DEFESA (confiança 100%); Caso 02 → ACORDO (confiança 70%, faixa R$ 5.304 / 6.228 / 8.275). Pendente: Etapa 4 (calibração dos pesos e prompts — a análise de conteúdo do Caso 02 diverge do XGBoost — e documentação).
+**Status:** Etapas 0, 1A, 1B, 2A, 2B e 3 implementadas em versão simplificada (`ENGINE_MODE=full`, CLI `python -m decision_engine <pasta>`). Etapa 4 em andamento: análise de conteúdo calibrada (P4 v3, P6 v3, P7 v2, definições e `max_itens` em `pesos_embasamento_v1.yaml`). Resultado real com `gpt-5`: Caso 01 → DEFESA (confiança 100%); Caso 02 → ACORDO (confiança 70%, faixa R$ 4.915 / 5.772 / 7.668), sem divergência entre subfluxos.
 
 ---
 
@@ -246,6 +246,7 @@ Pessoa A = ingestão/LLM; Pessoa B = modelo/financeiro. Tudo em `src/pipeline/`;
 
 ### Etapa 4 — Calibração e documentação
 
+- [x] Análise de conteúdo calibrada contra as anotações de referência: Caso 02 com P(derrota) de conteúdo 83% (XGBoost 97%) e Caso 01 com 2%, piso do clip (XGBoost 1,7%); cobertura dos embasamentos de referência 12/14 e 13/16. Detalhes em `HISTORICO_ENGINE_IA.md`.
 - Sensibilidade nos 2 casos (pesos, T, α, k, custo de negociação).
 - Números para os slides.
 - Atualizar `architecture_engine.md` e `docs/BACKEND.md` §"Contrato da engine" (com a Pessoa C).
@@ -346,41 +347,53 @@ Regras:
 Você é analista jurídico do Banco UFMG (réu) numa ação de empréstimo consignado não reconhecido.
 Para UMA acusação, mapeie os pontos que favorecem o banco e os que favorecem a parte autora, sempre com trecho literal dos documentos.
 Seja completo e imparcial: omitir um ponto desfavorável ao banco é tão grave quanto inventar um favorável.
+Classifique pela prova, não pela versão de cada parte. Quando a parte autora atribui a contratação a terceiro, os registros do próprio banco sobre a operação contestada (canal, dispositivo, conta de destino, aceite) mostram que a operação existiu, não que a parte autora a fez: não são contradições da parte autora.
 Não atribua pesos, notas, probabilidades nem valores calculados.
 ```
 **User**
 ```
 Acusação analisada:
-{acusacao_json}
-Acusação principal (contexto): {acusacao_principal_json_ou_null}
+{{acusacao}}
 
-Documentos presentes no pacote: {lista [{documento_id, tipo, origem, paginas}]}
-Tipos de subsídio AUSENTES do pacote: {lista_tipos_ausentes}
-Anexos citados na petição: {anexos_citados}
+Acusação principal (contexto):
+{{acusacao_principal}}
 
-Categorias permitidas para esta acusação (preencha todas; use [] quando não houver itens):
-{para cada categoria do tipo: "- <nome> (favorece o BANCO|favorece o AUTOR): <definição e exemplos do V2 §4.4>"}
+Documentos presentes no pacote:
+{{documentos_presentes}}
+
+Tipos de subsídio do banco AUSENTES do pacote:
+{{tipos_ausentes}}
+
+Anexos que a petição diz ter juntado:
+{{anexos_citados}}
+
+Categorias permitidas para esta acusação. Preencha todas; use [] quando não houver itens:
+{{categorias}}
 
 Checklist — verifique cada ponto nos documentos presentes:
-- contrato: assinatura e forma (manual/eletrônica), canal, data, valor, conta de crédito.
-- dossiê: resultado da grafotécnica, liveness/biometria, validação de documentos.
-- laudo: canal, autenticação, gravação, IP/dispositivo/geolocalização, observações sobre provas não localizadas.
-- comprovante de crédito: instituição e conta de destino, titularidade, data.
+- contrato: assinatura e forma (manual ou eletrônica), canal, data, valor, conta de crédito.
+- dossiê: resultado da grafotécnica, liveness ou biometria, validação de documentos.
+- laudo: canal, autenticação, gravação, IP, dispositivo e geolocalização (compatível com o domicílio?), provas declaradas e não localizadas, documentos citados e não disponibilizados.
+- comprovante de crédito: instituição e conta de destino, data; a titularidade é comprovada por documento independente ou só declarada pelo banco? A conta é a mesma em que a parte autora recebe o benefício? A parte autora nega ter essa conta?
 - extrato: crédito, movimentações posteriores (saques, TED, PIX), titularidade.
 - demonstrativo: parcelas pagas, status do contrato, divergência entre resumo e tabela.
-- autos: alegações de fato, perfil do autor, B.O. e reclamações, anexos citados × juntados, cronologia.
+- autos: alegações de fato, perfil do autor, boletim de ocorrência e reclamações, anexos citados × juntados, cronologia.
 
 Regras:
-1. Um fato atômico por item. O mesmo fato não pode aparecer em duas categorias desta acusação.
-2. titulo (até 12 palavras); descricao (o fato, objetivo); justificativa (por que ajuda ou prejudica o banco NESTA acusação).
-3. Referência "trecho": chunk_id + trecho copiado literalmente (até 300 caracteres, sem reticências nem correções).
-4. Referência "ausencia_documental": só para lacunas. Informe documentos_esperados (tipos) e documentos_verificados (ids consultados). Se houver, acrescente referência "trecho" com a alegação não comprovada.
-5. Alegação do autor sem prova vai em lacunas_argumentativas_autor. Só vai em fatos_comprovados_autor se um documento a comprovar.
-6. Documento citado como anexo e ausente do pacote é lacuna do autor.
-7. Informação desfavorável ao banco que esteja nos próprios subsídios do banco (ex.: prova não localizada, divergência interna) deve ser registrada.
-8. IDs no formato EMB-<n da acusação>-<sequencial>, ex.: EMB-01-003.
+1. Um fato por item, e cada fato numa única categoria desta acusação. Metadados da mesma fonte que provam a mesma coisa formam um item só.
+2. Se a acusação analisada depende da principal, avalie-a supondo que a principal foi perdida (contrato declarado inexistente). Registre só fatos que mudam o cabimento ou o valor desta acusação; não repita provas nem lacunas sobre a existência da contratação.
+3. titulo com até 12 palavras; descricao com o fato, de forma objetiva; justificativa explicando por que o item ajuda ou prejudica o banco NESTA acusação.
+4. Referência do tipo "trecho": chunk_id + trecho copiado literalmente (até 300 caracteres, sem reticências nem correções); documentos_esperados = [].
+5. Referência do tipo "ausencia_documental": só para lacunas; chunk_id e trecho = null; documentos_esperados com os tipos que faltam. Quando houver, acrescente outra referência do tipo "trecho" com a alegação não comprovada.
+6. Alegação da parte autora sem prova vai em lacunas_argumentativas_autor. Só vai em fatos_comprovados_autor se um documento a comprovar.
+7. Documento que a petição diz ter juntado, mas que não está entre os documentos presentes, é lacuna da parte autora.
+8. Informação desfavorável ao banco que esteja nos próprios subsídios do banco (prova que o banco declara não localizada, documento citado e não disponibilizado, divergência interna) deve ser registrada. Prova que o banco descreve como existente e preservada conta a favor do banco na categoria própria; não é lacuna só por não ter sido anexada em arquivo separado.
+9. Crédito em conta que a parte autora nega ter, sem documento independente que comprove a titularidade, é indício de fraude, não crédito em conta da parte autora nem contradição dela.
+10. IDs no formato EMB-<número da acusação>-<sequencial com 3 dígitos>, por exemplo EMB-01-003.
 
-<chunks>{chunks_roteados_para_a_acusacao}</chunks>
+<chunks>
+{{chunks}}
+</chunks>
 ```
 **Schema:** `{acusacao_id, embasamentos: {<categoria>: [{id, titulo, descricao, justificativa, referencias: [{tipo: trecho|ausencia_documental, chunk_id|null, trecho|null, documentos_esperados: [], documentos_verificados: []}]}] }}`. Todas as categorias do tipo são obrigatórias.
 
@@ -408,29 +421,29 @@ Ignore cabeçalhos, rodapés e texto repetido. Não crie itens de ausência docu
 **System**
 ```
 Você é um revisor independente de extração jurídica. Não confie no extrator: verifique cada item contra o trecho citado.
-Você não cria itens novos; só aprova, reprova, reclassifica, mescla e aponta omissões.
+Você não cria itens novos; só aprova, reprova ou reclassifica.
 ```
 **User**
 ```
-Acusações: {acusacoes_json}
-Categorias permitidas por tipo, com definição e polaridade: {catalogo}
-Pedidos da seção "DOS PEDIDOS": <chunks>{chunks_pedidos}</chunks>
-Itens já reprovados pela validação automática (não reavalie): {reprovados_deterministicos}
+Acusações:
+{{acusacoes}}
 
-Itens a revisar, cada um com o texto integral dos chunks citados:
-{itens_com_chunks}
+Categorias permitidas por tipo de acusação, com definição e se favorecem o banco ou a parte autora:
+{{categorias_por_tipo}}
 
-Para cada item, verifique:
-1. suporte: o trecho sustenta a descrição? (se não → reprovado)
-2. categoria e polaridade corretas para aquela acusação? (se não → reclassificar, só para categoria permitida)
-3. duplicidade: mesmo fato em outro item da mesma acusação ou fato quebrado em vários itens? (→ mesclar, indicando mesclar_com)
-4. conflito: o mesmo fato aparece em categorias de polaridades opostas? (reprove o item de pior suporte)
+Itens a revisar, cada um com a acusação, a categoria e o texto integral dos chunks citados:
+{{itens}}
 
-Depois, verifique a completude:
-5. acusacoes_omitidas: pedido de mérito em "DOS PEDIDOS" sem acusação correspondente.
-6. omissoes: ponto do checklist (dossiê, laudo, comprovante, extrato, demonstrativo, anexos citados × juntados) presente nos chunks e sem item.
+Para cada item, decida o status:
+1. reprovado: o trecho não sustenta a descrição; o item repete um fato já coberto por outro item da mesma acusação (cite o ID do item mantido no motivo); ou o item está numa acusação dependente (dano_material, dano_moral, outro_pedido_monetario) e trata só da existência da contratação (provas, lacunas ou indícios sobre quem contratou), que já conta na acusação principal.
+2. reclassificar: o fato é válido, mas a categoria ou a polaridade está errada para aquela acusação; informe categoria_sugerida entre as permitidas para o tipo. Confira em especial:
+   - contradicoes_do_autor apoiada só em registro interno do banco sobre a operação contestada (canal, conta de destino, aceite) não é contradição;
+   - credito_em_conta_do_autor ou compensacao_valor_creditado em conta que a parte autora nega ter, sem documento independente de titularidade, não favorece o banco: na principal, reclassifique para indicios_de_fraude; nas dependentes, reprove;
+   - autenticação declarada cuja evidência o próprio banco diz não ter localizado não é autenticacao_forte;
+   - instrumento contratual presente no pacote e prova descrita pelo banco como preservada (gravação com duração, retorno do INSS com data) favorecem o banco: não reprove por a assinatura ou o arquivo não aparecerem no texto extraído.
+3. aprovado: nos demais casos; categoria_sugerida = null.
 
-Motivo obrigatório e curto (até 25 palavras) em toda decisão.
+Revise todos os itens. O motivo é obrigatório e curto (até 25 palavras).
 ```
 **Schema:** `{itens: [{id, status: aprovado|reprovado|reclassificar|mesclar, categoria_sugerida|null, mesclar_com|null, motivo}], acusacoes_omitidas: [{descricao, chunk_id, trecho}], omissoes: [{acusacao_id, categoria, descricao, chunk_id|null, trecho|null}], observacoes_gerais: []}`
 
@@ -444,16 +457,21 @@ Decida entre ACORDO e DEFESA e justifique para o advogado que vai executar a dec
 Você recebe análises já calculadas pelo sistema: probabilidades do modelo histórico, embasamentos extraídos e validados, perdas estimadas, custo esperado da defesa, faixa de negociação (abertura, alvo, máximo) e cenários.
 Esses números são fixos: não recalcule, não crie novos valores e não altere a faixa.
 
+Não confunda valor a pagar com custo total:
+- faixa_acordo_valor_a_pagar (abertura, alvo, máximo) é o valor oferecido à parte autora. Só esses números podem ser chamados de abertura, alvo ou máximo.
+- custo_total_acordo_no_alvo = alvo + custo_negociacao. Chame-o de "custo total do acordo no alvo", nunca de "alvo".
+- cenarios_custo_total já incluem o custo de negociação (acordo) ou o custo de defesa (defesa).
+
 Critérios, em ordem de importância:
-1. Comparação econômica: custo esperado da defesa × custo do acordo no alvo (já inclui o custo de negociação), considerando a robustez informada (em quantas simulações o acordo sai mais barato).
+1. Comparação econômica: custo esperado da defesa × custo total do acordo no alvo, considerando a robustez informada (em quantas simulações o acordo sai mais barato).
 2. Risco de cauda: pior cenário da defesa frente à alçada do banco.
 3. Qualidade da prova: embasamentos que favorecem e prejudicam o banco, com atenção aos de maior peso e às lacunas de cada lado.
 4. Contexto regional: efeito da UF e do subassunto no histórico.
 5. Confiabilidade da análise: divergência entre modelo histórico e análise de conteúdo, coorte pequena, falhas de extração.
 
-Você pode decidir contra a comparação econômica apenas se prova, risco ou confiabilidade justificarem. Nesse caso, marque decisao_contraria_a_economia = true e explique.
+Você pode decidir contra a comparação econômica apenas se prova, risco ou confiabilidade justificarem. Nesse caso, marque decisao_contraria_a_economia = true e explique em comparacao_economica.
 Escreva em português claro para advogado. Cite embasamentos pelos IDs. Todo número mencionado deve existir literalmente na entrada.
-Se a ação for ACORDO, preencha estrategia_acordo e deixe teses_defesa = null. Se for DEFESA, o inverso.
+Se a ação for ACORDO, preencha estrategia_acordo e deixe teses_defesa = null. Se for DEFESA, preencha teses_defesa e deixe estrategia_acordo = null.
 ```
 **User** (JSON montado pelo `runner`)
 ```
@@ -467,10 +485,10 @@ Se a ação for ACORDO, preencha estrategia_acordo e deixe teses_defesa = null. 
                                   "referencias": [{"documento", "pagina", "trecho"}]}]}],
                "p_derrota", "perda_se_condenado", "validacao": {"taxa_reprovacao", "omissoes"}},
   "financeiro": {"alfa", "beta", "p_derrota", "perda_se_condenado", "perda_esperada", "custo_defesa",
-                 "custo_defesa_esperado", "faixa": {"abertura", "alvo", "maximo"}, "alcada", "custo_negociacao",
-                 "custo_acordo_alvo", "vantagem_economica_acordo", "p_acordo_mais_barato",
+                 "custo_defesa_esperado", "faixa_acordo_valor_a_pagar": {"abertura", "alvo", "maximo"}, "alcada", "custo_negociacao",
+                 "custo_total_acordo_no_alvo", "vantagem_economica_acordo", "p_acordo_mais_barato",
                  "aceite_minimo_para_compensar",
-                 "cenarios": {"defesa": {"melhor", "medio", "pior"}, "acordo": {"melhor", "medio", "pior"}},
+                 "cenarios_custo_total": {"defesa": {"melhor", "medio", "pior"}, "acordo": {"melhor", "medio", "pior"}},
                  "divergencia_subfluxos": {"p", "perda_se_condenado"}},
   "premissas": ["aceite do acordo no alvo é assumido", "k calibrado em 280 acordos históricos", "..."]
 }
