@@ -134,19 +134,23 @@ def _seed_documents(session: Session, case: Case, spec: dict, data_dir: Path) ->
 def _seed_closed_fixture(
     session: Session, case: Case, lawyer: Lawyer, documents: list[Document]
 ) -> None:
-    autos = next(document for document in documents if document.type == DocumentType.AUTOS)
+    contract = next(document for document in documents if document.type == DocumentType.CONTRATO)
     sources = [
         {
-            "document_id": autos.id,
+            "document_id": contract.id,
             "page": 1,
-            "excerpt": "Trecho demonstrativo seedado; não produzido pela engine.",
+            "excerpt": (
+                "O valor líquido liberado será creditado em conta de titularidade do TOMADOR, "
+                "junto ao Banco UFMG S.A., agência 0001, conta corrente 20.348.719-5, na data "
+                "prevista de 12/05/2022."
+            ),
         }
     ]
     evidence_payload = [
         {
             "id": "demo-evidence-1",
             "text": (
-                "A documentação de contratação e crédito está disponível no caso demonstrativo."
+                "O contrato registra crédito de R$ 5.000,00 na conta da titular em 12/05/2022."
             ),
             "type": "DOCUMENTACAO_COMPLETA",
             "weight": 1.0,
@@ -195,7 +199,7 @@ def _seed_closed_fixture(
                 "id": "demo-fact-1",
                 "fact_type": "documentacao_disponivel",
                 "description": (
-                    "A documentação de contratação e crédito está disponível no caso demonstrativo."
+                    "O contrato registra crédito de R$ 5.000,00 na conta da titular em 12/05/2022."
                 ),
                 "weight": 1.0,
                 "weights_version": "demo-fixture-v1",
@@ -216,6 +220,20 @@ def _seed_closed_fixture(
             existing.payload_json = json.dumps(payload, ensure_ascii=False)
             existing.versions_json = json.dumps(payload["versions"], ensure_ascii=False)
             session.add(existing)
+            evidence = session.exec(
+                select(EvidenceRecord).where(
+                    EvidenceRecord.recommendation_id == existing.id,
+                    EvidenceRecord.external_id == evidence_payload[0]["id"],
+                )
+            ).first()
+            if evidence is not None:
+                evidence.text = evidence_payload[0]["text"]
+                evidence.type = evidence_payload[0]["type"]
+                evidence.weight = evidence_payload[0]["weight"]
+                evidence.sources_json = json.dumps(
+                    evidence_payload[0]["sources"], ensure_ascii=False
+                )
+                session.add(evidence)
         return
     recommendation = RecommendationRecord(
         case_id=case.id,

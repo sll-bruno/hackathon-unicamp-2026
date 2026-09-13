@@ -5,9 +5,9 @@ import {
   type ChatApiMessage,
   type ChatEvidence,
 } from '../api/chat';
-import { documentFileUrl } from '../api/workspace';
 import { documentTypeLabel } from '../pages/Workspace/format';
 import type { CaseDocument, Source, Workspace } from '../types/workspace';
+import type { Citation } from './EvidenceCard';
 import './chat-panel.css';
 
 interface ChatMessage {
@@ -21,6 +21,7 @@ interface ChatMessage {
 interface Props {
   data: Workspace;
   isSample: boolean;
+  onSelectCitation: (citation: Citation) => void;
   onClose: () => void;
 }
 
@@ -59,12 +60,11 @@ function seedMessages(data: Workspace): ChatMessage[] {
   return messages;
 }
 
-export function ChatPanel({ data, isSample, onClose }: Props) {
+export function ChatPanel({ data, isSample, onSelectCitation, onClose }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>(() =>
     isSample ? seedMessages(data) : [],
   );
   const [draft, setDraft] = useState('');
-  const [openCitation, setOpenCitation] = useState<string | null>(null);
   const [loadingHistory, setLoadingHistory] = useState(!isSample);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -152,7 +152,7 @@ export function ChatPanel({ data, isSample, onClose }: Props) {
   };
 
   return (
-    <aside className="chat-panel" aria-label="Chatbot da análise">
+    <aside className="chat-panel side-panel" aria-label="Chatbot da análise">
       <header className="chat-panel__header">
         <div>
           <span className="eyebrow">Chatbot da análise</span>
@@ -183,9 +183,7 @@ export function ChatPanel({ data, isSample, onClose }: Props) {
             key={m.id}
             message={m}
             documents={documents}
-            isSample={isSample}
-            openCitation={openCitation}
-            onToggleCitation={setOpenCitation}
+            onSelectCitation={onSelectCitation}
           />
         ))}
         {sending && (
@@ -217,15 +215,11 @@ export function ChatPanel({ data, isSample, onClose }: Props) {
 function ChatBubble({
   message,
   documents,
-  isSample,
-  openCitation,
-  onToggleCitation,
+  onSelectCitation,
 }: {
   message: ChatMessage;
   documents: Map<string, CaseDocument>;
-  isSample: boolean;
-  openCitation: string | null;
-  onToggleCitation: (key: string | null) => void;
+  onSelectCitation: (citation: Citation) => void;
 }) {
   return (
     <div className={`chat-bubble chat-bubble--${message.role}${message.failed ? ' chat-bubble--failed' : ''}`}>
@@ -235,31 +229,16 @@ function ChatBubble({
           {message.sources.map((s, i) => {
             const key = `${message.id}-${i}`;
             const doc = documents.get(s.document_id);
-            const open = openCitation === key;
             return (
               <div key={key} className="chat-citation-wrap">
-                {isSample ? (
-                  <button
-                    type="button"
-                    className="chat-citation"
-                    aria-pressed={open}
-                    onClick={() => onToggleCitation(open ? null : key)}
-                  >
-                    {doc ? documentTypeLabel[doc.type] : s.document_id} · p. {s.page}
-                  </button>
-                ) : (
-                  <a
-                    className="chat-citation"
-                    href={documentFileUrl(s.document_id, s.page)}
-                    target="_blank"
-                    rel="noreferrer"
-                    title="Abrir a fonte no PDF"
-                    onClick={() => onToggleCitation(key)}
-                  >
-                    {doc ? documentTypeLabel[doc.type] : s.document_id} · p. {s.page}
-                  </a>
-                )}
-                {open && <blockquote className="chat-citation__quote">{s.excerpt}</blockquote>}
+                <button
+                  type="button"
+                  className="chat-citation"
+                  title="Abrir a fonte no visualizador"
+                  onClick={() => onSelectCitation({ document_id: s.document_id, page: s.page, excerpts: [s.excerpt] })}
+                >
+                  {doc ? documentTypeLabel[doc.type] : s.document_id} · p. {s.page}
+                </button>
               </div>
             );
           })}

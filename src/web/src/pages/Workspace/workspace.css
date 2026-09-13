@@ -163,8 +163,8 @@
   color: var(--text-secondary);
 }
 
-/* Layout com o chatbot aberto: a área de trabalho encolhe para a metade
-   esquerda, o painel de chat ocupa a direita (ver components/ChatPanel.tsx).
+/* Layout com um painel lateral aberto: a área de trabalho encolhe para a metade
+   esquerda, e o chat ou visualizador ocupa a direita.
    Cada metade rola por conta própria (altura própria + overflow), então o
    scroll do mouse só afeta o lado em que o cursor está, e a barra de rolagem
    da esquerda fica colada na divisa com o chat — não lá no canto da tela.
@@ -176,13 +176,40 @@
    (AppLayout) e ocupa exatamente 100vh − topbar — nenhum pixel de altura
    extra sobra para o documento rolar. */
 .ws-shell {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 0fr;
   align-items: flex-start;
+  transition: grid-template-columns 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .ws-shell--split {
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 1fr);
   overflow: hidden;
   margin: calc(var(--space-12) * -1) calc(var(--space-8) * -1);
   height: calc(100vh - var(--app-bar-h));
+}
+.side-panel {
+  animation: side-panel-enter 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.side-panel--loading {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-width: 360px;
+  height: calc(100vh - var(--app-bar-h));
+  border-left: 1px solid var(--stroke-primary);
+  background: var(--surface-page);
+  color: var(--text-muted);
+  font-size: var(--text-14);
+}
+@keyframes side-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 @media (max-width: 720px) {
   .ws-shell--split {
@@ -895,6 +922,11 @@
   gap: var(--space-2);
   min-width: 0;
   color: inherit;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
   text-decoration: none;
 }
 .evidence__main--clickable {
@@ -1040,11 +1072,6 @@
   list-style: none;
 }
 .inventory__item {
-  display: grid;
-  grid-template-columns: 8px 1fr auto;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) 0;
   border-top: 1px solid var(--stroke-secondary);
   font-size: var(--text-14);
 }
@@ -1056,6 +1083,28 @@
   height: 8px;
   border-radius: 50%;
   background: var(--text-primary);
+}
+.inventory__button {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) 0;
+  border: 0;
+  border-radius: var(--radius-4);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.inventory__button:hover:not(:disabled),
+.inventory__button[aria-pressed='true'] {
+  background: var(--hover);
+}
+.inventory__button:disabled {
+  cursor: not-allowed;
 }
 .inventory__state {
   color: var(--text-muted);
@@ -1120,6 +1169,28 @@
   }
   .evidence-tab__count {
     font-size: var(--text-32);
+  }
+}
+
+@media (max-width: 900px) {
+  .ws-shell--split {
+    grid-template-columns: minmax(0, 1fr) 0fr;
+  }
+  .side-panel--loading {
+    position: fixed;
+    inset: var(--app-bar-h) 0 0;
+    z-index: 16;
+    width: auto;
+    min-width: 0;
+    height: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-shell,
+  .side-panel {
+    animation: none;
+    transition: none;
   }
 }
 

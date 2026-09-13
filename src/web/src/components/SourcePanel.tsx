@@ -7,7 +7,9 @@ interface Props {
   documents: CaseDocument[];
   flags: Record<SubsidyType, boolean>;
   activeCitation: Citation | null;
+  citationsByDocument: Map<string, Citation[]>;
   isSample: boolean;
+  onSelectCitation: (citation: Citation) => void;
   onClear: () => void;
 }
 
@@ -21,7 +23,15 @@ const subsidyOrder: SubsidyType[] = [
 ];
 
 /** Coluna lateral: trecho citado selecionado e inventário dos subsídios. */
-export function SourcePanel({ documents, flags, activeCitation, isSample, onClear }: Props) {
+export function SourcePanel({
+  documents,
+  flags,
+  activeCitation,
+  citationsByDocument,
+  isSample,
+  onSelectCitation,
+  onClear,
+}: Props) {
   const activeDoc = activeCitation && documents.find((d) => d.document_id === activeCitation.document_id);
   const activeDocumentUrl =
     activeCitation && !isSample
@@ -61,7 +71,7 @@ export function SourcePanel({ documents, flags, activeCitation, isSample, onClea
                 target="_blank"
                 rel="noreferrer"
               >
-                Abrir PDF novamente
+                Abrir em nova aba
               </a>
             ) : (
               <p className="source-view__hint">O PDF abre aqui quando a API de documentos estiver conectada.</p>
@@ -80,13 +90,39 @@ export function SourcePanel({ documents, flags, activeCitation, isSample, onClea
           </span>
         </header>
         <ul className="inventory">
-          {subsidyOrder.map((type) => (
-            <li key={type} className="inventory__item" data-available={flags[type]}>
-              <span className="inventory__mark" aria-hidden="true" />
-              <span className="inventory__label">{documentTypeLabel[type]}</span>
-              <span className="inventory__state">{flags[type] ? 'Disponível' : 'Indisponível'}</span>
-            </li>
-          ))}
+          {subsidyOrder.map((type) => {
+            const document = documents.find((item) => item.type === type);
+            const citations = document ? citationsByDocument.get(document.document_id) ?? [] : [];
+            const available = flags[type] && Boolean(document);
+            const selected = document?.document_id === activeCitation?.document_id;
+            const initialCitation = citations[0] ?? (document
+              ? { document_id: document.document_id, page: 1, excerpts: [] }
+              : null);
+
+            return (
+              <li key={type} className="inventory__item" data-available={available}>
+                <button
+                  type="button"
+                  className="inventory__button"
+                  disabled={!available || !initialCitation}
+                  aria-pressed={selected}
+                  onClick={() => initialCitation && onSelectCitation(initialCitation)}
+                >
+                  <span className="inventory__mark" aria-hidden="true" />
+                  <span className="inventory__label">{documentTypeLabel[type]}</span>
+                  <span className="inventory__state">
+                    {available
+                      ? citations.length > 0
+                        ? `${citations.reduce((total, item) => total + item.excerpts.length, 0)} citações`
+                        : 'Abrir arquivo'
+                      : flags[type]
+                        ? 'Arquivo ausente'
+                        : 'Indisponível'}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </section>
     </aside>

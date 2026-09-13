@@ -1,4 +1,3 @@
-import { documentFileUrl } from '../api/workspace';
 import { documentTypeLabel, factTypeLabel, relationLabel } from '../pages/Workspace/format';
 import type { CaseDocument, Contradiction, Fact, FactRelation, Gap, Source } from '../types/workspace';
 
@@ -63,17 +62,15 @@ export function EvidenceCard({
 
   return (
     <article className={`evidence${isActive ? ' evidence--active' : ''}`} data-kind={kind}>
-      {primaryCitation && !isSample ? (
-        <a
+      {primaryCitation ? (
+        <button
+          type="button"
           className="evidence__main evidence__main--clickable"
-          href={documentFileUrl(primaryCitation.document_id, primaryCitation.page)}
-          target="_blank"
-          rel="noreferrer"
-          title="Abrir a principal fonte desta evidência"
+          title={isSample ? 'Ver o trecho citado' : 'Abrir a principal fonte no visualizador'}
           onClick={selectPrimary}
         >
           {mainContent}
-        </a>
+        </button>
       ) : (
         <div
           className={`evidence__main${primaryCitation ? ' evidence__main--clickable' : ''}`}
@@ -171,30 +168,17 @@ function CitationChips({
             {doc ? documentTypeLabel[doc.type] : c.document_id} · p. {c.page}
           </>
         );
-        return isSample ? (
+        return (
           <button
             key={`${c.document_id}-${c.page}`}
             type="button"
             className="source-chip"
             aria-pressed={isActive}
-            title={c.excerpts.join('\n')}
+            title={`${isSample ? 'Ver' : 'Abrir'} no visualizador\n${c.excerpts.join('\n')}`}
             onClick={() => onSelect(c)}
           >
             {content}
           </button>
-        ) : (
-          <a
-            key={`${c.document_id}-${c.page}`}
-            className="source-chip"
-            aria-current={isActive ? 'true' : undefined}
-            href={documentFileUrl(c.document_id, c.page)}
-            target="_blank"
-            rel="noreferrer"
-            title={c.excerpts.join('\n')}
-            onClick={() => onSelect(c)}
-          >
-            {content}
-          </a>
         );
       })}
     </div>

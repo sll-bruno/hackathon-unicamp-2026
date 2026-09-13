@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { sampleCaseIds, startAnalysis, useWorkspace } from '../../api/workspace';
 import { ChatPanel } from '../../components/ChatPanel';
 import { EvidenceCard, KindIcon, type Citation, type Evidence, type EvidenceKind } from '../../components/EvidenceCard';
@@ -7,9 +7,12 @@ import { RiskCard } from '../../components/RiskCard';
 import { SettlementCard } from '../../components/SettlementCard';
 import { SourcePanel } from '../../components/SourcePanel';
 import { WhatChangesCard } from '../../components/WhatChangesCard';
+import { buildCitationIndex } from '../../components/documentViewer';
 import type { Workspace } from '../../types/workspace';
 import { formatDateTime } from './format';
 import './workspace.css';
+
+const DocumentViewerPanel = lazy(() => import('../../components/DocumentViewerPanel'));
 
 interface Props {
   caseId: string;
@@ -78,6 +81,12 @@ function WorkspaceView({
   const [activeCitation, setActiveCitation] = useState<Citation | null>(null);
 
   const documents = useMemo(() => new Map(data.documents.map((d) => [d.document_id, d])), [data.documents]);
+  const citationsByDocument = useMemo(
+    () => buildCitationIndex(
+      [...data.facts, ...data.contradictions, ...data.gaps].flatMap((item) => item.sources),
+    ),
+    [data.contradictions, data.facts, data.gaps],
+  );
 
   const evidences = useMemo<Record<EvidenceKind, Evidence[]>>(
     () => ({
@@ -95,10 +104,12 @@ function WorkspaceView({
   }
 
   const { case: c, recommendation: rec } = data;
+  const activeDocument = activeCitation ? documents.get(activeCitation.document_id) ?? null : null;
+  const sidePanelOpen = chatOpen || Boolean(activeCitation);
 
   return (
-    <div className={`ws-shell${chatOpen ? ' ws-shell--split' : ''}`}>
-    <main className={`ws${chatOpen ? ' ws--split' : ''}`}>
+    <div className={`ws-shell${sidePanelOpen ? ' ws-shell--split' : ''}`}>
+    <main className={`ws${sidePanelOpen ? ' ws--split' : ''}`}>
       {isSample && (
         <div className="sample-banner" role="note">
           <span className="sample-banner__label">Dados de exemplo</span>
@@ -153,7 +164,14 @@ function WorkspaceView({
           </div>
 
           {onOpenChat && (
-            <button type="button" className="chatbot-cta" onClick={onOpenChat}>
+            <button
+              type="button"
+              className="chatbot-cta"
+              onClick={() => {
+                setActiveCitation(null);
+                onOpenChat();
+              }}
+            >
               <ChatIcon />
               Perguntar ao chatbot
             </button>
@@ -184,7 +202,9 @@ function WorkspaceView({
             documents={data.documents}
             flags={data.subsidy_flags}
             activeCitation={activeCitation}
+            citationsByDocument={citationsByDocument}
             isSample={isSample}
+            onSelectCitation={setActiveCitation}
             onClear={() => setActiveCitation(null)}
           />
         </div>
@@ -213,7 +233,25 @@ function WorkspaceView({
         {Object.entries(data.versions).map(([k, v]) => `${k} ${v}`).join(' · ')}
       </footer>
     </main>
-    {chatOpen && onCloseChat && <ChatPanel data={data} isSample={isSample} onClose={onCloseChat} />}
+    {activeCitation ? (
+      <Suspense fallback={<aside className="side-panel side-panel--loading">Carregando visualizador…</aside>}>
+        <DocumentViewerPanel
+          document={activeDocument}
+          citation={activeCitation}
+          citations={citationsByDocument.get(activeCitation.document_id) ?? [activeCitation]}
+          isSample={isSample}
+          returnToChat={chatOpen}
+          onClose={() => setActiveCitation(null)}
+        />
+      </Suspense>
+    ) : chatOpen && onCloseChat ? (
+      <ChatPanel
+        data={data}
+        isSample={isSample}
+        onSelectCitation={setActiveCitation}
+        onClose={onCloseChat}
+      />
+    ) : null}
     </div>
   );
 }

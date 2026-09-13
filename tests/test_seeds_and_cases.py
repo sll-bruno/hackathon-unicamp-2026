@@ -38,6 +38,11 @@ def test_seed_is_idempotent_and_files_are_downloadable(client: TestClient) -> No
         repaired_payload = json.loads(recommendation.payload_json)
         assert repaired_payload["risk"]["cohort_size"] == 196
         assert repaired_payload["settlement_range"]["target"] == 3200.0
+        repaired_source = repaired_payload["facts"][0]["sources"][0]
+        source_document = session.get(Document, repaired_source["document_id"])
+        assert source_document is not None
+        assert source_document.type.value == "CONTRATO"
+        assert "valor líquido liberado" in repaired_source["excerpt"]
 
     workspace = client.get(f"/api/cases/{demo['id']}/workspace").json()
     assert workspace["case"]["status"] == "ENCERRADO"
