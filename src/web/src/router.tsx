@@ -7,6 +7,7 @@ import CasesList from './pages/CasesList/CasesList';
 import DashboardShell from './pages/Dashboard/DashboardShell';
 import EffectivenessDashboard from './pages/EffectivenessDashboard/EffectivenessDashboard';
 import HistoryPage from './pages/History/HistoryPage';
+import PolicyPage from './pages/Policy/PolicyPage';
 
 export const router = createBrowserRouter([
   {
@@ -17,6 +18,7 @@ export const router = createBrowserRouter([
       { path: 'processos/novo', element: <CaseNew /> },
       { path: 'processos/:id', element: <CaseDetail /> },
       { path: 'historico', element: <HistoryPage /> },
+      { path: 'politica', element: <PolicyPage /> },
       {
         path: 'dashboard',
         element: <DashboardShell />,

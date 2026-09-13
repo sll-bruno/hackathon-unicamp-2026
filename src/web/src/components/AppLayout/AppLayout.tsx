@@ -8,6 +8,7 @@ import styles from './AppLayout.module.css';
 const NAV = [
   { to: '/processos', label: 'Processos', end: false },
   { to: '/historico', label: 'Histórico', end: false },
+  { to: '/politica', label: 'Política', end: false },
   { to: '/dashboard', label: 'Dashboard', end: false },
 ];
 
