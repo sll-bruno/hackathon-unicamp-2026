@@ -19,7 +19,7 @@ function KpiBox({ label, value }: { label: string; value: string }) {
 
 export function KpiRow({ openValueSum, newThisMonth, adherencePercent, effectivenessPercent }: KpiRowProps) {
   return (
-    <div className={styles.row} aria-label="Métricas do escritório">
+    <div className={styles.row} role="group" aria-label="Métricas do escritório">
       <KpiBox label="Valor em aberto" value={openValueSum === undefined ? '–' : formatBRL(openValueSum)} />
       <KpiBox label="Casos novos no mês" value={newThisMonth === undefined ? '–' : String(newThisMonth)} />
       <KpiBox label="Aderência à recomendação" value={formatPercent(adherencePercent ?? null)} />

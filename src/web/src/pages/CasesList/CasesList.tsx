@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCases, useCasesSummary } from '../../api/cases';
 import { RecommendationTag, StatusBadge } from '../../components/Badges/Badges';
@@ -77,16 +77,19 @@ export default function CasesList() {
   const resetFiltros = () => {
     setStatus('TODOS');
     setOnlyAlert(false);
+    setExpanded(false);
   };
   const toggleQuickStatus = (target: DisplayStatus, active: boolean) => {
     if (active) return resetFiltros();
     setStatus(target);
     setOnlyAlert(false);
+    setExpanded(false);
   };
   const toggleAlert = () => {
     if (onlyAlert) return resetFiltros();
     setOnlyAlert(true);
     setStatus('TODOS');
+    setExpanded(false);
   };
 
   const rows = useMemo(() => {
@@ -108,11 +111,6 @@ export default function CasesList() {
       .filter((c) => !onlyAlert || c.alert !== null)
       .sort(byUrgency);
   }, [cases.data, query, status, rec, onlyAlert]);
-
-  // Qualquer mudança de filtro volta a lista para o estado colapsado.
-  useEffect(() => {
-    setExpanded(false);
-  }, [query, status, rec, onlyAlert]);
 
   const visibleRows = expanded ? rows : rows.slice(0, VISIBLE_ROWS);
   const hiddenCount = rows.length - visibleRows.length;
@@ -171,12 +169,18 @@ export default function CasesList() {
           type="search"
           placeholder="Buscar por autor ou número CNJ"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setExpanded(false);
+          }}
         />
         <select
           className={styles.select}
           value={status}
-          onChange={(e) => setStatus(e.target.value as DisplayStatus | 'TODOS')}
+          onChange={(e) => {
+            setStatus(e.target.value as DisplayStatus | 'TODOS');
+            setExpanded(false);
+          }}
           aria-label="Status"
         >
           <option value="TODOS">Todos os status</option>
@@ -186,7 +190,15 @@ export default function CasesList() {
             </option>
           ))}
         </select>
-        <select className={styles.select} value={rec} onChange={(e) => setRec(e.target.value as RecFilter)} aria-label="Recomendação">
+        <select
+          className={styles.select}
+          value={rec}
+          onChange={(e) => {
+            setRec(e.target.value as RecFilter);
+            setExpanded(false);
+          }}
+          aria-label="Recomendação"
+        >
           <option value="TODAS">Todas as recomendações</option>
           <option value="ACORDO">Acordo</option>
           <option value="DEFESA">Defesa</option>
@@ -219,7 +231,7 @@ export default function CasesList() {
           </table>
           {hiddenCount > 0 && (
             <button type="button" className={styles.expandRow} onClick={() => setExpanded(true)}>
-              Mostrar mais {hiddenCount} processos
+              Mostrar mais {hiddenCount} processo{hiddenCount === 1 ? '' : 's'}
             </button>
           )}
         </div>

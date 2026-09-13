@@ -5,4 +5,4 @@ export const formatBRL = (value: number) => brl.format(value);
 export const formatDate = (iso: string) => date.format(new Date(iso));
 
 // null quando não há dado suficiente para calcular (ver lib/metrics.ts).
-export const formatPercent = (value: number | null) => (value === null ? '—' : `${Math.round(value)}%`);
+export const formatPercent = (value: number | null) => (value === null ? '–' : `${Math.round(value)}%`);

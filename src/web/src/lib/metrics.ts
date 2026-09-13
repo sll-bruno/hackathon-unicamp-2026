@@ -23,8 +23,9 @@ export function adherencePercent(cases: CaseListItem[]): number | null {
   return (followed / decided.length) * 100;
 }
 
-// docs/ARCHITECTURE.md §8: efetividade = desfechos favoráveis entre os casos
-// encerrados que seguiram a recomendação. null sem casos elegíveis.
+// Inspirado em docs/ARCHITECTURE.md §8 (usa case_outcomes), mas é uma métrica
+// própria para esta home: % de desfechos favoráveis entre os casos encerrados
+// que seguiram a recomendação. null sem casos elegíveis.
 export function effectivenessPercent(cases: CaseListItem[]): number | null {
   const followedAndClosed = cases.filter((c) => c.status === 'ENCERRADO' && c.followed_recommendation === true);
   if (followedAndClosed.length === 0) return null;
