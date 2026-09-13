@@ -1,8 +1,9 @@
+import json
 from pathlib import Path
 
 from app.core.config import get_settings
 from app.core.database import get_engine, reset_database_state
-from app.models import Case, Document
+from app.models import Case, Document, RecommendationRecord
 from app.services.seeds import seed_demo_data
 from fastapi.testclient import TestClient
 from sqlmodel import Session, select
@@ -19,11 +20,32 @@ def test_seed_is_idempotent_and_files_are_downloadable(client: TestClient) -> No
     assert live["status"] == "DOCUMENTOS_ENVIADOS"
 
     with Session(get_engine()) as session:
+        demo_case = session.exec(select(Case).where(Case.is_demo.is_(True))).one()
+        recommendation = session.exec(
+            select(RecommendationRecord).where(RecommendationRecord.case_id == demo_case.id)
+        ).one()
+        stale_payload = json.loads(recommendation.payload_json)
+        stale_payload.pop("risk")
+        stale_payload.pop("settlement_range")
+        recommendation.payload_json = json.dumps(stale_payload)
+        session.add(recommendation)
+        session.commit()
+
         seed_demo_data(session, get_settings())
         assert len(session.exec(select(Case)).all()) == 2
         assert len(session.exec(select(Document)).all()) == 11
+        session.refresh(recommendation)
+        repaired_payload = json.loads(recommendation.payload_json)
+        assert repaired_payload["risk"]["cohort_size"] == 196
+        assert repaired_payload["settlement_range"]["target"] == 3200.0
 
     workspace = client.get(f"/api/cases/{demo['id']}/workspace").json()
+    assert workspace["case"]["status"] == "ENCERRADO"
+    assert workspace["risk"]["probabilities"]["parcial"] == 0.51
+    assert workspace["recommendation"]["settlement_range"]["target"] == 3200.0
+    assert workspace["decision"]["adhered"] is True
+    assert workspace["negotiation"]["accepted"] is True
+    assert workspace["outcome"]["outcome"] == "ACORDO"
     download = client.get(workspace["documents"][0]["file_url"])
     assert download.status_code == 200
     assert download.content.startswith(b"%PDF-")

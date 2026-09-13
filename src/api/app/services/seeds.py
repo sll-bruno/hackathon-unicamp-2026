@@ -134,12 +134,14 @@ def _seed_documents(session: Session, case: Case, spec: dict, data_dir: Path) ->
 def _seed_closed_fixture(
     session: Session, case: Case, lawyer: Lawyer, documents: list[Document]
 ) -> None:
-    existing = session.exec(
-        select(RecommendationRecord).where(RecommendationRecord.case_id == case.id)
-    ).first()
-    if existing is not None:
-        return
     autos = next(document for document in documents if document.type == DocumentType.AUTOS)
+    sources = [
+        {
+            "document_id": autos.id,
+            "page": 1,
+            "excerpt": "Trecho demonstrativo seedado; não produzido pela engine.",
+        }
+    ]
     evidence_payload = [
         {
             "id": "demo-evidence-1",
@@ -148,17 +150,21 @@ def _seed_closed_fixture(
             ),
             "type": "DOCUMENTACAO_COMPLETA",
             "weight": 1.0,
-            "sources": [
-                {
-                    "document_id": autos.id,
-                    "page": 1,
-                    "excerpt": "Trecho demonstrativo seedado; não produzido pela engine.",
-                }
-            ],
+            "sources": sources,
         }
     ]
     payload = {
         "versions": {"pipeline": "demo-fixture-v1"},
+        "confidence_method_version": "demo-fixture-v1",
+        "risk": {
+            "probabilities": {
+                "extincao": 0.08,
+                "improcedencia": 0.12,
+                "parcial": 0.51,
+                "procedencia": 0.29,
+            },
+            "cohort_size": 196,
+        },
         "recommendation": {
             "action": "ACORDO",
             "confidence_percent": 87.0,
@@ -170,9 +176,47 @@ def _seed_closed_fixture(
             "expected_defense_cost": 6900.0,
             "expected_savings": 3700.0,
         },
+        "defense_cost_range": [5700.0, 8100.0],
+        "settlement_range": {
+            "opening": 2600.0,
+            "target": 3200.0,
+            "ceiling": 4200.0,
+        },
+        "what_changes": [
+            "Prova nova e autenticada da contratação pode tornar a defesa preferível.",
+            "Redução relevante do custo esperado da defesa exige nova comparação econômica.",
+        ],
+        "assumptions": [
+            "Valores e probabilidades deste processo encerrado são um fixture da demonstração.",
+            "A oferta-alvo de R$ 3.200 preserva R$ 3.700 frente ao custo esperado da defesa.",
+        ],
+        "facts": [
+            {
+                "id": "demo-fact-1",
+                "fact_type": "documentacao_disponivel",
+                "description": (
+                    "A documentação de contratação e crédito está disponível no caso demonstrativo."
+                ),
+                "weight": 1.0,
+                "weights_version": "demo-fixture-v1",
+                "relation": "neutral",
+                "sources": sources,
+            }
+        ],
+        "contradictions": [],
+        "gaps": [],
         "evidences": evidence_payload,
         "source_kind": "DEMO_FIXTURE",
     }
+    existing = session.exec(
+        select(RecommendationRecord).where(RecommendationRecord.case_id == case.id)
+    ).first()
+    if existing is not None:
+        if existing.source_kind == "DEMO_FIXTURE":
+            existing.payload_json = json.dumps(payload, ensure_ascii=False)
+            existing.versions_json = json.dumps(payload["versions"], ensure_ascii=False)
+            session.add(existing)
+        return
     recommendation = RecommendationRecord(
         case_id=case.id,
         action=Action.ACORDO,

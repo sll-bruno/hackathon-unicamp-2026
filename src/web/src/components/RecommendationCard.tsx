@@ -126,6 +126,14 @@ function DecisionControl({ status }: { status: CaseStatus }) {
     };
   }, [open]);
 
+  if (status === 'ENCERRADO') {
+    return (
+      <span className="decision-control__button" data-decision="accepted">
+        Processo encerrado
+      </span>
+    );
+  }
+
   const choose = (next: Decision) => {
     setDecision(next);
     setOpen(false);
