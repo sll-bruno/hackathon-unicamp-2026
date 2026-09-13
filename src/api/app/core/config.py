@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     data_dir: Path = Path("./data")
     demo_seed: bool = True
     demo_replay_enabled: bool = True
-    demo_replay_seconds: float = 28.0
+    demo_replay_seconds: float = 20.0
     openai_api_key: str = ""
     openai_model: str = "gpt-5"
     openai_chat_model: str = "gpt-5.6-luna"
