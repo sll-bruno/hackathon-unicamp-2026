@@ -6,8 +6,8 @@ import CaseDraft from '../CaseDraft/CaseDraft';
 import { WorkspaceRoute } from '../Workspace/WorkspaceRoute';
 
 // Área do processo (Tela 3). Rascunho tem tela própria; o resto abre a área de
-// trabalho. Os casos de exemplo do workspace não aparecem na lista de processos,
-// então passam direto — a própria área de trabalho trata id desconhecido.
+// trabalho. Os casos de exemplo passam direto para o workspace para evitar uma
+// consulta redundante antes de carregar os dados completos.
 export default function CaseDetail() {
   const { id = '' } = useParams();
   const { data: item, isLoading } = useCase(id);

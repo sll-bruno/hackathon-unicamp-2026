@@ -15,13 +15,13 @@ import { STATUS_LABEL, THESIS_LABEL } from '../../types/labels';
 import styles from './CasesList.module.css';
 
 type RecFilter = 'TODAS' | 'ACORDO' | 'DEFESA' | 'SEM';
-// Status que fazem sentido filtrar aqui — Encerrado já tem tela própria (Histórico).
-const FILTERABLE_STATUS: Exclude<DisplayStatus, 'ENCERRADO'>[] = [
+const FILTERABLE_STATUS: DisplayStatus[] = [
   'RASCUNHO',
   'DOCUMENTOS_ENVIADOS',
   'EM_ANALISE',
   'AGUARDANDO_DECISAO',
   'AGUARDANDO_ENCERRAMENTO',
+  'ENCERRADO',
 ];
 
 const VISIBLE_ROWS = 5;
@@ -96,7 +96,6 @@ export default function CasesList() {
     const digits = query.replace(/\D/g, '');
     const text = normalize(query.trim());
     return (cases.data ?? [])
-      .filter((c) => c.status !== 'ENCERRADO') // encerrados ficam só no Histórico
       .filter((c) => {
         if (!text) return true;
         if (digits && c.cnj.replace(/\D/g, '').includes(digits)) return true;
@@ -249,7 +248,7 @@ export default function CasesList() {
 
       {cases.isSuccess && (
         <p className={styles.count}>
-          {rows.length} de {cases.data.filter((c) => c.status !== 'ENCERRADO').length} processos em aberto
+          {rows.length} de {cases.data.length} processos
         </p>
       )}
     </div>
