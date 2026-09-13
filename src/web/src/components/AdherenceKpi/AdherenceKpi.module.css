@@ -1,0 +1,54 @@
+.row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-4);
+}
+
+.box {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--stroke-secondary);
+  border-radius: var(--radius-12);
+  background: var(--surface-primary);
+  text-align: center;
+}
+
+.hero {
+  border-color: var(--stroke-primary);
+  border-top: 3px solid var(--accent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent),
+    0 0 48px -12px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.label {
+  color: var(--text-secondary);
+  font-size: var(--text-12);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+}
+
+.value {
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-48);
+  font-weight: var(--weight-light);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.value.positive {
+  color: var(--status-positive);
+}
+
+.value.warning {
+  color: var(--status-warning);
+}
+
+.value.negative {
+  color: var(--status-negative);
+}

@@ -8,7 +8,7 @@ export interface KpiRowProps {
   effectivenessPercent: number | null | undefined;
 }
 
-function KpiBox({ label, value }: { label: string; value: string }) {
+export function KpiBox({ label, value }: { label: string; value: string }) {
   return (
     <div className={styles.box}>
       <span className={styles.label}>{label}</span>
