@@ -49,6 +49,7 @@ def test_seed_is_idempotent_and_files_are_downloadable(client: TestClient) -> No
     download = client.get(workspace["documents"][0]["file_url"])
     assert download.status_code == 200
     assert download.content.startswith(b"%PDF-")
+    assert download.headers["content-disposition"].startswith("inline;")
 
 
 def test_demo_seed_can_be_disabled(tmp_path: Path, monkeypatch) -> None:

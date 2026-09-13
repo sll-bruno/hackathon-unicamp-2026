@@ -1,5 +1,6 @@
-import type { CaseDocument, Contradiction, Fact, FactRelation, Gap, Source } from '../types/workspace';
+import { documentFileUrl } from '../api/workspace';
 import { documentTypeLabel, factTypeLabel, relationLabel } from '../pages/Workspace/format';
+import type { CaseDocument, Contradiction, Fact, FactRelation, Gap, Source } from '../types/workspace';
 
 export type EvidenceKind = 'fato' | 'contradicao' | 'lacuna';
 
@@ -19,33 +20,83 @@ interface Props {
   evidence: Evidence;
   documents: Map<string, CaseDocument>;
   activeCitation: Citation | null;
+  isSample: boolean;
   onSelectCitation: (citation: Citation) => void;
 }
 
 /** Card de explicabilidade: texto curto em destaque e documentos citados como atalhos. */
-export function EvidenceCard({ evidence, documents, activeCitation, onSelectCitation }: Props) {
+export function EvidenceCard({
+  evidence,
+  documents,
+  activeCitation,
+  isSample,
+  onSelectCitation,
+}: Props) {
   const { kind, item } = evidence;
+  const citations = groupSources(item.sources);
+  const primaryCitation = citations[0];
+  const isActive = citations.some(
+    (citation) =>
+      citation.document_id === activeCitation?.document_id &&
+      citation.page === activeCitation.page,
+  );
+
+  const selectPrimary = () => {
+    if (primaryCitation) onSelectCitation(primaryCitation);
+  };
+
+  const mainContent = (
+    <>
+      {kind === 'fato' && (
+        <div className="evidence__meta">
+          <RelationBadge relation={evidence.item.relation} claim={evidence.item.claim} />
+          <span className="evidence__category">
+            {factTypeLabel[evidence.item.fact_type] ?? 'Categoria não mapeada'}
+          </span>
+          <WeightBadge weight={evidence.item.weight} version={evidence.item.weights_version} />
+        </div>
+      )}
+      <p className="evidence__text">{item.description}</p>
+      {kind === 'lacuna' && <p className="evidence__impact">{evidence.item.impact}</p>}
+    </>
+  );
 
   return (
-    <article className="evidence" data-kind={kind}>
-      <div className="evidence__main">
-        {kind === 'fato' && (
-          <div className="evidence__meta">
-            <RelationBadge relation={evidence.item.relation} claim={evidence.item.claim} />
-            <span className="evidence__category">
-              {factTypeLabel[evidence.item.fact_type] ?? 'Categoria não mapeada'}
-            </span>
-            <WeightBadge weight={evidence.item.weight} version={evidence.item.weights_version} />
-          </div>
-        )}
-        <p className="evidence__text">{item.description}</p>
-        {kind === 'lacuna' && <p className="evidence__impact">{evidence.item.impact}</p>}
-      </div>
+    <article className={`evidence${isActive ? ' evidence--active' : ''}`} data-kind={kind}>
+      {primaryCitation && !isSample ? (
+        <a
+          className="evidence__main evidence__main--clickable"
+          href={documentFileUrl(primaryCitation.document_id, primaryCitation.page)}
+          target="_blank"
+          rel="noreferrer"
+          title="Abrir a principal fonte desta evidência"
+          onClick={selectPrimary}
+        >
+          {mainContent}
+        </a>
+      ) : (
+        <div
+          className={`evidence__main${primaryCitation ? ' evidence__main--clickable' : ''}`}
+          role={primaryCitation ? 'button' : undefined}
+          tabIndex={primaryCitation ? 0 : undefined}
+          title={primaryCitation ? 'Selecionar a principal fonte desta evidência' : undefined}
+          onClick={selectPrimary}
+          onKeyDown={(event) => {
+            if (primaryCitation && (event.key === 'Enter' || event.key === ' ')) {
+              event.preventDefault();
+              selectPrimary();
+            }
+          }}
+        >
+          {mainContent}
+        </div>
+      )}
 
       <CitationChips
-        citations={groupSources(item.sources)}
+        citations={citations}
         documents={documents}
         activeCitation={activeCitation}
+        isSample={isSample}
         onSelect={onSelectCitation}
       />
     </article>
@@ -96,11 +147,13 @@ function CitationChips({
   citations,
   documents,
   activeCitation,
+  isSample,
   onSelect,
 }: {
   citations: Citation[];
   documents: Map<string, CaseDocument>;
   activeCitation: Citation | null;
+  isSample: boolean;
   onSelect: (citation: Citation) => void;
 }) {
   if (citations.length === 0) {
@@ -112,7 +165,13 @@ function CitationChips({
       {citations.map((c) => {
         const doc = documents.get(c.document_id);
         const isActive = activeCitation?.document_id === c.document_id && activeCitation.page === c.page;
-        return (
+        const content = (
+          <>
+            <DocIcon />
+            {doc ? documentTypeLabel[doc.type] : c.document_id} · p. {c.page}
+          </>
+        );
+        return isSample ? (
           <button
             key={`${c.document_id}-${c.page}`}
             type="button"
@@ -121,9 +180,21 @@ function CitationChips({
             title={c.excerpts.join('\n')}
             onClick={() => onSelect(c)}
           >
-            <DocIcon />
-            {doc ? documentTypeLabel[doc.type] : c.document_id} · p. {c.page}
+            {content}
           </button>
+        ) : (
+          <a
+            key={`${c.document_id}-${c.page}`}
+            className="source-chip"
+            aria-current={isActive ? 'true' : undefined}
+            href={documentFileUrl(c.document_id, c.page)}
+            target="_blank"
+            rel="noreferrer"
+            title={c.excerpts.join('\n')}
+            onClick={() => onSelect(c)}
+          >
+            {content}
+          </a>
         );
       })}
     </div>

@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import type { CaseDocument, Source, Workspace } from '../types/workspace';
+import {
+  createChatMessage,
+  getChatMessages,
+  type ChatApiMessage,
+  type ChatEvidence,
+} from '../api/chat';
+import { documentFileUrl } from '../api/workspace';
 import { documentTypeLabel } from '../pages/Workspace/format';
+import type { CaseDocument, Source, Workspace } from '../types/workspace';
 import './chat-panel.css';
 
 interface ChatMessage {
@@ -8,6 +15,7 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   text: string;
   sources?: Source[];
+  failed?: boolean;
 }
 
 interface Props {
@@ -52,29 +60,95 @@ function seedMessages(data: Workspace): ChatMessage[] {
 }
 
 export function ChatPanel({ data, isSample, onClose }: Props) {
-  const [messages, setMessages] = useState<ChatMessage[]>(() => seedMessages(data));
+  const [messages, setMessages] = useState<ChatMessage[]>(() =>
+    isSample ? seedMessages(data) : [],
+  );
   const [draft, setDraft] = useState('');
   const [openCitation, setOpenCitation] = useState<string | null>(null);
+  const [loadingHistory, setLoadingHistory] = useState(!isSample);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const threadEndRef = useRef<HTMLDivElement>(null);
 
   const documents = useMemo(() => new Map(data.documents.map((d) => [d.document_id, d])), [data.documents]);
+  const evidenceSources = useMemo(() => {
+    const index = new Map<string, Source[]>();
+    for (const item of [...data.facts, ...data.contradictions, ...data.gaps]) {
+      index.set(item.id, item.sources);
+    }
+    return index;
+  }, [data.contradictions, data.facts, data.gaps]);
+
+  useEffect(() => {
+    if (isSample) {
+      setMessages(seedMessages(data));
+      setLoadingHistory(false);
+      setError(null);
+      return;
+    }
+
+    const controller = new AbortController();
+    setLoadingHistory(true);
+    setError(null);
+    getChatMessages(data.case.case_id, controller.signal)
+      .then(({ items }) => {
+        if (!controller.signal.aborted) {
+          setMessages(items.map((message) => fromApiMessage(message, evidenceSources)));
+        }
+      })
+      .catch((reason: unknown) => {
+        if (!controller.signal.aborted) {
+          setError(errorMessage(reason, 'Não foi possível carregar o histórico do chatbot.'));
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoadingHistory(false);
+      });
+
+    return () => controller.abort();
+  }, [data, evidenceSources, isSample]);
 
   useEffect(() => {
     threadEndRef.current?.scrollIntoView({ block: 'end' });
   }, [messages]);
 
-  const send = (e: FormEvent) => {
+  const send = async (e: FormEvent) => {
     e.preventDefault();
     const text = draft.trim();
-    if (!text) return;
+    if (!text || sending || loadingHistory) return;
 
-    const reply: ChatMessage = {
-      id: `a-${Date.now()}`,
-      role: 'assistant',
-      text: 'Ainda não estou conectado ao pipeline de IA. Quando estiver, toda resposta vai citar o documento e a página, como nos exemplos acima.',
-    };
-    setMessages((m) => [...m, { id: `u-${Date.now()}`, role: 'user', text }, reply]);
+    if (isSample) {
+      setMessages((current) => [
+        ...current,
+        { id: `sample-user-${Date.now()}`, role: 'user', text },
+        {
+          id: `sample-assistant-${Date.now()}`,
+          role: 'assistant',
+          text: 'Este é um caso de exemplo local. Abra um processo carregado pela API para conversar com a análise real.',
+        },
+      ]);
+      setDraft('');
+      return;
+    }
+
+    const pendingId = `pending-${Date.now()}`;
+    setMessages((current) => [...current, { id: pendingId, role: 'user', text }]);
     setDraft('');
+    setSending(true);
+    setError(null);
+
+    try {
+      const response = await createChatMessage(data.case.case_id, text);
+      setMessages((current) => [
+        ...current.filter((message) => message.id !== pendingId),
+        fromApiMessage(response.user_message, evidenceSources),
+        fromApiMessage(response.assistant_message, evidenceSources, response.sources),
+      ]);
+    } catch (reason) {
+      setError(errorMessage(reason, 'Não foi possível obter uma resposta do chatbot.'));
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -97,28 +171,43 @@ export function ChatPanel({ data, isSample, onClose }: Props) {
       )}
 
       <div className="chat-panel__thread">
+        {loadingHistory && <p className="chat-panel__status">Carregando conversa…</p>}
+        {!loadingHistory && messages.length === 0 && (
+          <div className="chat-panel__empty">
+            <strong>Converse com a análise</strong>
+            <span>Pergunte sobre a recomendação, os valores ou as evidências do processo.</span>
+          </div>
+        )}
         {messages.map((m) => (
           <ChatBubble
             key={m.id}
             message={m}
             documents={documents}
+            isSample={isSample}
             openCitation={openCitation}
             onToggleCitation={setOpenCitation}
           />
         ))}
+        {sending && (
+          <div className="chat-bubble chat-bubble--assistant chat-bubble--typing" aria-live="polite">
+            Analisando o processo…
+          </div>
+        )}
         <div ref={threadEndRef} />
       </div>
 
       <form className="chat-panel__composer" onSubmit={send}>
+        {error && <p className="chat-panel__error" role="alert">{error}</p>}
         <input
           type="text"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Pergunte sobre a evidência, o valor ou a defesa…"
           aria-label="Pergunta para o chatbot"
+          disabled={loadingHistory || sending}
         />
-        <button type="submit" className="button button--secondary">
-          Enviar
+        <button type="submit" className="button button--secondary" disabled={loadingHistory || sending || !draft.trim()}>
+          {sending ? 'Enviando…' : 'Enviar'}
         </button>
       </form>
     </aside>
@@ -128,16 +217,18 @@ export function ChatPanel({ data, isSample, onClose }: Props) {
 function ChatBubble({
   message,
   documents,
+  isSample,
   openCitation,
   onToggleCitation,
 }: {
   message: ChatMessage;
   documents: Map<string, CaseDocument>;
+  isSample: boolean;
   openCitation: string | null;
   onToggleCitation: (key: string | null) => void;
 }) {
   return (
-    <div className={`chat-bubble chat-bubble--${message.role}`}>
+    <div className={`chat-bubble chat-bubble--${message.role}${message.failed ? ' chat-bubble--failed' : ''}`}>
       <p className="chat-bubble__text">{message.text}</p>
       {message.sources && message.sources.length > 0 && (
         <div className="chat-citations">
@@ -147,14 +238,27 @@ function ChatBubble({
             const open = openCitation === key;
             return (
               <div key={key} className="chat-citation-wrap">
-                <button
-                  type="button"
-                  className="chat-citation"
-                  aria-pressed={open}
-                  onClick={() => onToggleCitation(open ? null : key)}
-                >
-                  {doc ? documentTypeLabel[doc.type] : s.document_id} · p. {s.page}
-                </button>
+                {isSample ? (
+                  <button
+                    type="button"
+                    className="chat-citation"
+                    aria-pressed={open}
+                    onClick={() => onToggleCitation(open ? null : key)}
+                  >
+                    {doc ? documentTypeLabel[doc.type] : s.document_id} · p. {s.page}
+                  </button>
+                ) : (
+                  <a
+                    className="chat-citation"
+                    href={documentFileUrl(s.document_id, s.page)}
+                    target="_blank"
+                    rel="noreferrer"
+                    title="Abrir a fonte no PDF"
+                    onClick={() => onToggleCitation(key)}
+                  >
+                    {doc ? documentTypeLabel[doc.type] : s.document_id} · p. {s.page}
+                  </a>
+                )}
                 {open && <blockquote className="chat-citation__quote">{s.excerpt}</blockquote>}
               </div>
             );
@@ -163,6 +267,40 @@ function ChatBubble({
       )}
     </div>
   );
+}
+
+function fromApiMessage(
+  message: ChatApiMessage,
+  evidenceSources: Map<string, Source[]>,
+  evidences: ChatEvidence[] = [],
+): ChatMessage {
+  const responseSources = new Map(evidences.map((evidence) => [evidence.id, evidence.sources]));
+  const sources = uniqueSources(
+    message.evidence_ids.flatMap(
+      (evidenceId) => responseSources.get(evidenceId) ?? evidenceSources.get(evidenceId) ?? [],
+    ),
+  );
+  return {
+    id: message.id,
+    role: message.role.toLowerCase() as ChatMessage['role'],
+    text: message.content,
+    sources,
+    failed: message.status === 'FAILED',
+  };
+}
+
+function uniqueSources(sources: Source[]): Source[] {
+  const seen = new Set<string>();
+  return sources.filter((source) => {
+    const key = `${source.document_id}:${source.page}:${source.excerpt}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function errorMessage(reason: unknown, fallback: string): string {
+  return reason instanceof Error && reason.message ? reason.message : fallback;
 }
 
 function CloseIcon() {

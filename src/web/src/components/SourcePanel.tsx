@@ -23,6 +23,10 @@ const subsidyOrder: SubsidyType[] = [
 /** Coluna lateral: trecho citado selecionado e inventário dos subsídios. */
 export function SourcePanel({ documents, flags, activeCitation, isSample, onClear }: Props) {
   const activeDoc = activeCitation && documents.find((d) => d.document_id === activeCitation.document_id);
+  const activeDocumentUrl =
+    activeCitation && !isSample
+      ? documentFileUrl(activeCitation.document_id, activeCitation.page)
+      : null;
 
   return (
     <aside className="source-panel" aria-label="Fontes e documentos">
@@ -50,17 +54,17 @@ export function SourcePanel({ documents, flags, activeCitation, isSample, onClea
                 {excerpt}
               </blockquote>
             ))}
-            {isSample ? (
-              <p className="source-view__hint">O PDF abre aqui quando a API de documentos estiver conectada.</p>
-            ) : (
+            {activeDocumentUrl ? (
               <a
                 className="button button--secondary"
-                href={documentFileUrl(activeCitation.document_id, activeCitation.page)}
+                href={activeDocumentUrl}
                 target="_blank"
                 rel="noreferrer"
               >
-                Abrir PDF na página {activeCitation.page}
+                Abrir PDF novamente
               </a>
+            ) : (
+              <p className="source-view__hint">O PDF abre aqui quando a API de documentos estiver conectada.</p>
             )}
           </div>
         ) : (

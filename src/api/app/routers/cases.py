@@ -230,4 +230,9 @@ def download_document(
     allowed_roots = [settings.storage_dir.resolve(), settings.data_dir.resolve()]
     if not any(path.is_relative_to(root) for root in allowed_roots) or not path.is_file():
         raise APIError(404, "FILE_NOT_FOUND", "Arquivo do documento não encontrado")
-    return FileResponse(path, media_type="application/pdf", filename=document.original_name)
+    return FileResponse(
+        path,
+        media_type="application/pdf",
+        filename=document.original_name,
+        content_disposition_type="inline",
+    )

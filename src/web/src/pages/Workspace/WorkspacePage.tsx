@@ -172,6 +172,7 @@ function WorkspaceView({
                     evidence={ev}
                     documents={documents}
                     activeCitation={activeCitation}
+                    isSample={isSample}
                     onSelectCitation={setActiveCitation}
                   />
                 ))}

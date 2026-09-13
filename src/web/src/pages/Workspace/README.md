@@ -7,7 +7,7 @@ Visão de um processo: cartão de recomendação, explicabilidade (fatos, contra
 - Contrato consumido: `GET /api/cases/{id}/workspace` → `Workspace` em [`src/types/workspace.ts`](../../types/workspace.ts). Segue a engine: `confidence_percent` 0–100 ou `null`, fatos com `weight`/`weights_version` e fontes `{document_id, page, excerpt}`.
 - Enquanto a API não responde, em `npm run dev` a tela usa `fixtures/caso01.ts` (DEFESA) e `fixtures/caso02.ts` (ACORDO) e mostra o selo **Dados de exemplo**. Os trechos citados vêm dos PDFs em `data/`; confiança, probabilidades, valores e pesos são ilustrativos.
 - Trocar de caso: `?case=caso-01` ou `?case=caso-02`.
-- "Abrir PDF na página N" usa `GET /api/documents/{id}/file#page=N` e só aparece com a API conectada.
+- Clicar no texto ou em uma fonte da evidência abre automaticamente o PDF em nova aba na página citada, via `GET /api/documents/{id}/file#page=N`; o trecho permanece selecionado no painel lateral e há um link para reabrir o documento.
 
 ## Componentes
 
@@ -24,4 +24,4 @@ A perspectiva é sempre a do banco réu. O app tem só tema escuro.
 
 ## Pendente
 
-Aceitar/divergir (`POST /decision` + modal de divergência), confirmar/corrigir evidência, visualizador de PDF embutido, negociação e chatbot.
+Confirmar/corrigir evidência.
