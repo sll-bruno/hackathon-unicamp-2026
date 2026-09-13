@@ -63,6 +63,14 @@ Modelos Pydantic aceitam campos adicionais. Depois da validação, a saída inte
 consulta são projetados em colunas. Uma resposta inválida falha o job sem criar
 snapshot parcial.
 
+O endpoint `GET /api/cases/{id}/workspace` projeta o snapshot completo para a
+tela: metadados do caso e documentos, inventário de subsídios, probabilidades,
+recomendação e faixas financeiras, fatos, contradições, lacunas, versões e
+estado do job. Enquanto a análise não existe ou está em andamento,
+`recommendation`, `risk` e `analyzed_at` retornam `null`; listas retornam vazias.
+Os IDs citados em `facts`, `contradictions` e `gaps` são os mesmos IDs usados em
+`documents` e em `GET /api/documents/{id}/file`.
+
 ## Intake upload-first a partir dos Autos
 
 O cadastro principal de processos começa com o upload de um único PDF AUTOS,

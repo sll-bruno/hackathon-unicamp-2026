@@ -3,6 +3,7 @@ import type { DocumentType, SubsidyType } from './workspace';
 
 export const STATUS_LABEL: Record<CaseStatus, string> = {
   RASCUNHO: 'Rascunho',
+  DOCUMENTOS_ENVIADOS: 'Documentos enviados',
   EM_ANALISE: 'Em análise',
   AGUARDANDO_DECISAO: 'Revisar recomendação',
   PROPOSTA_ACEITA: 'Proposta aceita',

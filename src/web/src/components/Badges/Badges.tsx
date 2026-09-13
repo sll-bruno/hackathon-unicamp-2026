@@ -7,6 +7,7 @@ type Tone = 'accent' | 'neutral' | 'muted' | 'negative' | 'positive';
 
 const STATUS_TONE: Record<DisplayStatus, Tone> = {
   RASCUNHO: 'muted',
+  DOCUMENTOS_ENVIADOS: 'neutral',
   EM_ANALISE: 'neutral',
   AGUARDANDO_DECISAO: 'accent',
   AGUARDANDO_ENCERRAMENTO: 'neutral',

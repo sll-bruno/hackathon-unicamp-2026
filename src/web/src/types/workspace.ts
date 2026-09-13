@@ -9,6 +9,7 @@ export type Action = 'ACORDO' | 'DEFESA';
 
 export type CaseStatus =
   | 'RASCUNHO'
+  | 'DOCUMENTOS_ENVIADOS'
   | 'EM_ANALISE'
   | 'AGUARDANDO_DECISAO'
   | 'PROPOSTA_ACEITA'
@@ -31,7 +32,8 @@ export interface CaseDocument {
   document_id: string;
   filename: string;
   type: DocumentType;
-  pages: number;
+  pages?: number;
+  file_url?: string;
 }
 
 /** Trecho citado: documento, página (1-based) e trecho literal. */
@@ -105,21 +107,27 @@ export interface Workspace {
   case: {
     case_id: string;
     cnj: string;
-    court: string;
+    court?: string;
     uf: string;
     thesis: string;
     claim_value: number;
     status: CaseStatus;
-    plaintiff: string;
-    contract_number: string;
+    plaintiff?: string;
+    contract_number?: string;
   };
   documents: CaseDocument[];
   subsidy_flags: Record<SubsidyType, boolean>;
-  risk: { probabilities: OutcomeProbabilities; cohort_size: number | null };
-  recommendation: Recommendation;
+  risk: { probabilities: OutcomeProbabilities; cohort_size: number | null } | null;
+  recommendation: Recommendation | null;
   facts: Fact[];
   contradictions: Contradiction[];
   gaps: Gap[];
   versions: Record<string, string>;
-  analyzed_at: string;
+  analyzed_at: string | null;
+  analysis_job?: {
+    status: 'QUEUED' | 'RUNNING' | 'COMPLETED' | 'FAILED';
+    stage: string;
+    progress_percent: number;
+    safe_error?: string | null;
+  } | null;
 }

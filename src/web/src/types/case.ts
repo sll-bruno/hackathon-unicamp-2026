@@ -1,6 +1,7 @@
 // Estados do processo (docs/ARCHITECTURE.md §4).
 export type CaseStatus =
   | 'RASCUNHO'
+  | 'DOCUMENTOS_ENVIADOS'
   | 'EM_ANALISE'
   | 'AGUARDANDO_DECISAO'
   | 'PROPOSTA_ACEITA'
@@ -33,7 +34,7 @@ export interface CaseAlert {
 }
 
 // Resultado final do caso, gravado em case_outcomes ao encerrar (docs/ARCHITECTURE.md §8).
-export type CaseOutcome = 'FAVORAVEL' | 'PARCIAL' | 'DESFAVORAVEL';
+export type CaseOutcome = 'ACORDO' | 'EXTINCAO' | 'IMPROCEDENCIA' | 'PARCIAL' | 'PROCEDENCIA';
 
 export interface CaseListItem {
   id: string;

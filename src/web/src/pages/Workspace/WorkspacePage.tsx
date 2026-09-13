@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { sampleCaseIds, useWorkspace } from '../../api/workspace';
+import { sampleCaseIds, startAnalysis, useWorkspace } from '../../api/workspace';
 import { ChatPanel } from '../../components/ChatPanel';
 import { EvidenceCard, KindIcon, type Citation, type Evidence, type EvidenceKind } from '../../components/EvidenceCard';
 import { RecommendationCard } from '../../components/RecommendationCard';
@@ -89,6 +89,10 @@ function WorkspaceView({
     }),
     [data],
   );
+
+  if (!data.recommendation || !data.risk) {
+    return <WorkspacePending data={data} isSample={isSample} />;
+  }
 
   const { case: c, recommendation: rec } = data;
 
@@ -204,12 +208,50 @@ function WorkspaceView({
       </section>
 
       <footer className="ws-footer">
-        Análise em {formatDateTime(data.analyzed_at)} ·{' '}
+        {data.analyzed_at ? `Análise em ${formatDateTime(data.analyzed_at)} · ` : ''}
         {Object.entries(data.versions).map(([k, v]) => `${k} ${v}`).join(' · ')}
       </footer>
     </main>
     {chatOpen && onCloseChat && <ChatPanel data={data} isSample={isSample} onClose={onCloseChat} />}
     </div>
+  );
+}
+
+function WorkspacePending({ data, isSample }: { data: Workspace; isSample: boolean }) {
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const job = data.analysis_job;
+  const running = job?.status === 'QUEUED' || job?.status === 'RUNNING';
+
+  const analyze = async () => {
+    setSubmitting(true);
+    setError(null);
+    try {
+      await startAnalysis(data.case.case_id);
+      window.location.reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <main className="ws ws--state">
+      <h1>{running ? 'Analisando o processo…' : 'Processo pronto para análise'}</h1>
+      <p>
+        {running
+          ? `${job?.stage ?? 'PROCESSANDO'} · ${job?.progress_percent ?? 0}%`
+          : job?.status === 'FAILED'
+            ? job.safe_error ?? 'A análise anterior falhou. Você pode tentar novamente.'
+            : 'Os documentos foram recebidos. Inicie a engine para gerar a recomendação rastreável.'}
+      </p>
+      {!running && !isSample && (
+        <button type="button" className="button button--primary" disabled={submitting} onClick={analyze}>
+          {submitting ? 'Iniciando…' : job?.status === 'FAILED' ? 'Tentar novamente' : 'Analisar processo'}
+        </button>
+      )}
+      {error && <p role="alert">{error}</p>}
+    </main>
   );
 }
 

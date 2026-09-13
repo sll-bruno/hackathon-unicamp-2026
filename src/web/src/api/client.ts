@@ -17,12 +17,11 @@ export async function apiFetch(path: string, init?: RequestInit): Promise<Respon
   return fetch(apiUrl(path), init);
 }
 
-// Enquanto a API não expõe os endpoints no formato que estas telas esperam,
-// o front usa dados simulados. Para usar a API real: VITE_USE_MOCKS=false npm run dev
-export const USE_MOCKS = import.meta.env.VITE_USE_MOCKS !== 'false';
+// A integração real é o padrão. Mocks só entram quando solicitados explicitamente.
+export const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
-export async function apiGet<T>(path: string): Promise<T> {
-  const res = await apiFetch(`/api${path}`);
+export async function apiGet<T>(path: string, signal?: AbortSignal): Promise<T> {
+  const res = await apiFetch(`/api${path}`, { signal });
   if (!res.ok) throw new Error(`GET /api${path} → ${res.status}`);
   return res.json() as Promise<T>;
 }

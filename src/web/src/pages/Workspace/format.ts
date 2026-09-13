@@ -21,6 +21,7 @@ export const documentTypeLabel: Record<DocumentType, string> = {
 
 export const statusLabel: Record<CaseStatus, string> = {
   RASCUNHO: 'Rascunho',
+  DOCUMENTOS_ENVIADOS: 'Documentos enviados',
   EM_ANALISE: 'Em análise',
   AGUARDANDO_DECISAO: 'Aguardando decisão',
   PROPOSTA_ACEITA: 'Proposta aceita',

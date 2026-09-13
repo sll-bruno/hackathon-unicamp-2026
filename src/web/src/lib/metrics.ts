@@ -29,6 +29,8 @@ export function adherencePercent(cases: CaseListItem[]): number | null {
 export function effectivenessPercent(cases: CaseListItem[]): number | null {
   const followedAndClosed = cases.filter((c) => c.status === 'ENCERRADO' && c.followed_recommendation === true);
   if (followedAndClosed.length === 0) return null;
-  const favorable = followedAndClosed.filter((c) => c.outcome === 'FAVORAVEL').length;
+  const favorable = followedAndClosed.filter((c) =>
+    c.outcome === 'IMPROCEDENCIA' || c.outcome === 'EXTINCAO',
+  ).length;
   return (favorable / followedAndClosed.length) * 100;
 }
