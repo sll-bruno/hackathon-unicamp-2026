@@ -2,21 +2,12 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import {
   createChatMessage,
   getChatMessages,
-  type ChatApiMessage,
-  type ChatEvidence,
 } from '../api/chat';
 import { documentTypeLabel } from '../pages/Workspace/format';
 import type { CaseDocument, Source, Workspace } from '../types/workspace';
 import type { Citation } from './EvidenceCard';
+import { fromApiMessage, type ChatMessage } from './chatMessages';
 import './chat-panel.css';
-
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  text: string;
-  sources?: Source[];
-  failed?: boolean;
-}
 
 interface Props {
   data: Workspace;
@@ -246,36 +237,6 @@ function ChatBubble({
       )}
     </div>
   );
-}
-
-function fromApiMessage(
-  message: ChatApiMessage,
-  evidenceSources: Map<string, Source[]>,
-  evidences: ChatEvidence[] = [],
-): ChatMessage {
-  const responseSources = new Map(evidences.map((evidence) => [evidence.id, evidence.sources]));
-  const sources = uniqueSources(
-    message.evidence_ids.flatMap(
-      (evidenceId) => responseSources.get(evidenceId) ?? evidenceSources.get(evidenceId) ?? [],
-    ),
-  );
-  return {
-    id: message.id,
-    role: message.role.toLowerCase() as ChatMessage['role'],
-    text: message.content,
-    sources,
-    failed: message.status === 'FAILED',
-  };
-}
-
-function uniqueSources(sources: Source[]): Source[] {
-  const seen = new Set<string>();
-  return sources.filter((source) => {
-    const key = `${source.document_id}:${source.page}:${source.excerpt}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
 }
 
 function errorMessage(reason: unknown, fallback: string): string {

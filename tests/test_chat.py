@@ -42,6 +42,10 @@ def test_chat_persists_messages_and_filters_unknown_citations(
     history = client.get(f"/api/cases/{case['id']}/chat/messages").json()
     assert history["total"] == 2
     assert [message["role"] for message in history["items"]] == ["USER", "ASSISTANT"]
+    cited_evidence_id = history["items"][1]["evidence_ids"][0]
+    workspace = client.get(f"/api/cases/{case['id']}/workspace").json()
+    cited_fact = next(fact for fact in workspace["facts"] if fact["id"] == cited_evidence_id)
+    assert cited_fact["sources"] == response.json()["sources"][0]["sources"]
 
 
 def test_chat_reports_missing_key_and_provider_failure(client: TestClient, monkeypatch) -> None:

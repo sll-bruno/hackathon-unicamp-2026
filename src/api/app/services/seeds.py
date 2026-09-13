@@ -209,7 +209,7 @@ def _seed_closed_fixture(
         ],
         "facts": [
             {
-                "id": "demo-fact-1",
+                "id": evidence_payload[0]["id"],
                 "fact_type": "documentacao_disponivel",
                 "description": (
                     "O contrato registra crédito de R$ 5.000,00 na conta da titular em 12/05/2022."
