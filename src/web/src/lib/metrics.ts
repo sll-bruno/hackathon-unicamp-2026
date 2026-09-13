@@ -79,8 +79,8 @@ export function countNewThisMonth(cases: CaseListItem[], now = new Date()): numb
   return cases.filter((c) => new Date(c.created_at).getTime() >= cutoff).length;
 }
 
-// docs/ARCHITECTURE.md §7: aderência = aceitos / (aceitos + divergiu), via
-// followed_recommendation (espelha lawyer_decisions.accepted). null sem decisões.
+// Aderência = aceitos / (aceitos + divergiu), via followed_recommendation
+// (espelha lawyer_decisions.accepted). null sem decisões.
 export function adherencePercent(cases: CaseListItem[]): number | null {
   const decided = cases.filter((c) => c.followed_recommendation !== null);
   if (decided.length === 0) return null;
@@ -88,8 +88,8 @@ export function adherencePercent(cases: CaseListItem[]): number | null {
   return (followed / decided.length) * 100;
 }
 
-// Inspirado em docs/ARCHITECTURE.md §8 (usa case_outcomes), mas é uma métrica
-// própria para esta home: % de desfechos favoráveis entre os casos encerrados
+// Usa case_outcomes, mas é uma métrica própria para esta home: percentual de
+// desfechos favoráveis entre os casos encerrados
 // que seguiram a recomendação. null sem casos elegíveis.
 export function effectivenessPercent(cases: CaseListItem[]): number | null {
   const followedAndClosed = cases.filter((c) => c.status === 'ENCERRADO' && c.followed_recommendation === true);

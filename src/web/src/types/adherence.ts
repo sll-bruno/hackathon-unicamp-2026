@@ -1,6 +1,6 @@
 import type { RecommendedAction, Thesis } from './case';
 
-// Motivo estruturado quando o advogado diverge da recomendação (docs/ARCHITECTURE.md §6/§7).
+// Motivo estruturado quando o advogado diverge da recomendação.
 export type DivergenceReason = 'DOCUMENTO_INVALIDO' | 'FATO_NOVO' | 'ERRO_EXTRACAO' | 'VALOR_IRREAL' | 'OUTRO';
 
 // Bucket de recommendation.confidence_percent: alta ≥80, média 50–79, baixa <50.

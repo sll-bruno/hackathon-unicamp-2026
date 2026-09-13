@@ -1,9 +1,0 @@
-pandas>=2.2
-openpyxl>=3.1
-matplotlib>=3.9
-seaborn>=0.13
-scipy>=1.13
-jupyter>=1.0
-scikit-learn>=1.5
-nbconvert>=7.16
-ipykernel>=6.29

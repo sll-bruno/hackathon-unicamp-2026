@@ -1,7 +1,7 @@
 /*
  * Contrato proposto para GET /api/cases/{id}/workspace (Tela 3 · Área de trabalho).
- * Segue o contrato atualizado da engine (docs/architecture_engine.md):
- * confiança percentual 0–100 (ou null), fatos com peso por categoria e fontes
+ * Segue o contrato atualizado da engine: confiança percentual 0–100 (ou null),
+ * fatos com peso por categoria e fontes
  * com documento, página e trecho. Alinhar mudanças com Backend e Pipeline.
  */
 

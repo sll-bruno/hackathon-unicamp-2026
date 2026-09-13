@@ -76,17 +76,11 @@ recomendação atual, evidências e as 20 mensagens recentes; PDFs e caminhos
 locais nunca são enviados. Sem chave, a API retorna `503`; falha da OpenAI
 retorna `502`.
 
-## Qualidade e smoke test
+## Validação
 
 ```bash
-ruff check src/api src/contracts src/pipeline tests
-pytest -q
-./scripts/smoke_backend.sh
+ruff check src/api src/contracts src/pipeline
 ```
-
-O smoke test constrói o container, verifica health, seeds e download de PDF,
-reinicia a API e confirma que os IDs persistiram. Ele deixa a API em execução
-para inspeção.
 
 ## Limitações deliberadas do hackathon
 
@@ -145,12 +139,6 @@ O `PORT` é injetado pela Railway e já é consumido pelo comando da imagem. Os
 11 PDFs de `data/` entram na imagem como arquivos seedados somente para leitura;
 CSVs e planilhas são excluídos do contexto Docker. SQLite e uploads ficam no
 volume e sobrevivem a restart e novo deploy.
-
-Com a Railway CLI, depois de vincular o projeto e o serviço, o smoke remoto é:
-
-```bash
-./scripts/smoke_deployed.sh https://SEU-SERVICO.up.railway.app
-```
 
 Não configure autoscaling ou múltiplas réplicas: o serviço usa SQLite, um único
 worker Uvicorn e jobs locais. Um serviço Railway com volume pode ter uma breve

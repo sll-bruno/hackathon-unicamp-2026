@@ -7,7 +7,7 @@ Lê o SQLite da API (mesmo `DATABASE_URL` de `app.core.config`) e produz um CSV 
 mesmas colunas de `train_risk.load_dataset()` (processo, uf, assunto, sub, macro, micro,
 vc, vd + flags), para ser concatenado à base histórica via `train_risk.py --feedback-data`.
 
-Critério de seleção (docs/RELATORIO_FLUXO_MOTOR_DECISAO.md §10, regras do loop):
+Critério de seleção do loop de feedback:
 - caso `ENCERRADO` com `case_outcomes` registrado;
 - desfecho observado em produção (`source_kind=OBSERVED`), nunca fixture de demo;
 - desfecho diferente de ACORDO — acordo não é resultado judicial e não entra no treino

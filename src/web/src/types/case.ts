@@ -1,4 +1,4 @@
-// Estados do processo (docs/ARCHITECTURE.md §4).
+// Estados do processo.
 export type CaseStatus =
   | 'RASCUNHO'
   | 'DOCUMENTOS_ENVIADOS'
@@ -16,7 +16,7 @@ export type Thesis = 'GOLPE' | 'GENERICO';
 export type RecommendedAction = 'ACORDO' | 'DEFESA';
 
 // Resumo da recomendação exibido fora da área do processo.
-// Campos seguem docs/architecture_engine.md §5.
+// Campos do resumo da recomendação.
 export interface RecommendationSummary {
   action: RecommendedAction;
   confidence_percent: number | null; // 0–100; null quando não calculável
@@ -26,14 +26,14 @@ export interface RecommendationSummary {
   policy_version: string;
 }
 
-// Pendência que trava a análise e exige reenvio do advogado (docs/ARCHITECTURE.md §4/§7,
-// erros de analysis_jobs como ARQUIVO_ILEGIVEL).
+// Pendência que trava a análise e exige reenvio do advogado, como erros de
+// analysis_jobs do tipo ARQUIVO_ILEGIVEL.
 export interface CaseAlert {
   code: 'DOCUMENTO_ILEGIVEL' | 'FALHA_EXTRACAO';
   message: string;
 }
 
-// Resultado final do caso, gravado em case_outcomes ao encerrar (docs/ARCHITECTURE.md §8).
+// Resultado final do caso, gravado em case_outcomes ao encerrar.
 export type CaseOutcome = 'ACORDO' | 'EXTINCAO' | 'IMPROCEDENCIA' | 'PARCIAL' | 'PROCEDENCIA';
 
 export interface CaseListItem {
@@ -49,7 +49,7 @@ export interface CaseListItem {
   updated_at: string; // ISO datetime
   recommendation: RecommendationSummary | null;
   alert: CaseAlert | null;
-  // Espelha lawyer_decisions.accepted (docs/ARCHITECTURE.md §7). null até o
+  // Espelha lawyer_decisions.accepted. null até o
   // advogado decidir; preenchido a partir de PROPOSTA_ACEITA/DIVERGIU e mantido
   // mesmo depois que o status avança (o status sozinho não distingue mais os dois
   // casos uma vez que o caso chega em AGUARDANDO_ENCERRAMENTO/ENCERRADO).
@@ -61,7 +61,7 @@ export interface CaseListItem {
   final_value: number | null;
 }
 
-// Dados básicos do processo extraídos por OCR a partir do auto (docs/architecture_engine.md).
+// Dados básicos do processo extraídos por OCR a partir do auto.
 // O advogado revisa/corrige antes de salvar — nunca são gravados sem confirmação.
 export interface ExtractedCaseData {
   cnj: string;
