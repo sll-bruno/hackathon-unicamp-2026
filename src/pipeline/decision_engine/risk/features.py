@@ -15,6 +15,24 @@ FLAG_NAMES = (
     "laudo_referenciado",
 )
 
+# Rótulo bruto (base histórica em xlsx, coluna "micro") -> classe do modelo.
+MICRO_TO_CLASS = {
+    "Extinção": "extincao",
+    "Improcedência": "improcedencia",
+    "Parcial procedência": "parcial",
+    "Procedência": "procedencia",
+}
+
+# `OutcomeType` do backend (app.models.domain, casos reais fechados) -> classe do modelo.
+# Mesmo espaço de rótulos de MICRO_TO_CLASS; mantido separado porque a origem dos
+# dados (base histórica em xlsx vs. casos reais encerrados) usa nomes diferentes.
+OUTCOME_TO_CLASS = {
+    "EXTINCAO": "extincao",
+    "IMPROCEDENCIA": "improcedencia",
+    "PARCIAL": "parcial",
+    "PROCEDENCIA": "procedencia",
+}
+
 
 @dataclass(frozen=True)
 class CaseFeatures:

@@ -28,6 +28,7 @@ class EngineSettings:
     artifacts_dir: Path
     params_version: str
     weights_version: str
+    risk_model_version: str
 
 
 def _dotenv() -> dict[str, str]:
@@ -70,4 +71,5 @@ def load_settings() -> EngineSettings:
         artifacts_dir=Path(_env("ENGINE_ARTIFACTS_DIR", str(PACKAGE_DIR / "artifacts"), dotenv)),
         params_version=_env("ENGINE_PARAMS_VERSION", "engine_v1", dotenv),
         weights_version=_env("ENGINE_WEIGHTS_VERSION", "pesos_embasamento_v1", dotenv),
+        risk_model_version=_env("ENGINE_RISK_MODEL_VERSION", "risco_v1", dotenv),
     )
