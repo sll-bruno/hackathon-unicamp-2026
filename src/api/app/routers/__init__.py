@@ -3,6 +3,7 @@ from app.routers.chat import router as chat_router
 from app.routers.dashboard import router as dashboard_router
 from app.routers.health import router as health_router
 from app.routers.history import router as history_router
+from app.routers.intakes import router as intakes_router
 from app.routers.workflow import router as workflow_router
 
 __all__ = [
@@ -11,5 +12,6 @@ __all__ = [
     "dashboard_router",
     "health_router",
     "history_router",
+    "intakes_router",
     "workflow_router",
 ]

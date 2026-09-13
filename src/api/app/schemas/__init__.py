@@ -6,6 +6,7 @@ from app.schemas.api import (
     ClosureCreate,
     DecisionCreate,
     DocumentPatch,
+    IntakeConfirm,
     NegotiationCreate,
     SubsidyFlagsInput,
 )
@@ -18,6 +19,7 @@ __all__ = [
     "ClosureCreate",
     "DecisionCreate",
     "DocumentPatch",
+    "IntakeConfirm",
     "NegotiationCreate",
     "SubsidyFlagsInput",
 ]

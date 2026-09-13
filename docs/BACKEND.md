@@ -25,8 +25,11 @@ a proposta.
 
 - `app/core`: settings, engine SQLite, lifecycle e envelope de erros.
 - `app/models`: tabelas SQLModel e enums operacionais.
-- `app/routers`: HTTP para casos, workflow, histórico, dashboard e chat.
+- `app/routers`: HTTP para casos, intakes upload-first, workflow, histórico,
+  dashboard e chat.
 - `app/services/analysis.py`: adapter e persistência da engine.
+- `app/services/autos.py`: extração nativa/OCR seletivo e estruturação dos
+  Autos para o intake (`CaseIntake`).
 - `app/services/metrics.py`: agregações derivadas dos eventos persistidos.
 - `app/services/chat.py`: adapter da OpenAI Responses API.
 - `app/services/seeds.py`: dois casos idempotentes e fixture sinalizada.
@@ -59,6 +62,66 @@ Modelos Pydantic aceitam campos adicionais. Depois da validação, a saída inte
 é serializada em `recommendations.payload_json`, enquanto campos necessários à
 consulta são projetados em colunas. Uma resposta inválida falha o job sem criar
 snapshot parcial.
+
+## Intake upload-first a partir dos Autos
+
+O cadastro principal de processos começa com o upload de um único PDF AUTOS,
+sem exigir preenchimento prévio de CNJ, UF, assunto, subassunto ou valor da
+causa. O fluxo é:
+
+```text
+POST /api/intakes (PDF)
+    -> UPLOADED (arquivo persistido em STORAGE_DIR/intakes)
+    -> EXTRACTING (BackgroundTasks, mesmo worker único do backend)
+    -> NEEDS_REVIEW (campos + página/trecho para conferência humana)
+    -> POST /api/intakes/{id}/confirm (correções opcionais)
+    -> CONFIRMED + Case DOCUMENTOS_ENVIADOS + Document AUTOS
+    -> análise existente (POST /api/cases/{id}/analyze)
+```
+
+Em falha, o intake vai para `FAILED` com apenas uma mensagem segura em
+`safe_error`; o PDF é preservado e `POST /api/intakes/{id}/retry` reexecuta a
+extração. Intakes interrompidos por reinício da API são marcados `FAILED` no
+startup (`FAILED_ON_RESTART`), também sem apagar o arquivo.
+
+Extração (`app/services/autos.py`, versão `autos-v1`, sem dependências novas):
+
+- texto nativo de cada página tem preferência; OCR é seletivo, somente nas
+  páginas com menos de 50 caracteres não-brancos;
+- OCR usa backends opcionais (`pdf2image` + `pytesseract`, nunca obrigatórios
+  nem chamados pelos testes); sem backend, a página fraca falha com
+  `OCR_REQUIRED` e permite retry;
+- cada campo carrega `page` (1-based) e `excerpt`; `ocr_pages` lista as páginas
+  que usaram OCR;
+- CNJ é normalizado para `NNNNNNN-DD.AAAA.J.TR.OOOO`;
+- UF é extraída da comarca (`COMARCA DE .../UF`) com fallback para a sigla mais
+  frequente entre as UFs válidas;
+- valor da causa é lido da âncora `Dá-se à causa o valor de R$ X` (pt-BR);
+- assunto/subassunto usam heurística inicial (`EMPRÉSTIMO CONSIGNADO` →
+  `Empréstimo consignado não reconhecido`; `INEXISTÊNCIA` → `Inexistência de
+  relação jurídica`); campos ausentes voltam `null` e o usuário completa na
+  confirmação;
+- os seis flags de subsídios (`contrato`, `extrato`, `comprovante_credito`,
+  `dossie`, `demonstrativo_divida`, `laudo_referenciado`) sempre nascem `false`
+  e nunca são inferidos dos Autos.
+
+Contrato para o frontend:
+
+- `POST /api/intakes` (multipart `file`, só PDF até `max_upload_bytes`) → `201`
+  com o intake; a extração roda em background, então o frontend deve fazer
+  polling em `GET /api/intakes/{id}` até `NEEDS_REVIEW` ou `FAILED`;
+- `GET /api/intakes` lista; `GET /api/intakes/{id}/file` baixa o PDF original;
+- `POST /api/intakes/{id}/retry` → `202` (de `FAILED` ou `NEEDS_REVIEW`;
+  `409 INTAKE_ALREADY_RUNNING` se já estiver extraindo);
+- `POST /api/intakes/{id}/confirm` com corpo opcional
+  `{cnj?, uf?, assunto?, subassunto?, valor_causa?}` → `201 {intake, case}`;
+  valores enviados prevalecem sobre os extraídos (inclusive divergência de
+  valor); CNJ duplicado retorna `409 CNJ_ALREADY_EXISTS` com
+  `details.existing_case_id` sem alterar o caso existente; segunda confirmação
+  retorna `409 INTAKE_ALREADY_CONFIRMED` sem duplicar o caso;
+- respostas de intake nunca expõem `stored_path` nem segredos; erros de
+  validação usam `422 INVALID_CNJ | INVALID_UF | INVALID_ASSUNTO |
+  INVALID_VALOR_CAUSA`.
 
 ## Máquina de estados
 
