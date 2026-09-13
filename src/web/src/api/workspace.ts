@@ -31,23 +31,28 @@ async function fetchWorkspace(caseId: string, signal: AbortSignal): Promise<Work
   };
 }
 
-export async function startAnalysis(caseId: string): Promise<void> {
+export async function startAnalysis(caseId: string): Promise<NonNullable<Workspace['analysis_job']>> {
   const response = await apiFetch(`/api/cases/${encodeURIComponent(caseId)}/analyze`, {
     method: 'POST',
   });
   if (!response.ok) throw new Error(`POST /api/cases/${caseId}/analyze → ${response.status}`);
+  return response.json() as Promise<NonNullable<Workspace['analysis_job']>>;
 }
 
 /**
  * Carrega a área de trabalho pela API. Em desenvolvimento, se a API ainda não
  * responder, usa os dados de exemplo identificados como tal (isSample).
  */
-export function useWorkspace(caseId: string): WorkspaceState {
+export function useWorkspace(caseId: string, refreshVersion = 0): WorkspaceState {
   const [state, setState] = useState<WorkspaceState>({ status: 'loading' });
 
   useEffect(() => {
     const controller = new AbortController();
-    setState({ status: 'loading' });
+    setState((current) =>
+      current.status === 'ready' && current.data.case.case_id === caseId
+        ? current
+        : { status: 'loading' },
+    );
 
     if (USE_MOCKS) {
       const loadSample = samples[caseId];
@@ -65,7 +70,7 @@ export function useWorkspace(caseId: string): WorkspaceState {
       .then((data) => {
         setState({ status: 'ready', data, isSample: false });
         if (data.analysis_job?.status === 'QUEUED' || data.analysis_job?.status === 'RUNNING') {
-          timer = window.setTimeout(load, 1500);
+          timer = window.setTimeout(load, 1000);
         }
       })
       .catch(async (err: unknown) => {
@@ -84,7 +89,7 @@ export function useWorkspace(caseId: string): WorkspaceState {
       controller.abort();
       if (timer !== undefined) window.clearTimeout(timer);
     };
-  }, [caseId]);
+  }, [caseId, refreshVersion]);
 
   return state;
 }

@@ -1,4 +1,5 @@
 import json
+from collections.abc import Callable
 
 import decision_engine
 from contracts.pipeline import CaseInput, PipelineDocument, PipelineOutput, SubsidyFlags
@@ -42,8 +43,13 @@ def build_engine_input(session: Session, case: Case) -> CaseInput:
     )
 
 
-def invoke_pipeline(case_input: CaseInput) -> PipelineOutput:
-    return PipelineOutput.model_validate(decision_engine.run_pipeline(case_input))
+def invoke_pipeline(
+    case_input: CaseInput,
+    on_progress: Callable[[str, int], None] | None = None,
+) -> PipelineOutput:
+    return PipelineOutput.model_validate(
+        decision_engine.run_pipeline(case_input, on_progress=on_progress)
+    )
 
 
 def _persist_output(session: Session, job: AnalysisJob, output: PipelineOutput) -> None:
@@ -113,7 +119,23 @@ def run_analysis_job(job_id: str) -> None:
 
         try:
             case_input = build_engine_input(session, case)
-            output = invoke_pipeline(case_input)
+
+            def persist_progress(stage: str, progress_percent: int) -> None:
+                # A engine sinaliza CONCLUIDO quando terminou o cálculo, antes de a API
+                # persistir e projetar o resultado no workspace. Mapeamos esse marco para
+                # a última etapa visível para não mostrar 100% antes de o resultado existir.
+                if stage == "CONCLUIDO":
+                    stage = "PERSISTING_RESULT"
+                    progress_percent = 90
+                job.stage = stage
+                job.progress_percent = max(
+                    job.progress_percent,
+                    min(progress_percent, 90),
+                )
+                session.add(job)
+                session.commit()
+
+            output = invoke_pipeline(case_input, on_progress=persist_progress)
             job.stage = "PERSISTING_RESULT"
             job.progress_percent = 90
             session.add(job)

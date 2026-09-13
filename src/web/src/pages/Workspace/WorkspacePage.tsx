@@ -24,7 +24,8 @@ interface Props {
 
 /** Tela 3 · Área de trabalho de um processo. */
 export function WorkspacePage({ caseId, onSelectSampleCase, chatOpen = false, onOpenChat, onCloseChat }: Props) {
-  const state = useWorkspace(caseId);
+  const [refreshVersion, setRefreshVersion] = useState(0);
+  const state = useWorkspace(caseId, refreshVersion);
 
   if (state.status === 'loading') {
     return (
@@ -52,6 +53,7 @@ export function WorkspacePage({ caseId, onSelectSampleCase, chatOpen = false, on
       chatOpen={chatOpen}
       onOpenChat={onOpenChat}
       onCloseChat={onCloseChat}
+      onAnalysisStarted={() => setRefreshVersion((version) => version + 1)}
     />
   );
 }
@@ -69,6 +71,7 @@ function WorkspaceView({
   chatOpen,
   onOpenChat,
   onCloseChat,
+  onAnalysisStarted,
 }: {
   data: Workspace;
   isSample: boolean;
@@ -76,6 +79,7 @@ function WorkspaceView({
   chatOpen: boolean;
   onOpenChat?: () => void;
   onCloseChat?: () => void;
+  onAnalysisStarted: () => void;
 }) {
   const [tab, setTab] = useState<EvidenceKind>('fato');
   const [activeCitation, setActiveCitation] = useState<Citation | null>(null);
@@ -100,7 +104,7 @@ function WorkspaceView({
   );
 
   if (!data.recommendation || !data.risk) {
-    return <WorkspacePending data={data} isSample={isSample} />;
+    return <WorkspacePending data={data} isSample={isSample} onAnalysisStarted={onAnalysisStarted} />;
   }
 
   const { case: c, recommendation: rec } = data;
@@ -256,40 +260,135 @@ function WorkspaceView({
   );
 }
 
-function WorkspacePending({ data, isSample }: { data: Workspace; isSample: boolean }) {
+const analysisSteps = [
+  { stage: 'INGESTAO', label: 'Organizando documentos e metadados' },
+  { stage: 'EXTRACAO', label: 'Extraindo fatos, pedidos e evidências' },
+  { stage: 'RISCO', label: 'Calculando o risco judicial' },
+  { stage: 'FINANCEIRO', label: 'Comparando acordo e defesa' },
+  { stage: 'DECISAO', label: 'Gerando a recomendação jurídica' },
+  { stage: 'PERSISTING_RESULT', label: 'Preparando a área de trabalho' },
+] as const;
+
+const stageCopy: Record<string, string> = {
+  QUEUED: 'Análise recebida. Preparando o processamento',
+  RUNNING_ENGINE: 'Preparando modelos e regras da política',
+  INGESTAO: analysisSteps[0].label,
+  EXTRACAO: analysisSteps[1].label,
+  RISCO: analysisSteps[2].label,
+  FINANCEIRO: analysisSteps[3].label,
+  DECISAO: analysisSteps[4].label,
+  CONCLUIDO: analysisSteps[5].label,
+  PERSISTING_RESULT: analysisSteps[5].label,
+};
+
+function WorkspacePending({
+  data,
+  isSample,
+  onAnalysisStarted,
+}: {
+  data: Workspace;
+  isSample: boolean;
+  onAnalysisStarted: () => void;
+}) {
   const [submitting, setSubmitting] = useState(false);
+  const [startedJob, setStartedJob] = useState<NonNullable<Workspace['analysis_job']> | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const job = data.analysis_job;
+  const job = startedJob ?? data.analysis_job;
   const running = job?.status === 'QUEUED' || job?.status === 'RUNNING';
 
   const analyze = async () => {
     setSubmitting(true);
     setError(null);
     try {
-      await startAnalysis(data.case.case_id);
-      window.location.reload();
+      const newJob = await startAnalysis(data.case.case_id);
+      setStartedJob(newJob);
+      onAnalysisStarted();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
       setSubmitting(false);
     }
   };
 
+  if (running || submitting) {
+    const stage = job?.stage ?? 'QUEUED';
+    const progress = job?.progress_percent ?? 0;
+    const currentStep = analysisSteps.findIndex((step) => step.stage === stage);
+    const activeStep = currentStep >= 0 ? currentStep : stage === 'RUNNING_ENGINE' || stage === 'QUEUED' ? 0 : 5;
+
+    return (
+      <main className="ws ws--analysis" aria-busy="true">
+        <section className="analysis-loading" aria-labelledby="analysis-title">
+          <div className="analysis-loading__visual" aria-hidden="true">
+            <svg viewBox="0 0 120 120">
+              <circle className="analysis-loading__track" cx="60" cy="60" r="52" pathLength="100" />
+              <circle
+                className="analysis-loading__progress"
+                cx="60"
+                cy="60"
+                r="52"
+                pathLength="100"
+                style={{ strokeDashoffset: 100 - progress }}
+              />
+            </svg>
+            <strong>{progress}%</strong>
+          </div>
+
+          <div className="analysis-loading__content">
+            <span className="analysis-loading__eyebrow">
+              <span className="analysis-loading__pulse" /> Análise em andamento
+            </span>
+            <h1 id="analysis-title">Construindo a estratégia do processo</h1>
+            <p className="analysis-loading__stage" aria-live="polite">
+              {stageCopy[stage] ?? 'Processando o caso'}
+            </p>
+            <p className="analysis-loading__context">
+              O OCR já foi concluído. Agora a engine cruza os documentos com o histórico e a política econômica.
+            </p>
+
+            <div
+              className="analysis-loading__bar"
+              role="progressbar"
+              aria-label="Progresso da análise"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={progress}
+            >
+              <span style={{ width: `${progress}%` }} />
+            </div>
+
+            <ol className="analysis-steps" aria-label="Etapas da análise">
+              {analysisSteps.map((step, index) => {
+                const status = index < activeStep ? 'done' : index === activeStep ? 'active' : 'waiting';
+                return (
+                  <li key={step.stage} data-status={status}>
+                    <span className="analysis-steps__marker">{status === 'done' ? '✓' : index + 1}</span>
+                    <span>{step.label}</span>
+                    {status === 'active' && <span className="analysis-steps__status">em andamento</span>}
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   return (
-    <main className="ws ws--state">
-      <h1>{running ? 'Analisando o processo…' : 'Processo pronto para análise'}</h1>
-      <p>
-        {running
-          ? `${job?.stage ?? 'PROCESSANDO'} · ${job?.progress_percent ?? 0}%`
-          : job?.status === 'FAILED'
-            ? job.safe_error ?? 'A análise anterior falhou. Você pode tentar novamente.'
-            : 'Os documentos foram recebidos. Inicie a engine para gerar a recomendação rastreável.'}
+    <main className="ws ws--state ws--pending">
+      <span className="analysis-ready__eyebrow">Documentos preparados</span>
+      <h1>Processo pronto para análise</h1>
+      <p className="analysis-ready__copy">
+        {job?.status === 'FAILED'
+          ? job.safe_error ?? 'A análise anterior falhou. Você pode tentar novamente.'
+          : 'O OCR e a leitura inicial já foram concluídos. Gere agora uma recomendação rastreável de acordo ou defesa.'}
       </p>
-      {!running && !isSample && (
+      {!isSample && (
         <button type="button" className="button button--primary" disabled={submitting} onClick={analyze}>
-          {submitting ? 'Iniciando…' : job?.status === 'FAILED' ? 'Tentar novamente' : 'Analisar processo'}
+          {job?.status === 'FAILED' ? 'Tentar novamente' : 'Analisar processo'}
         </button>
       )}
-      {error && <p role="alert">{error}</p>}
+      {error && <p className="analysis-ready__error" role="alert">{error}</p>}
     </main>
   );
 }

@@ -280,7 +280,7 @@ def test_confirmed_case_can_go_to_analysis(client: TestClient, monkeypatch) -> N
     confirmed = client.post(f"/api/intakes/{intake['id']}/confirm", json={})
     case_id = confirmed.json()["case"]["id"]
 
-    def _fake_pipeline(case_input):
+    def _fake_pipeline(case_input, **_kwargs):
         return {
             "versions": {"pipeline": "test-v1"},
             "recommendation": {

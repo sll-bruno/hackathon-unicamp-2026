@@ -80,6 +80,46 @@ def test_full_engine_payload_is_projected_to_workspace_contract(
     assert cited_ids <= document_ids
 
 
+def test_analysis_job_persists_live_engine_progress(client: TestClient, monkeypatch) -> None:
+    case = live_case(client)
+    observed: list[tuple[str, int]] = []
+
+    def progressive_pipeline(case_input, on_progress):
+        for stage, progress in [
+            ("INGESTAO", 10),
+            ("EXTRACAO", 25),
+            ("RISCO", 60),
+            ("FINANCEIRO", 70),
+            ("DECISAO", 85),
+            ("CONCLUIDO", 100),
+        ]:
+            on_progress(stage, progress)
+            with Session(get_engine()) as observation:
+                persisted = observation.exec(
+                    select(AnalysisJob)
+                    .where(AnalysisJob.case_id == case["id"])
+                    .order_by(AnalysisJob.created_at.desc())
+                ).first()
+                assert persisted is not None
+                observed.append((persisted.stage, persisted.progress_percent))
+        return pipeline_result(document_id=case_input.documents[0].id)
+
+    monkeypatch.setattr(
+        "app.services.analysis.decision_engine.run_pipeline",
+        progressive_pipeline,
+    )
+
+    assert client.post(f"/api/cases/{case['id']}/analyze").status_code == 202
+    assert observed == [
+        ("INGESTAO", 10),
+        ("EXTRACAO", 25),
+        ("RISCO", 60),
+        ("FINANCEIRO", 70),
+        ("DECISAO", 85),
+        ("PERSISTING_RESULT", 90),
+    ]
+
+
 def test_failed_job_can_retry_and_snapshots_are_immutable(client: TestClient, monkeypatch) -> None:
     case = live_case(client)
 
@@ -91,7 +131,7 @@ def test_failed_job_can_retry_and_snapshots_are_immutable(client: TestClient, mo
 
     monkeypatch.setattr(
         "app.services.analysis.decision_engine.run_pipeline",
-        lambda case_input: pipeline_result(document_id=case_input.documents[0].id),
+        lambda case_input, **_kwargs: pipeline_result(document_id=case_input.documents[0].id),
     )
     assert client.post(f"/api/cases/{case['id']}/analyze").status_code == 202
     first_workspace = client.get(f"/api/cases/{case['id']}/workspace").json()
@@ -119,7 +159,7 @@ def test_divergence_negotiation_and_dashboard_are_distinct_events(
     case = live_case(client)
     monkeypatch.setattr(
         "app.services.analysis.decision_engine.run_pipeline",
-        lambda case_input: pipeline_result(document_id=case_input.documents[0].id),
+        lambda case_input, **_kwargs: pipeline_result(document_id=case_input.documents[0].id),
     )
     client.post(f"/api/cases/{case['id']}/analyze")
 
@@ -168,7 +208,7 @@ def test_defense_closure_after_rejected_agreement(client: TestClient, monkeypatc
     case = live_case(client)
     monkeypatch.setattr(
         "app.services.analysis.decision_engine.run_pipeline",
-        lambda case_input: pipeline_result("ACORDO", case_input.documents[0].id),
+        lambda case_input, **_kwargs: pipeline_result("ACORDO", case_input.documents[0].id),
     )
     client.post(f"/api/cases/{case['id']}/analyze")
     client.post(f"/api/cases/{case['id']}/decision", json={"action": "ACORDO"})
