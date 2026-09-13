@@ -26,7 +26,7 @@ from app.services.domain import (
     serialize_model,
     transition_case,
 )
-from app.services.seeds import reset_demo_case_two
+from app.services.seeds import reset_demo_baseline
 
 router = APIRouter(tags=["workflow"])
 
@@ -38,7 +38,7 @@ def reset_case_two_for_demo(
 ) -> dict:
     if not settings.demo_seed:
         raise APIError(404, "DEMO_RESET_NOT_AVAILABLE", "O reset da demo não está disponível")
-    return build_workspace(session, reset_demo_case_two(session))
+    return build_workspace(session, reset_demo_baseline(session))
 
 
 @router.post("/cases/{case_id}/analyze", status_code=status.HTTP_202_ACCEPTED)

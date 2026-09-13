@@ -273,15 +273,23 @@ def _remove_legacy_demo_cases(session: Session) -> None:
         session.flush()
 
 
-def reset_demo_case_two(session: Session) -> Case:
-    case = session.exec(select(Case).where(Case.cnj == LIVE_REPLAY_CNJ)).first()
-    if case is None:
-        raise ValueError(f"Missing live replay case {LIVE_REPLAY_CNJ}")
-    _clear_case_workflow(session, case)
-    _set_baseline_status(session, case, CaseStatus.DOCUMENTOS_ENVIADOS)
+def reset_demo_baseline(session: Session) -> Case:
+    lawyer = _get_or_create_profile(session)
+    seeded_cases: list[tuple[Case, list[Document], dict]] = []
+    for spec in CASE_SPECS:
+        case = session.exec(select(Case).where(Case.cnj == spec["cnj"])).first()
+        if case is None:
+            raise ValueError(f'Missing demo case {spec["cnj"]}')
+        documents = list(
+            session.exec(select(Document).where(Document.case_id == case.id)).all()
+        )
+        seeded_cases.append((case, documents, spec))
+
+    _reset_demo_baseline(session, seeded_cases, lawyer)
     session.commit()
-    session.refresh(case)
-    return case
+    replay_case = seeded_cases[1][0]
+    session.refresh(replay_case)
+    return replay_case
 
 
 def _baseline_marker(session: Session) -> AppMetadata | None:
