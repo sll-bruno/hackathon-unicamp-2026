@@ -23,6 +23,9 @@ build/
 .next/
 .nuxt/
 
+# Vercel CLI
+.vercel/
+
 # Outputs e artefatos
 *.log
 *.tmp
