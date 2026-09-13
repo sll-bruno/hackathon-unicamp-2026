@@ -2,7 +2,10 @@
 
 > Baseado no board Figma [Hackathon Enter](https://www.figma.com/board/70A3JVeYbKGQhmZjcRdfAO/Hackathon-Enter) — seções **Userflow principal** (Fluxos A/B + Telas 1–4), **Motor de aderência** e **Efetividade / Retroalimentação** (Fluxo C + Tela 5) — e em [`RELATORIO_FLUXO_MOTOR_DECISAO.md`](./RELATORIO_FLUXO_MOTOR_DECISAO.md).
 >
-> **Status:** rascunho v0. O pipeline de IA está sendo lapidado e será documentado em `.md` próprio; aqui ele aparece como **caixa-preta com contrato de entrada/saída** (§5).
+> **Status:** arquitetura funcional do MVP. A implementação canônica do backend,
+> incluindo estados, métricas e limitações, está em [`BACKEND.md`](./BACKEND.md).
+> A arquitetura interna do motor está em
+> [`architecture_engine.md`](./architecture_engine.md).
 >
 > **Visão rápida:** [diagrama de arquitetura (§3)](#3-diagrama-de-arquitetura).
 
@@ -14,7 +17,7 @@ A solução tem três responsabilidades, que viram três módulos do backend:
 
 | Módulo | Pergunta que responde | Quem usa | Telas |
 |---|---|---|---|
-| **Recomendação** (pipeline de IA) | Acordo ou defesa? Qual faixa de valor? | Advogado | 2, 3 |
+| **Recomendação** (pipeline de IA) | Acordo ou defesa? Qual valor sugerido? | Advogado | 2, 3 |
 | **Aderência** | O advogado seguiu a política? Por que não? | Banco (na demo, também o advogado) | 3, 4, 5 |
 | **Efetividade** | A política gera o resultado esperado? | Banco (na demo, também o advogado) | 4, 5 |
 
@@ -28,12 +31,12 @@ Princípio central: **a decisão do advogado e o desfecho do caso são eventos r
 |---|---|---|
 | Frontend | React + Vite + TypeScript | React Router, TanStack Query (polling do status de análise), Recharts (dashboard) |
 | Backend | FastAPI (Python 3.12) | Mesmo runtime do pipeline de IA e dos modelos |
-| ORM / migrações | SQLModel (ou SQLAlchemy) + Alembic | Schemas Pydantic compartilhados com a API |
+| ORM / schema | SQLModel + `metadata.create_all()` | Sem Alembic no hackathon |
 | Banco | SQLite (modo WAL) | Arquivo em volume Docker, não é container próprio |
 | Arquivos | Volume local `storage/` | PDFs de autos/subsídios |
 | Jobs assíncronos | `BackgroundTasks` do FastAPI + tabela `analysis_jobs` | Sem Redis/Celery para o hackathon |
 | LLM | OpenAI API | Chave via `.env` |
-| Infra | Docker Compose | 2 serviços: `web` e `api` |
+| Infra | Docker Compose | Somente a API; frontend roda fora do Compose |
 
 ## 3. Diagrama de arquitetura
 
@@ -77,7 +80,7 @@ flowchart TB
 |---|---|
 | **web (React)** | As 5 telas do Figma + Histórico geral. Na demo, o mesmo usuário vê tudo |
 | **Processos** | Cadastro, upload e status. Registra a decisão do advogado (aceitou/divergiu) e o desfecho |
-| **Pipeline de IA** | Recebe autos + subsídios e devolve recomendação, faixa de valor, confiança e evidências (§5) |
+| **Pipeline de IA** | Recebe caso + documentos e devolve ação, valor sugerido, confiança e evidências (§5) |
 | **Motor de aderência** | Lê as decisões e calcula quanto a política é seguida e os motivos de divergência (§7) |
 | **Motor de efetividade** | Lê os desfechos e calcula economia prevista vs. realizada e aceite de acordos (§8) |
 | **SQLite + Storage** | Volumes Docker com o banco e os PDFs |
@@ -93,12 +96,8 @@ stateDiagram-v2
   DOCUMENTOS_ENVIADOS --> EM_ANALISE: Avaliar processo
   EM_ANALISE --> DOCUMENTOS_ENVIADOS: arquivo ilegível / pedir reenvio
   EM_ANALISE --> AGUARDANDO_DECISAO: pipeline concluído
-  AGUARDANDO_DECISAO --> PROPOSTA_ACEITA: aceita recomendação
-  AGUARDANDO_DECISAO --> DIVERGIU: não aceita + motivo
-  PROPOSTA_ACEITA --> EM_NEGOCIACAO: ação = acordo
-  DIVERGIU --> EM_NEGOCIACAO: ação escolhida = acordo
-  PROPOSTA_ACEITA --> AGUARDANDO_ENCERRAMENTO: ação = defesa
-  DIVERGIU --> AGUARDANDO_ENCERRAMENTO: ação escolhida = defesa
+  AGUARDANDO_DECISAO --> EM_NEGOCIACAO: advogado escolhe acordo
+  AGUARDANDO_DECISAO --> AGUARDANDO_ENCERRAMENTO: advogado escolhe defesa
   EM_NEGOCIACAO --> AGUARDANDO_ENCERRAMENTO: acordo recusado → defesa
   EM_NEGOCIACAO --> ENCERRADO: acordo fechado
   AGUARDANDO_ENCERRAMENTO --> ENCERRADO: 5. Encerrar caso (sentença)
@@ -107,6 +106,7 @@ stateDiagram-v2
 
 Regras:
 - Toda transição grava uma linha em `case_status_history`, que alimenta a tela **Histórico geral**. O histórico fica **fora da visão de um processo**: a Tela 3 mostra só o status atual.
+- `PROPOSTA_ACEITA` e `DIVERGIU` são propriedades da decisão, não status.
 - `ENCERRADO` é somente leitura.
 - Contrato ausente **não bloqueia** a análise. Ele entra como lacuna no cálculo (Tela 2).
 
@@ -116,10 +116,10 @@ Regras:
 |---|---|---|
 | **1. Meus processos** | listar, buscar CNJ, filtrar status/prazo/recomendação, cards de resumo | `GET /api/cases`, `GET /api/cases/summary` |
 | **2. Cadastrar + documentos** | dados do processo, upload múltiplo, checklist dos 6 subsídios, salvar rascunho, avaliar | `POST /api/cases`, `PATCH /api/cases/{id}`, `POST /api/cases/{id}/documents`, `PATCH /api/documents/{id}` (trocar tipo), `POST /api/cases/{id}/analyze`, `GET /api/cases/{id}/analysis` (polling) |
-| **3. Área de trabalho** | cartão de recomendação, evidências com citação, PDF viewer, chatbot, aceitar/não aceitar, negociação | `GET /api/cases/{id}/workspace`, `GET /api/documents/{id}/file`, `POST /api/evidences/{id}/feedback` (confirmar/corrigir), `POST /api/cases/{id}/decision`, `POST /api/cases/{id}/negotiation-rounds`, `POST /api/cases/{id}/chat` |
-| **Histórico geral** (tela própria no menu, fora do processo) | duas visualizações: **Casos críticos** (padrão, ordenada por criticidade) e **Linha do tempo** (todas as transições de status). Filtro por processo (CNJ), status, escritório e período; clicar abre o processo | `GET /api/history/critical`, `GET /api/history` (filtros `cnj, status, office_id, period`) |
-| **4. Encerrar caso** | como terminou, valores, resumo automático, comentário | `GET /api/cases/{id}/closure-preview`, `POST /api/cases/{id}/closure` |
-| **5. Dashboard do banco** (na demo, acessível pelo menu do advogado) | KPIs, economia prevista vs. realizada, motivos de divergência, aderência por escritório, alertas | `GET /api/dashboard/kpis`, `/economy-timeseries`, `/divergence-reasons`, `/adherence-by-office`, `/alerts` (todos com os filtros `period, uf, office_id, thesis, confidence, policy_version`) |
+| **3. Área de trabalho** | recomendação, evidências, PDF, chatbot, decisão e negociação | `GET /api/cases/{id}/workspace`, `GET /api/documents/{id}/file`, `POST /api/cases/{id}/decision`, `POST /api/cases/{id}/negotiation-result`, `GET/POST /api/cases/{id}/chat/messages` |
+| **Histórico geral** | linha do tempo de estados, jobs, decisão, negociação e desfecho | `GET /api/history` |
+| **4. Encerrar caso** | resultado judicial e custos observados | `POST /api/cases/{id}/closure` |
+| **5. Dashboard** | payload composto de operação, aderência e efetividade | `GET /api/dashboard` |
 
 ### Casos críticos (Histórico geral)
 
@@ -140,7 +140,9 @@ A ordenação é calculada no backend por uma regra simples e configurável: pri
 
 ## 5. Pipeline de IA — contrato (caixa-preta)
 
-O backend só depende deste contrato. O miolo (OCR, extração, controle de extração, risco, severidade, motor financeiro e política) fica em `src/api/app/pipeline/` e será detalhado no `.md` do pipeline.
+O backend só depende deste contrato. O miolo (extração, risco, severidade, motor
+financeiro e política) fica em `src/pipeline/decision_engine/` e é detalhado em
+`architecture_engine.md`.
 
 ```python
 def run_pipeline(case: CaseInput) -> PipelineOutput: ...
@@ -150,180 +152,130 @@ O risco usa exclusivamente metadados e as seis flags do inventário: disponível
 
 ### Entrada — `CaseInput`
 
-```jsonc
-{
-  "case_id": "uuid",
-  "cnj": "0801234-56.2024.8.10.0001",
-  "uf": "MA",
-  "thesis": "golpe",                 // assunto/subassunto
-  "claim_value": 15000.00,           // valor da causa
-  "documents": [
-    { "document_id": "uuid", "path": "storage/…/03_Extrato.pdf",
-      "declared_type": "extrato" | "contrato" | "comprovante_credito" | "dossie"
-                     | "demonstrativo_divida" | "laudo_referenciado" | "autos" | null }
-  ]
-}
+```text
+case_id, cnj, uf, assunto, subassunto, valor_causa
+subsidy_flags
+documents[id, type, path]
 ```
 
 ### Saída — `PipelineOutput`
 
-```jsonc
-{
-  "versions": { "pipeline": "0.1.0", "risk_model": "…", "severity_model": "…", "policy": "v1.0" },
-  "documents": [                     // classificação + qualidade (checklist da Tela 2)
-    { "document_id": "uuid", "detected_type": "extrato", "legible": true, "illegible_pages": [] }
-  ],
-  "subsidy_flags": { "contrato": false, "extrato": true, "comprovante_credito": true,
-                     "dossie": true, "demonstrativo_divida": true, "laudo_referenciado": true },
-  "evidences": [                     // cards de explicabilidade da Tela 3
-    { "kind": "FATO" | "CONTRADICAO" | "LACUNA",
-      "text": "Crédito caiu na conta do autor",
-      "sources": [{ "document_id": "uuid", "page": 3, "quote": "TED CRÉDITO EMPRÉSTIMO R$ 5.200,00" }],
-      "confidence": "alta" | "media" | "baixa",
-      "impact": "Subsídio indisponível no inventário; disponibilidade é uma entrada binária do modelo" }
-  ],
-  "risk": { "p_extincao": 0.1, "p_improcedencia": 0.12, "p_parcial": 0.48, "p_procedencia": 0.3,
-            "cohort_size": 9946 },
-  "financial": { "expected_defense_cost": 11300, "expected_savings": 6950,
-                 "settlement_range": { "opening": 3750, "target": 4350, "ceiling": 9800 } },
-  "recommendation": {
-    "action": "ACORDO" | "DEFESA",
-    "confidence": "alta" | "media" | "baixa",
-    "reason_codes": ["BAIXA_CONFIANCA", "EVIDENCIA_CONTRADITORIA", …], // alertas exibidos no cartão, não mudam a ação
-    "summary": "disponibilidade — contrato ausente · risco — perda 78% …",
-    "what_changes": ["alteração dos dados de entrada exige nova análise", "pedido acima de R$ 9.800 → DEFESA"]
-  },
-  "errors": [{ "code": "ARQUIVO_ILEGIVEL", "document_id": "uuid" }]
-}
+```text
+versions
+recommendation[action, confidence_percent, summary, reason_codes]
+financial[suggested_offer, expected_defense_cost, expected_savings]
+evidences[id, text, type, weight?, sources]
 ```
 
-- O pipeline sempre devolve `ACORDO` ou `DEFESA`. Casos incertos (dados insuficientes, falhas de extração, intervalos sobrepostos) saem com `confidence: baixa` e `reason_codes` visíveis no cartão. Quem decide é o advogado, que pode aceitar ou divergir.
-- A saída inteira é persistida como snapshot imutável em `recommendations.payload_json`, junto com as `versions`. Isso garante a auditoria e alimenta o retreino.
-- O chatbot (`POST /cases/{id}/chat`) recebe o snapshot e os trechos dos documentos. Toda resposta tem que citar documento e página.
-- Execução assíncrona: `POST /analyze` cria um `analysis_jobs` com status `queued`, e o pipeline vai atualizando `progress` e `stage` (OCR, extração, controle de extração, risco, motor financeiro). A Tela 1/2 faz polling.
+- O pipeline sempre devolve `ACORDO` ou `DEFESA`.
+- `confidence_percent` é `0..100` ou `null`; não há confiança por evidência.
+- Pesos, probabilidades, fórmula financeira e valor sugerido são responsabilidade
+  exclusiva da engine e podem vir como campos adicionais.
+- A API aceita campos adicionais e persiste a saída inteira como snapshot
+  imutável em `recommendations.payload_json`.
+- O chatbot recebe o snapshot, evidências e conversa recente, nunca PDFs.
+- `POST /analyze` cria um job local e `GET /analysis` fornece polling.
 
 ## 6. Modelo de dados (SQLite)
 
 ```mermaid
 erDiagram
   offices ||--o{ lawyers : has
-  lawyers ||--o{ cases : owns
   cases ||--o{ documents : has
   cases ||--o{ case_status_history : logs
   cases ||--o{ analysis_jobs : runs
   cases ||--o{ recommendations : receives
   recommendations ||--o{ evidences : contains
-  evidences ||--o{ evidence_feedback : gets
   recommendations ||--o| lawyer_decisions : answered_by
-  cases ||--o{ negotiation_rounds : has
+  cases ||--o| negotiation_results : has
   cases ||--o| case_outcomes : closes_with
-  policy_versions ||--o{ recommendations : generated
+  cases ||--o{ chat_messages : has
 ```
 
 | Tabela | Campos principais | Alimenta |
 |---|---|---|
-| `offices` | id, name | filtro/aderência por escritório |
-| `lawyers` | id, office_id, name, email | autoria |
-| `cases` | id, cnj (unique), uf, thesis, claim_value, lawyer_id, status, deadline_at, created_at | Tela 1 |
-| `case_status_history` | case_id, from_status, to_status, at, actor | Histórico geral, tempo por etapa |
-| `documents` | id, case_id, path, filename, declared_type, detected_type, legible, illegible_pages_json | checklist (Tela 2) |
-| `analysis_jobs` | id, case_id, status, stage, progress, error, started_at, finished_at | loading/polling |
-| `policy_versions` | id (`v1.0`), params_json, created_at, active | filtro "versão da política" |
-| `recommendations` | id, case_id, policy_version_id, action, confidence, range_opening/target/ceiling, expected_defense_cost, expected_savings, reason_codes_json, payload_json, created_at | **aderência + efetividade** |
-| `evidences` | id, recommendation_id, kind, text, sources_json, confidence | cards (Tela 3) |
-| `evidence_feedback` | evidence_id, lawyer_id, verdict (`confirmado`/`corrigido`), correction | erro de extração |
-| `lawyer_decisions` | recommendation_id, lawyer_id, accepted (bool), chosen_action, divergence_reason, divergence_note, decided_at | **motor de aderência** |
-| `negotiation_rounds` | case_id, round, offer_value, counter_value, at | aceite, rodadas |
-| `case_outcomes` | case_id, outcome (`acordo`/`improcedencia`/`extincao`/`parcial`/`procedencia`), final_amount, fees, costs, closed_at, comment | **motor de efetividade** |
+| `offices`, `lawyers` | perfil único de demonstração | autoria |
+| `cases` | CNJ, UF, assunto, subassunto, valor, seis flags, status, `is_demo` | fila |
+| `case_status_history` | transição, data, ator | histórico |
+| `documents` | tipo, nome, caminho, origem | upload e viewer |
+| `analysis_jobs` | status, estágio, erro seguro e datas | polling e retry |
+| `recommendations` | projeção mínima, versões, payload integral, `is_current` | auditoria e métricas |
+| `evidences` | ID externo, tipo, texto, peso opcional e fontes | explicabilidade e chat |
+| `lawyer_decisions` | ação, aderência derivada e divergência | aderência |
+| `negotiation_results` | aceite e valor final | aceite de acordos |
+| `case_outcomes` | desfecho e custos observados | efetividade |
+| `chat_messages` | papel, conteúdo, fontes e status | histórico do chat |
 
-Enums:
-- `divergence_reason`: `DOCUMENTO_INVALIDO`, `FATO_NOVO`, `ERRO_EXTRACAO`, `VALOR_IRREAL`, `OUTRO` (Tela 3).
-- `thesis`: `GOLPE`, `GENERICO`.
+Enums e nomes exatos estão em `app/models/domain.py`. As ações são somente
+`ACORDO` e `DEFESA`; os motivos de divergência são `FATO_NOVO`,
+`ERRO_EXTRACAO`, `VALOR_IRREAL`, `REGRA_CLIENTE` e `OUTRO`.
 
 ## 7. Motor de aderência
 
 **Aderência mede comportamento, não resultado.** Ela não altera a recomendação e serve para treino e governança (Figma, Tela 5).
 
-**Captura (Tela 3):** "Você aceita a proposta?" grava um `lawyer_decisions`.
-- **Aceitar**: `accepted=true` e `chosen_action = recommendation.action`, status `PROPOSTA_ACEITA`.
-- **Não aceitar**: abre o modal de divergência. Motivo estruturado obrigatório, texto livre e ação escolhida, status `DIVERGIU`.
+**Captura (Tela 3):** a ação escolhida grava um `lawyer_decisions`.
+- `adhered` é derivado da igualdade entre ação escolhida e recomendada.
+- Ao divergir, o motivo estruturado é obrigatório.
+- A resposta da parte autora só é gravada depois, em `negotiation_results`.
 
 **Métricas** (`app/adherence/service.py`, SQL agregado com os filtros do dashboard):
 
 | Métrica | Definição |
 |---|---|
 | Aderência geral | `count(accepted) / count(decisões)` |
-| Aderência por tipo | idem, agrupado por `recommendation.action` |
-| Aderência por escritório | idem, agrupado por `offices.id` + economia realizada do escritório |
-| Motivos de divergência | distribuição de `divergence_reason` (por escritório, UF, tese) |
-| Acordo fora da faixa | `final_amount > range_ceiling` em casos de acordo |
-| Tempo até decisão | `decided_at − AGUARDANDO_DECISAO.at` |
-| Aderência por confiança | aderência agrupada por `confidence`. Divergência alta em `alta` indica problema na política ou na extração |
+| Motivos de divergência | distribuição de `divergence_reason` |
 
-**Alertas de padrão:** um job simples, que roda sob demanda ou quando o dashboard carrega, procura coortes (UF × tese × flags de subsídios) com `n ≥ N_MIN` e divergência `≥ X%`. Ele retorna o motivo dominante e a lista de casos, como insumo para o próximo retreino. Exemplo do Figma: *AM + Golpe com contrato: 40% de divergência, motivo documento inválido*.
+Recortes avançados por escritório, confiança e alertas de coorte ficam fora do
+MVP do hackathon.
 
 ## 8. Motor de efetividade
 
 **Efetividade mede se a política gera o resultado econômico esperado.**
 
-**Captura (Tela 4, Encerrar caso):** grava `case_outcomes` e status `ENCERRADO`. O resumo automático junta a recomendação, a decisão, as rodadas e o resultado.
+**Captura:** acordo aceito cria um `case_outcomes` diretamente. Defesa ou acordo
+recusado aguardam o desfecho judicial em `POST /closure`.
 
 | Métrica | Definição |
 |---|---|
-| Casos analisados | `count(recommendations)` no período |
-| Economia prevista | `Σ recommendations.expected_savings` |
-| Economia realizada | `Σ (expected_defense_cost − custo_real)`, com `custo_real = final_amount + fees + costs` |
-| Erro do motor financeiro | prevista − realizada por mês (área sombreada do gráfico) |
-| Aceite de acordos | `acordos fechados / casos que foram para negociação` |
-| Taxa de êxito / não êxito | por UF, tese, documentos, escritório (Fluxo C) |
+| Casos analisados | quantidade de recomendações atuais |
+| Economia esperada | `Σ recommendations.expected_savings` |
+| Desembolso observado | acordo: valor final + custos; defesa: defesa + condenação + custos |
+| Economia do acordo | custo esperado da defesa − desembolso observado |
+| Erro da defesa | desembolso observado − custo esperado da defesa |
+| Aceite de acordos | negociações aceitas / negociações registradas |
 
 ## 9. Retroalimentação (Fluxo C)
 
 ```mermaid
 flowchart LR
-  A[case_outcomes<br/>lawyer_decisions<br/>evidence_feedback] --> B[Filtros<br/>UF · tese · documentos · escritório · êxito]
+  A[case_outcomes<br/>lawyer_decisions] --> B[Filtros<br/>UF · assunto · documentos · resultado]
   B --> C[Retreino periódico<br/>processo interno]
-  C --> E[Nova policy_version ativa]
-  E --> F[Dashboards de efetividade<br/>filtráveis por versão]
+  C --> E[Nova versão do motor]
+  E --> F[Novas recomendações versionadas]
 ```
 
 - A retroalimentação é **apenas retreino periódico**, offline e em lote (notebook/script em `src/pipeline/training/`). Não roda na API.
-- Toda recomendação guarda sua `policy_version`. Uma versão nova não reescreve as recomendações antigas.
+- Toda recomendação guarda o mapa `versions` devolvido pela engine. Uma versão
+  nova não reescreve recomendações antigas.
 
 ## 10. Estrutura de pastas
 
 ```
 src/
-├── web/                          # React + Vite
-│   ├── src/
-│   │   ├── pages/
-│   │   │   ├── CasesList/        # Tela 1
-│   │   │   ├── CaseNew/          # Tela 2 (stepper)
-│   │   │   ├── Workspace/        # Tela 3
-│   │   │   ├── History/          # Histórico geral: casos críticos + linha do tempo
-│   │   │   └── BankDashboard/    # Tela 5
-│   │   ├── components/           # RecommendationCard, EvidenceCard, PdfViewer,
-│   │   │                         # Chat, DivergenceModal, CloseCaseModal (Tela 4)
-│   │   ├── api/                  # client + hooks TanStack Query
-│   │   └── types/                # gerado do OpenAPI (openapi-typescript)
-│   └── Dockerfile
+├── web/                          # React + Vite, fora do Compose
 ├── api/                          # FastAPI
 │   ├── app/
 │   │   ├── main.py
-│   │   ├── core/                 # config, db (SQLite WAL), storage
-│   │   ├── models/               # SQLModel (tabelas §6)
-│   │   ├── schemas/              # Pydantic (CaseInput, PipelineOutput, DTOs)
-│   │   ├── routers/              # cases, documents, decisions, closure, chat, dashboard
-│   │   ├── services/             # cases (máquina de estados), analysis_jobs
-│   │   ├── pipeline/             # 🔲 caixa-preta — run_pipeline()
-│   │   ├── adherence/            # métricas + alertas
-│   │   └── effectiveness/        # métricas de efetividade
-│   ├── migrations/               # Alembic
-│   ├── seeds/                    # casos de exemplo (data/Caso_01, Caso_02) + escritórios
-│   ├── tests/
+│   │   ├── core/                 # settings, SQLite e erros
+│   │   ├── models/               # tabelas e enums SQLModel
+│   │   ├── schemas/              # DTOs HTTP
+│   │   ├── routers/              # casos, workflow, histórico, dashboard e chat
+│   │   └── services/             # seed, engine, métricas e OpenAI
 │   └── Dockerfile
-└── pipeline/
-    └── training/                 # retreino periódico offline
+├── contracts/                    # envelope Pydantic compartilhado
+└── pipeline/                     # run_pipeline + treino offline
+tests/                            # testes de contrato, API e domínio
 docker-compose.yml
 ```
 
@@ -332,38 +284,18 @@ docker-compose.yml
 ```yaml
 services:
   api:
-    build: ./src/api
-    env_file: .env
-    environment:
-      DATABASE_URL: sqlite:////app/db/app.db
-      STORAGE_DIR: /app/storage
-    volumes:
-      - ./db:/app/db
-      - ./storage:/app/storage
-      - ./data:/app/data:ro        # base histórica + casos exemplo
+    build:
+      context: .
+      dockerfile: src/api/Dockerfile
     ports: ["8000:8000"]
-    command: >
-      sh -c "alembic upgrade head && python -m seeds.run &&
-             uvicorn app.main:app --host 0.0.0.0 --port 8000"
-
-  web:
-    build: ./src/web
-    environment:
-      VITE_API_URL: http://localhost:8000
-    ports: ["5173:5173"]
-    depends_on: [api]
+    volumes:
+      - app_db:/app/db
+      - app_storage:/app/storage
+      - ./data:/app/data:ro
 ```
 
-`.env.example`:
-
-```env
-OPENAI_API_KEY=
-DATABASE_URL=sqlite:////app/db/app.db
-STORAGE_DIR=/app/storage
-POLICY_VERSION=v1.0
-```
-
-**SQLite:** um único worker do uvicorn, `PRAGMA journal_mode=WAL` e `busy_timeout`. É suficiente pro volume da demo. Se for pra produção, troca por Postgres mudando só o `DATABASE_URL`.
+O arquivo real inclui health check, todas as variáveis de `.env.example` e os
+volumes nomeados. SQLite roda com um worker, WAL e timeout de 30 segundos.
 
 ## 12. Decisões em aberto
 
@@ -372,6 +304,5 @@ POLICY_VERSION=v1.0
 | 1 | Baseline de "economia": custo esperado da defesa (modelo) ou valor da causa (sticky do Fluxo C)? | Economia prevista/realizada |
 | 2 | ~~Perfis `advogado` e `banco`~~ **Demo:** perfil único e dashboard visível ao advogado. **Pós-demo:** `lawyers.role` (`advogado`/`banco`) + guarda nas rotas `/api/dashboard/*` e no menu | Tela 5 |
 | 3 | Período do retreino periódico (Fluxo C: "definir períodos") | §9 |
-| 4 | Limites `N_MIN` e `X%` dos alertas de padrão | §7 |
-| 5 | Fluxo de negociação: o advogado registra cada rodada ou só o valor final? | `negotiation_rounds` |
-| 6 | Critério de criticidade: quais sinais entram, pesos e limites (ex.: prazo ≤ 5 dias, valor em risco acima de R$ X, dias parado) | Casos críticos (Histórico geral) |
+| 4 | Limites dos alertas de padrão (fora do MVP) | evolução do dashboard |
+| 5 | Critério de criticidade (fora do MVP) | evolução do histórico |

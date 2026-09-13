@@ -27,6 +27,8 @@ build/
 *.log
 *.tmp
 *.cache
+/db/
+/storage/
 .DS_Store
 Thumbs.db
 
@@ -45,3 +47,18 @@ Thumbs.db
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Beads / Dolt files
+.beads/
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
+
+.claude/
+.codex/
+.vercel/
+.agents/
+
+AGENTS.md
+CLAUDE.md
