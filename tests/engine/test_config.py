@@ -39,12 +39,6 @@ def test_params_are_internally_consistent() -> None:
     combination = params["combinacao"]
     assert combination["alfa_min"] <= combination["alfa"] <= combination["alfa_max"] <= 1
 
-    k = params["acordo_k"]
-    assert k["p10"] < k["p25"] < k["p50"] < k["p75"] < k["p90"] < 1
-
-    severity = params["severidade"]
-    assert 0 < severity["parcial"] < severity["procedencia"] <= severity["procedencia_p90"] <= 1
-
     low, high = params["scoring"]["clip"]
     assert 0 < low < params["scoring"]["p0_principal"] < high < 1
     assert "margem" not in params["custos"], "a margem só servia à regra de decisão removida"

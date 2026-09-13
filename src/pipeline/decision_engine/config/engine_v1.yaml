@@ -17,24 +17,14 @@ combinacao:
     p_derrota: 0.30
     perda_se_condenado_sobre_valor_causa: 0.25
 
-severidade:                     # média condenação / valor da causa na base histórica
-  parcial: 0.62
-  procedencia: 0.90
-  procedencia_p90: 0.98         # pior caso da defesa
-  escala_valor_pedido_llm: 0.90 # deixa cond_llm na mesma escala de cond_xgb e de k
+# Severidade (condenação / valor da causa) e k do acordo vêm do treino:
+# decision_engine/artifacts/risco_v1_meta.json (training/train_risk.py).
 
 custos:
   custo_defesa_percentual: 0.05
   custo_defesa_minimo: 0.0
   custo_negociacao: 500.0       # premissa ilustrativa
   alcada_sobre_valor_causa: 0.6 # limite da faixa de acordo, não gatilho
-
-acordo_k:                       # k = valor do acordo / perda se condenado (280 acordos)
-  p10: 0.30
-  p25: 0.35                     # abertura
-  p50: 0.41                     # alvo
-  p75: 0.49
-  p90: 0.54                     # máximo (limitado pela alçada)
 
 scoring:
   temperatura_T: 5.0
