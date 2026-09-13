@@ -33,6 +33,9 @@ export interface CaseAlert {
   message: string;
 }
 
+// Resultado final do caso, gravado em case_outcomes ao encerrar (docs/ARCHITECTURE.md §8).
+export type CaseOutcome = 'FAVORAVEL' | 'PARCIAL' | 'DESFAVORAVEL';
+
 export interface CaseListItem {
   id: string;
   cnj: string;
@@ -42,9 +45,16 @@ export interface CaseListItem {
   claim_value: number;
   status: CaseStatus;
   office: string; // escritório responsável; não exibido nesta lista (um advogado só vê os próprios casos)
+  created_at: string; // ISO datetime — data de cadastro do caso
   updated_at: string; // ISO datetime
   recommendation: RecommendationSummary | null;
   alert: CaseAlert | null;
+  // Espelha lawyer_decisions.accepted (docs/ARCHITECTURE.md §7). null até o
+  // advogado decidir; preenchido a partir de PROPOSTA_ACEITA/DIVERGIU e mantido
+  // mesmo depois que o status avança (o status sozinho não distingue mais os dois
+  // casos uma vez que o caso chega em AGUARDANDO_ENCERRAMENTO/ENCERRADO).
+  followed_recommendation: boolean | null;
+  outcome: CaseOutcome | null; // só preenchido quando status === 'ENCERRADO'
 }
 
 export interface CasesSummary {
@@ -53,4 +63,8 @@ export interface CasesSummary {
   pending_outcome: number; // decisão tomada, falta registrar o desfecho
   document_errors: number; // documento com erro de leitura, precisa reenvio
   in_analysis: number;
+  open_value_sum: number; // soma de claim_value dos casos não encerrados
+  new_this_month: number; // casos com created_at nos últimos 30 dias
+  adherence_percent: number | null; // % de decisões que seguiram a recomendação; null sem decisões
+  effectiveness_percent: number | null; // % de desfechos favoráveis entre os que seguiram a recomendação; null sem casos encerrados elegíveis
 }

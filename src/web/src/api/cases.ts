@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { adherencePercent, countNewThisMonth, effectivenessPercent, sumOpenValue } from '../lib/metrics';
 import { toDisplayStatus } from '../lib/status';
 import type { CaseListItem, CasesSummary } from '../types/case';
 import { USE_MOCKS, apiGet, simulateLatency } from './client';
@@ -14,6 +15,10 @@ function summarize(cases: CaseListItem[]): CasesSummary {
     pending_outcome: open.filter((c) => toDisplayStatus(c.status) === 'AGUARDANDO_ENCERRAMENTO').length,
     document_errors: open.filter((c) => c.alert !== null).length,
     in_analysis: open.filter((c) => c.status === 'EM_ANALISE').length,
+    open_value_sum: sumOpenValue(cases),
+    new_this_month: countNewThisMonth(cases),
+    adherence_percent: adherencePercent(cases),
+    effectiveness_percent: effectivenessPercent(cases),
   };
 }
 
