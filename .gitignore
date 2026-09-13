@@ -30,6 +30,8 @@ build/
 *.log
 *.tmp
 *.cache
+/db/
+/storage/
 .DS_Store
 Thumbs.db
 
@@ -55,5 +57,16 @@ Thumbs.db
 # Superpowers planning docs (local process artifacts, not project deliverables)
 docs/superpowers/
 
-# Config local do Claude Code 
+# Beads / Dolt
+.beads/
+.beads/proxieddb/
+.beads-credential-key
+.dolt/
+*.db
+
+# Config local de agentes
 .claude/
+.codex/
+.agents/
+AGENTS.md
+CLAUDE.md
