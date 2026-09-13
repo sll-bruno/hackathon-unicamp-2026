@@ -1,0 +1,103 @@
+# Pesos por categoria de embasamento — versão pesos_embasamento_v1.
+# peso > 0 favorece o banco; peso < 0 favorece a parte autora.
+# A LLM classifica itens nas categorias; os pesos são aplicados pelo sistema e
+# nunca aparecem nos prompts de extração. Valores iniciais a calibrar.
+# max_itens (opcional) limita os itens contados na categoria; o padrão é
+# scoring.max_itens_por_categoria do engine_v1.yaml.
+version: pesos_embasamento_v1
+
+tipos_acusacao:
+  inexistencia_contratacao:
+    principal: true
+    categorias:
+      provas_contratacao:
+        peso: 3
+        definicao: "Prova do ato de contratar pela parte autora: instrumento contratual presente no pacote com assinatura da parte autora (cédula, termo de adesão), gravação de atendimento com aceite descrita como preservada (com identificação ou duração), autorização de consignação com retorno do INSS. Não entra documento que só declara que a operação existiu, sem instrumento, gravação ou retorno do INSS."
+      autenticacao_forte:
+        peso: 3
+        definicao: "Verificação com resultado positivo que liga a pessoa da parte autora à contratação: perícia grafotécnica compatível, biometria ou liveness com resultado confirmado, documentos pessoais validados em bases oficiais. Autenticação apenas declarada, cuja evidência não foi localizada, não entra aqui."
+      registros_digitais:
+        peso: 1
+        definicao: "Metadados técnicos da contratação digital sem biometria confirmada: canal e aplicativo, device fingerprint, IP, geolocalização, senha, aceite eletrônico. Identificam uma sessão ou um dispositivo, não a pessoa. Agrupe num único item os metadados da mesma sessão (canal, aplicativo, dispositivo, IP, geolocalização); senha e aceite eletrônico podem formar um segundo item."
+      credito_em_conta_do_autor:
+        peso: 2
+        definicao: "Crédito liberado em conta cuja titularidade da parte autora está comprovada por documento independente da declaração do banco (extrato da conta, mesma conta do benefício, conta reconhecida pela parte autora). Se a parte autora nega ter a conta e a titularidade só consta de declaração do banco, o fato vai em indicios_de_fraude."
+      uso_do_credito_pelo_autor:
+        peso: 2
+        definicao: "Saques, transferências para conta de mesma titularidade ou de familiares e pagamentos feitos com o crédito, comprovados por extrato."
+      contradicoes_do_autor:
+        peso: 2
+        definicao: "Alegação de fato da parte autora desmentida por prova que não depende da versão do banco sobre a operação contestada: extrato com uso do crédito, perícia ou biometria confirmadas, documento juntado pela própria parte autora, cronologia impossível. Não é contradição o registro interno do banco que só repete como a operação foi feita (canal, conta de destino, aceite): esse é justamente o fato que a parte autora atribui a terceiro."
+      lacunas_argumentativas_autor:
+        peso: 1
+        definicao: "Alegação relevante da parte autora sem a prova que ela mesma poderia juntar: documento citado como anexo e não juntado (boletim de ocorrência, protocolo de reclamação), negativa de recebimento sem extrato próprio, perfil alegado sem prova (ex.: não ter smartphone), cronologia incoerente. Requisitos de pedidos processuais (gratuidade, hipossuficiência) não entram."
+      comportamento_do_autor:
+        peso: 1
+        definicao: "Inércia longa diante dos descontos ou parcelas pagas sem contestação."
+      questoes_processuais:
+        peso: 2
+        definicao: "Prescrição, inépcia, ilegitimidade ou falta de documento indispensável."
+      fatos_comprovados_autor:
+        peso: -2
+        definicao: "Fato favorável à parte autora comprovado por documento: boletim de ocorrência juntado, reclamação comprovada, prova de conta em outro banco."
+      lacunas_probatorias_banco:
+        peso: -3
+        definicao: "Prova da contratação que o banco não tem: tipo de subsídio ausente do pacote (ex.: contrato, extrato), prova que o próprio banco declara não localizada, perícia grafotécnica não realizada, contratação sem nenhum registro de autorização do INSS. Prova que o banco descreve como preservada (ex.: gravação com duração, retorno do INSS com data) não é lacuna. Um item por prova ausente."
+      indicios_de_fraude:
+        peso: -3
+        definicao: "Fato que aponta contratação por terceiro, mesmo que conste só dos documentos do banco: crédito em conta que a parte autora nega ter e cuja titularidade não é comprovada por documento independente, conta de destino diferente da conta do benefício, dados cadastrais divergentes, canal incompatível com o perfil comprovado, geolocalização distante do domicílio."
+      inconsistencias_documentos_banco:
+        peso: -2
+        definicao: "Divergência dentro dos subsídios do banco: autenticação ou prova declarada e não localizada (ex.: liveness declarado sem o vídeo), documento que cita outro não disponibilizado (ex.: TED identificada em extrato não juntado), forma de assinatura incompatível com o canal, resumo divergente da tabela do demonstrativo."
+
+  dano_material:
+    principal: false
+    categorias:
+      fatos_comprovados_autor:
+        peso: -2
+        definicao: "Descontos efetivamente realizados, comprovados por documento (demonstrativo com parcelas liquidadas, extrato do benefício). Um item para o conjunto de descontos."
+      lacunas_argumentativas_autor:
+        peso: 1
+        max_itens: 1              # perdida a principal, falhas de argumentação pesam pouco no valor
+        definicao: "Período ou valor dos descontos sem prova; pedido em dobro sem fundamento fático. Lacunas sobre a contratação (boletim de ocorrência, conta de destino) não entram: já contam na acusação principal."
+      compensacao_valor_creditado:
+        peso: 2
+        definicao: "Crédito comprovadamente recebido e usado pela parte autora, passível de compensação com a restituição. Crédito em conta que a parte autora nega ter, sem prova de titularidade ou de uso, não entra."
+      questoes_processuais:
+        peso: 2
+        definicao: "Prescrição de parte das parcelas."
+
+  dano_moral:
+    principal: false
+    categorias:
+      agravantes_dano_moral:
+        peso: -2
+        definicao: "Negativação, comprometimento relevante da renda, descontos mantidos após reclamação comprovada, longa duração dos descontos. Um item por agravante distinto."
+      vulnerabilidade_autor:
+        peso: -1
+        definicao: "Pessoa idosa, analfabeta ou com renda exclusiva do benefício."
+      atenuantes_dano_moral:
+        peso: 2
+        definicao: "Desconto de baixo valor relativo à renda, ausência de negativação, crédito recebido e usado pela parte autora, cessação rápida dos descontos comprovada por documento. Provas da contratação (assinatura, biometria, gravação) não entram: esta acusação é avaliada supondo o contrato declarado inexistente."
+      lacunas_argumentativas_autor:
+        peso: 1
+        max_itens: 1              # abalo genérico é um único ponto, por mais que se repita
+        definicao: "Abalo moral descrito de forma genérica, sem fato concreto; agravante alegado sem prova. Condição pessoal da parte autora (idade, renda) não é lacuna. Lacunas sobre a contratação (boletim de ocorrência, conta de destino) não entram."
+
+  outro_pedido_monetario:
+    principal: false
+    categorias:
+      fatos_comprovados_autor:
+        peso: -2
+        definicao: "Cobrança ou desconto do item pedido comprovado por documento."
+      lacunas_probatorias_banco:
+        peso: -3
+        definicao: "Ausência de prova da contratação ou autorização do item cobrado."
+      lacunas_argumentativas_autor:
+        peso: 1
+        definicao: "Pedido sem demonstração do valor ou da cobrança."
+
+# Projeção das categorias nos blocos da Tela 3 (src/web/src/types/workspace.ts).
+projecao_workspace:
+  contradictions: [contradicoes_do_autor, inconsistencias_documentos_banco]
+  gaps: [lacunas_argumentativas_autor, lacunas_probatorias_banco]

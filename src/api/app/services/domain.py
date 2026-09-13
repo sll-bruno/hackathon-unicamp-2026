@@ -199,10 +199,64 @@ def build_workspace(session: Session, case: Case) -> dict[str, Any]:
         .where(AnalysisJob.case_id == case.id)
         .order_by(AnalysisJob.created_at.desc())
     ).first()
+    case_payload = serialize_case(session, case, include_recommendation=False)
+    engine_payload = (
+        json_loads(recommendation.payload_json, {}) if recommendation is not None else {}
+    )
+    engine_recommendation = engine_payload.get("recommendation", {})
+    engine_financial = engine_payload.get("financial", {})
+    workspace_recommendation = None
+    if recommendation is not None:
+        workspace_recommendation = {
+            "id": recommendation.id,
+            "action": recommendation.action.value,
+            "confidence_percent": recommendation.confidence_percent,
+            "confidence_method_version": engine_payload.get("confidence_method_version"),
+            "confidence_null_reason": engine_recommendation.get("confidence_null_reason"),
+            "reason": recommendation.summary,
+            "reason_codes": json_loads(recommendation.reason_codes_json, []),
+            "expected_defense_cost": recommendation.expected_defense_cost,
+            "defense_cost_range": engine_payload.get("defense_cost_range"),
+            "settlement_range": engine_payload.get("settlement_range"),
+            "expected_savings": recommendation.expected_savings,
+            "suggested_offer": engine_financial.get(
+                "suggested_offer", recommendation.suggested_offer
+            ),
+            "what_changes": engine_payload.get("what_changes", []),
+            "assumptions": engine_payload.get("assumptions", []),
+            "versions": json_loads(recommendation.versions_json, {}),
+            "source_kind": recommendation.source_kind,
+            "created_at": recommendation.created_at,
+        }
     return {
-        "case": serialize_case(session, case, include_recommendation=False),
-        "documents": [serialize_document(document) for document in documents],
-        "recommendation": serialize_recommendation(session, recommendation),
+        "case": {
+            "case_id": case.id,
+            "cnj": case.cnj,
+            "uf": case.uf,
+            "assunto": case.assunto,
+            "thesis": case.subassunto,
+            "claim_value": case.valor_causa,
+            "status": case.status.value,
+        },
+        "documents": [
+            {
+                "document_id": document.id,
+                "filename": document.original_name,
+                "type": document.type.value,
+                "file_url": f"/api/documents/{document.id}/file",
+            }
+            for document in documents
+        ],
+        "subsidy_flags": case_payload["subsidy_flags"],
+        "risk": engine_payload.get("risk"),
+        "recommendation": workspace_recommendation,
+        "facts": engine_payload.get("facts", []),
+        "contradictions": engine_payload.get("contradictions", []),
+        "gaps": engine_payload.get("gaps", []),
+        "versions": json_loads(recommendation.versions_json, {})
+        if recommendation is not None
+        else {},
+        "analyzed_at": recommendation.created_at if recommendation is not None else None,
         "decision": serialize_model(decision),
         "negotiation": serialize_model(negotiation),
         "outcome": serialize_model(outcome),

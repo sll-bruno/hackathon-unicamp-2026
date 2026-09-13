@@ -22,6 +22,7 @@ interface Props {
  * pede o `architecture_engine.md` para a explicabilidade.
  */
 function seedMessages(data: Workspace): ChatMessage[] {
+  if (!data.recommendation) return [];
   const topFact = [...data.facts].sort((a, b) => (b.weight ?? -1) - (a.weight ?? -1))[0];
   const contradiction = data.contradictions[0];
   const isAgreement = data.recommendation.action === 'ACORDO';
@@ -81,7 +82,7 @@ export function ChatPanel({ data, isSample, onClose }: Props) {
       <header className="chat-panel__header">
         <div>
           <span className="eyebrow">Chatbot da análise</span>
-          <h2 className="chat-panel__title">{data.case.plaintiff}</h2>
+          <h2 className="chat-panel__title">{data.case.plaintiff ?? data.case.cnj}</h2>
         </div>
         <button type="button" className="chat-panel__close" onClick={onClose} aria-label="Fechar chatbot">
           <CloseIcon />

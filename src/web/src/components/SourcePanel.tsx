@@ -42,7 +42,7 @@ export function SourcePanel({ documents, flags, activeCitation, isSample, onClea
               {activeDoc ? documentTypeLabel[activeDoc.type] : activeCitation.document_id}
               <span>
                 Página {activeCitation.page}
-                {activeDoc && ` de ${activeDoc.pages}`}
+                {activeDoc?.pages ? ` de ${activeDoc.pages}` : ''}
               </span>
             </p>
             {activeCitation.excerpts.map((excerpt) => (

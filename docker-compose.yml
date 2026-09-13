@@ -10,6 +10,7 @@ services:
       DEMO_SEED: ${DEMO_SEED:-true}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5}
+      ENGINE_MODE: ${ENGINE_MODE:-full}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
       MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-20971520}
     ports:

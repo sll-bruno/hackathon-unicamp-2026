@@ -10,7 +10,8 @@ import type { Recommendation, Workspace } from '../../types/workspace';
 
 const THESIS_LABEL: Record<Thesis, string> = { GOLPE: 'Golpe', GENERICO: 'Genérico' };
 
-function buildRecommendation(base: Recommendation, item: CaseListItem): Recommendation {
+function buildRecommendation(base: Recommendation | null, item: CaseListItem): Recommendation | null {
+  if (!base) return null;
   const rec = item.recommendation;
   if (!rec) return base;
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Workspace } from '../types/workspace';
-import { USE_MOCKS } from './client';
+import { USE_MOCKS, apiFetch, apiGet, apiUrl } from './client';
 import { mockCases } from './mocks/cases';
 import { buildMockWorkspace } from './mocks/workspace';
 
@@ -17,13 +17,25 @@ const samples: Record<string, () => Promise<Workspace>> = {
 export const sampleCaseIds = Object.keys(samples);
 
 export function documentFileUrl(documentId: string, page?: number) {
-  return `/api/documents/${encodeURIComponent(documentId)}/file${page ? `#page=${page}` : ''}`;
+  return `${apiUrl(`/api/documents/${encodeURIComponent(documentId)}/file`)}${page ? `#page=${page}` : ''}`;
 }
 
 async function fetchWorkspace(caseId: string, signal: AbortSignal): Promise<Workspace> {
-  const res = await fetch(`/api/cases/${encodeURIComponent(caseId)}/workspace`, { signal });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+  const workspace = await apiGet<Workspace>(`/cases/${encodeURIComponent(caseId)}/workspace`, signal);
+  return {
+    ...workspace,
+    documents: workspace.documents.map((document) => ({
+      ...document,
+      type: document.type.toLowerCase() as (typeof document)['type'],
+    })),
+  };
+}
+
+export async function startAnalysis(caseId: string): Promise<void> {
+  const response = await apiFetch(`/api/cases/${encodeURIComponent(caseId)}/analyze`, {
+    method: 'POST',
+  });
+  if (!response.ok) throw new Error(`POST /api/cases/${caseId}/analyze → ${response.status}`);
 }
 
 /**
@@ -48,8 +60,14 @@ export function useWorkspace(caseId: string): WorkspaceState {
       return () => controller.abort();
     }
 
-    fetchWorkspace(caseId, controller.signal)
-      .then((data) => setState({ status: 'ready', data, isSample: false }))
+    let timer: number | undefined;
+    const load = () => fetchWorkspace(caseId, controller.signal)
+      .then((data) => {
+        setState({ status: 'ready', data, isSample: false });
+        if (data.analysis_job?.status === 'QUEUED' || data.analysis_job?.status === 'RUNNING') {
+          timer = window.setTimeout(load, 1500);
+        }
+      })
       .catch(async (err: unknown) => {
         if (controller.signal.aborted) return;
         const loadSample = samples[caseId];
@@ -60,7 +78,12 @@ export function useWorkspace(caseId: string): WorkspaceState {
         setState({ status: 'error', message: err instanceof Error ? err.message : String(err) });
       });
 
-    return () => controller.abort();
+    load();
+
+    return () => {
+      controller.abort();
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
   }, [caseId]);
 
   return state;

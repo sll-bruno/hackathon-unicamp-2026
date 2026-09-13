@@ -18,6 +18,7 @@ type RecFilter = 'TODAS' | 'ACORDO' | 'DEFESA' | 'SEM';
 // Status que fazem sentido filtrar aqui — Encerrado já tem tela própria (Histórico).
 const FILTERABLE_STATUS: Exclude<DisplayStatus, 'ENCERRADO'>[] = [
   'RASCUNHO',
+  'DOCUMENTOS_ENVIADOS',
   'EM_ANALISE',
   'AGUARDANDO_DECISAO',
   'AGUARDANDO_ENCERRAMENTO',

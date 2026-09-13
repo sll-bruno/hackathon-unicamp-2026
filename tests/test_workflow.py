@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from app.core.database import get_engine
 from app.models import AnalysisJob, Case, CaseStatus, JobStatus, RecommendationRecord
@@ -39,6 +40,44 @@ def pipeline_result(action: str = "DEFESA", document_id: str = "document") -> di
 
 def live_case(client: TestClient) -> dict:
     return next(item for item in client.get("/api/cases").json()["items"] if not item["is_demo"])
+
+
+def test_full_engine_payload_is_projected_to_workspace_contract(
+    client: TestClient, monkeypatch
+) -> None:
+    cache = Path(__file__).parent / "engine" / "fixtures" / "llm_cache"
+    monkeypatch.setenv("ENGINE_MODE", "full")
+    monkeypatch.setenv("ENGINE_LLM_CACHE", "replay")
+    monkeypatch.setenv("ENGINE_LLM_CACHE_DIR", str(cache))
+    monkeypatch.setenv("OPENAI_MODEL", "gpt-5")
+    case = live_case(client)
+
+    assert client.post(f"/api/cases/{case['id']}/analyze").status_code == 202
+    workspace = client.get(f"/api/cases/{case['id']}/workspace").json()
+
+    assert workspace["case"]["case_id"] == case["id"]
+    assert workspace["case"]["claim_value"] == case["valor_causa"]
+    assert workspace["recommendation"]["action"] == "ACORDO"
+    assert workspace["recommendation"]["settlement_range"]["target"] > 0
+    assert workspace["recommendation"]["defense_cost_range"][0] > 0
+    assert workspace["recommendation"]["confidence_method_version"]
+    assert set(workspace["risk"]["probabilities"]) == {
+        "extincao",
+        "improcedencia",
+        "parcial",
+        "procedencia",
+    }
+    assert workspace["facts"]
+    assert workspace["contradictions"]
+    assert workspace["gaps"]
+    document_ids = {document["document_id"] for document in workspace["documents"]}
+    cited_ids = {
+        source["document_id"]
+        for group in ("facts", "contradictions", "gaps")
+        for item in workspace[group]
+        for source in item["sources"]
+    }
+    assert cited_ids <= document_ids
 
 
 def test_failed_job_can_retry_and_snapshots_are_immutable(client: TestClient, monkeypatch) -> None:

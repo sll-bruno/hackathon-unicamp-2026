@@ -41,11 +41,11 @@ export function RecommendationCard({ recommendation: rec, caseInfo: c }: Props) 
       </div>
 
       <footer className="rec-card__meta">
-        <span className="rec-card__meta-name">{c.plaintiff}</span>
+        {c.plaintiff && <span className="rec-card__meta-name">{c.plaintiff}</span>}
         <span>{c.cnj}</span>
-        <span>{c.court}</span>
+        {c.court && <span>{c.court}</span>}
         <span>{c.thesis}</span>
-        <span>Contrato {c.contract_number}</span>
+        {c.contract_number && <span>Contrato {c.contract_number}</span>}
         <span>{formatBRL(c.claim_value)}</span>
       </footer>
     </section>

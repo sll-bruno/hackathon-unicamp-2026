@@ -14,6 +14,7 @@ export function toDisplayStatus(status: CaseStatus): DisplayStatus {
 
 export const DISPLAY_STATUS_ORDER: DisplayStatus[] = [
   'RASCUNHO',
+  'DOCUMENTOS_ENVIADOS',
   'EM_ANALISE',
   'AGUARDANDO_DECISAO',
   'AGUARDANDO_ENCERRAMENTO',

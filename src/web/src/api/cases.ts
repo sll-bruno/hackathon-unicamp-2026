@@ -23,6 +23,73 @@ const draftToCaseListItem = (d: DraftRecord): CaseListItem => ({
   alert: null,
 });
 
+interface ApiCase {
+  id: string;
+  cnj: string;
+  uf: string;
+  assunto: string;
+  subassunto: string;
+  valor_causa: number;
+  status: CaseListItem['status'];
+  created_at: string;
+  updated_at: string;
+  recommendation: null | {
+    action: 'ACORDO' | 'DEFESA';
+    confidence_percent: number | null;
+    financial: {
+      suggested_offer: number | null;
+      expected_defense_cost: number;
+    };
+    versions: Record<string, string>;
+  };
+}
+
+interface ApiPage<T> {
+  items: T[];
+  total: number;
+}
+
+interface ApiDashboard {
+  adherence: { rate: number | null };
+}
+
+function apiCaseToListItem(item: ApiCase): CaseListItem {
+  const suggested = item.recommendation?.financial.suggested_offer ?? null;
+  return {
+    id: item.id,
+    cnj: item.cnj,
+    plaintiff_name: 'Parte autora não informada',
+    uf: item.uf,
+    thesis: /golpe/i.test(item.subassunto) ? 'GOLPE' : 'GENERICO',
+    claim_value: item.valor_causa,
+    status: item.status,
+    office: '',
+    created_at: item.created_at,
+    updated_at: item.updated_at,
+    recommendation: item.recommendation
+      ? {
+          action: item.recommendation.action,
+          confidence_percent: item.recommendation.confidence_percent,
+          suggested_range: suggested === null ? null : [suggested, suggested],
+          economic_ceiling: null,
+          defense_cost_central: item.recommendation.financial.expected_defense_cost,
+          policy_version:
+            item.recommendation.versions.policy ??
+            item.recommendation.versions.pipeline ??
+            'não informada',
+        }
+      : null,
+    followed_recommendation: null,
+    outcome: null,
+    alert: null,
+  };
+}
+
+async function fetchRealCases(): Promise<CaseListItem[]> {
+  const page = await apiGet<ApiPage<ApiCase>>('/cases?page_size=100');
+  return page.items.map(apiCaseToListItem);
+}
+
 // Casos estáticos de exemplo + rascunhos criados em CaseNew (persistidos em localStorage).
 function allCases(): CaseListItem[] {
   const drafts = listDrafts().map(draftToCaseListItem);
@@ -50,14 +117,24 @@ function summarize(cases: CaseListItem[]): CasesSummary {
 export const useCases = () =>
   useQuery({
     queryKey: ['cases'],
-    queryFn: () => (USE_MOCKS ? simulateLatency(allCases()) : apiGet<CaseListItem[]>('/cases')),
+    queryFn: () => (USE_MOCKS ? simulateLatency(allCases()) : fetchRealCases()),
   });
 
 // GET /api/cases/summary
 export const useCasesSummary = () =>
   useQuery({
     queryKey: ['cases', 'summary'],
-    queryFn: () => (USE_MOCKS ? simulateLatency(summarize(allCases())) : apiGet<CasesSummary>('/cases/summary')),
+    queryFn: async () => {
+      if (USE_MOCKS) return simulateLatency(summarize(allCases()));
+      const [cases, dashboard] = await Promise.all([
+        fetchRealCases(),
+        apiGet<ApiDashboard>('/dashboard'),
+      ]);
+      const summary = summarize(cases);
+      summary.adherence_percent =
+        dashboard.adherence.rate === null ? null : dashboard.adherence.rate * 100;
+      return summary;
+    },
   });
 
 // GET /api/cases/{id}
@@ -65,6 +142,7 @@ export const useCase = (id: string) =>
   useQuery({
     queryKey: ['cases', id],
     queryFn: () =>
-      USE_MOCKS ? simulateLatency(allCases().find((c) => c.id === id) ?? null) : apiGet<CaseListItem>(`/cases/${id}`),
+      USE_MOCKS
+        ? simulateLatency(allCases().find((c) => c.id === id) ?? null)
+        : apiGet<ApiCase>(`/cases/${id}`).then(apiCaseToListItem),
   });
-

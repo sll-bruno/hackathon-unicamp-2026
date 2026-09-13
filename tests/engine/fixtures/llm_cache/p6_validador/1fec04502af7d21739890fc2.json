@@ -1,0 +1,178 @@
+{
+ "itens": [
+  {
+   "id": "EMB-01-001",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Contrato indica firma manual do tomador e data; prova do instrumento contratual."
+  },
+  {
+   "id": "EMB-01-002",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo refere gravação preservada com duração; atende à prova de contratação."
+  },
+  {
+   "id": "EMB-01-003",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo informa ACK do INSS à autorização; prova de consignação."
+  },
+  {
+   "id": "EMB-01-004",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Dossiê indica compatibilidade de assinatura (91%); autenticação forte."
+  },
+  {
+   "id": "EMB-01-005",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Dossiê registra liveness com match 97,3%; autenticação biométrica confirmada."
+  },
+  {
+   "id": "EMB-01-006",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Dossiê valida RG e endereço em bases oficiais; autenticação documental."
+  },
+  {
+   "id": "EMB-01-007",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Extrato em nome da autora mostra crédito do contrato; conta de titularidade comprovada."
+  },
+  {
+   "id": "EMB-01-008",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Extrato registra TED após o crédito; indício de uso do valor pela autora."
+  },
+  {
+   "id": "EMB-01-009",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Extrato mostra PIX a familiar; uso do crédito comprovado."
+  },
+  {
+   "id": "EMB-01-010",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Extrato mostra saque em ATM; uso do crédito."
+  },
+  {
+   "id": "EMB-01-011",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Autora negou movimentação; extrato comprova TED/PIX/saque. Contradição objetiva."
+  },
+  {
+   "id": "EMB-01-012",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Alegada reclamação administrativa sem protocolos ou comprovantes nos autos."
+  },
+  {
+   "id": "EMB-01-013",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Negou movimentação sem juntar extratos próprios do período."
+  },
+  {
+   "id": "EMB-01-014",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Descontos desde 06/2022 e 21 parcelas pagas; ausência de impugnação imediata."
+  },
+  {
+   "id": "EMB-01-015",
+   "status": "reprovado",
+   "categoria_sugerida": null,
+   "motivo": "Idade não se relaciona à existência da contratação; irrelevante à acusação."
+  },
+  {
+   "id": "EMB-01-016",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Quadro financeiro indica IOF/seguro financiados sem somar ao total; inconsistência interna."
+  },
+  {
+   "id": "EMB-01-017",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Resumo aponta saldo ~R$1.037,66 com 21 parcelas; tabela indica >R$4 mil. Divergência patente."
+  },
+  {
+   "id": "EMB-02-001",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Demonstrativo indica 21 parcelas liquidadas; descontos comprovados."
+  },
+  {
+   "id": "EMB-02-002",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Período e valores não comprovados por extratos/contracheques do INSS."
+  },
+  {
+   "id": "EMB-02-003",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Pedido em dobro sem elementos que afastem engano justificável."
+  },
+  {
+   "id": "EMB-02-004",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Crédito de R$5.000,00 lançado em conta da autora; compensação possível."
+  },
+  {
+   "id": "EMB-02-005",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "TED, PIX e saque após o crédito; uso dos recursos indicado."
+  },
+  {
+   "id": "EMB-03-001",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Descontos por 21 parcelas; longa duração configurada."
+  },
+  {
+   "id": "EMB-03-002",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "RG comprova idade >60; vulnerabilidade caracterizada."
+  },
+  {
+   "id": "EMB-03-003",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Extrato comprova recebimento e uso do crédito; atenuante aplicável."
+  },
+  {
+   "id": "EMB-03-004",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Abalo moral alegado genericamente, sem documentos comprobatórios."
+  },
+  {
+   "id": "EMB-03-005",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Sem prova do valor do benefício ou impacto objetivo do desconto."
+  },
+  {
+   "id": "EMB-03-006",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Reclamação administrativa alegada sem protocolos ou respostas."
+  },
+  {
+   "id": "EMB-03-007",
+   "status": "reprovado",
+   "categoria_sugerida": null,
+   "motivo": "Trata apenas da contratação/uso; em dano moral é matéria da acusação principal."
+  }
+ ]
+}
