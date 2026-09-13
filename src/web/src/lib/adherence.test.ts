@@ -119,4 +119,39 @@ describe('buildAdherenceOverview', () => {
     expect(buildAdherenceOverview(records, { period: 'all', confidenceBand: 'alta' }, NOW).total_decisions).toBe(2);
     expect(buildAdherenceOverview(records, { period: 'all', policyVersion: 'v0.9' }, NOW).total_decisions).toBe(1);
   });
+
+  describe('trend (agregação por semana)', () => {
+    it('retorna array vazio quando não há decisões no filtro', () => {
+      const overview = buildAdherenceOverview([], { period: 'all' }, NOW);
+      expect(overview.trend).toEqual([]);
+    });
+
+    it('bucketiza por semana dentro da janela do período (30d); a decisão de 40 dias atrás fica fora', () => {
+      // janela de 30d: [NOW-30d, NOW]. Registros de o1 (5d atrás), o2/DEFESA (10d atrás) e
+      // o3/ACORDO (2d atrás) caem dentro da janela; o2/DEFESA de 40d atrás é removida pelo
+      // filtro de período antes mesmo de chegar no trend.
+      const overview = buildAdherenceOverview(records, { period: '30d' }, NOW);
+
+      const totalAcrossBuckets = overview.trend.reduce((sum, p) => sum + p.total, 0);
+      expect(totalAcrossBuckets).toBe(4);
+
+      const acceptedAcrossBuckets = overview.trend.reduce(
+        (sum, p) => sum + (p.total === 0 ? 0 : Math.round(((p.adherence_percent ?? 0) / 100) * p.total)),
+        0,
+      );
+      expect(acceptedAcrossBuckets).toBe(3); // 3 aceitos de 4 (mesmo total que overall_percent 75%)
+
+      for (const point of overview.trend) {
+        expect(point.week_start).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        if (point.total === 0) expect(point.adherence_percent).toBeNull();
+      }
+    });
+
+    it('bucket sem decisões tem total 0 e adherence_percent null', () => {
+      const overview = buildAdherenceOverview(records, { period: '30d' }, NOW);
+      const emptyBucket = overview.trend.find((p) => p.total === 0);
+      expect(emptyBucket).toBeDefined();
+      expect(emptyBucket?.adherence_percent).toBeNull();
+    });
+  });
 });

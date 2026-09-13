@@ -4,12 +4,12 @@
   gap: var(--space-4);
 }
 
-.hero {
+.box {
   display: flex;
+  flex: 1;
   flex-direction: column;
   justify-content: center;
   gap: var(--space-2);
-  flex: 2;
   padding: var(--space-5) var(--space-6);
   border: 1px solid var(--stroke-secondary);
   border-radius: var(--radius-12);
@@ -17,29 +17,22 @@
   text-align: center;
 }
 
-.hero.positive {
-  border-color: var(--status-positive);
-  background: var(--status-positive-bg);
+.hero {
+  border-color: var(--stroke-primary);
+  border-top: 3px solid var(--accent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent),
+    0 0 48px -12px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
-.hero.warning {
-  border-color: var(--status-warning);
-  background: var(--status-warning-bg);
-}
-
-.hero.negative {
-  border-color: var(--status-negative);
-  background: var(--status-negative-bg);
-}
-
-.heroLabel {
+.label {
   color: var(--text-secondary);
   font-size: var(--text-12);
   letter-spacing: var(--ls-label);
   text-transform: uppercase;
 }
 
-.heroValue {
+.value {
   color: var(--text-primary);
   font-family: var(--font-heading);
   font-size: var(--text-48);
@@ -48,24 +41,14 @@
   line-height: 1;
 }
 
-.hero.positive .heroValue {
+.value.positive {
   color: var(--status-positive);
 }
 
-.hero.warning .heroValue {
+.value.warning {
   color: var(--status-warning);
 }
 
-.hero.negative .heroValue {
+.value.negative {
   color: var(--status-negative);
-}
-
-.support {
-  display: flex;
-  flex: 1;
-}
-
-.support > * {
-  flex: 1;
-  height: 100%;
 }

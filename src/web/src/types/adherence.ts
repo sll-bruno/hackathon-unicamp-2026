@@ -39,6 +39,12 @@ export interface DivergenceReasonCount {
   count: number;
 }
 
+export interface AdherenceTrendPoint {
+  week_start: string; // ISO date (YYYY-MM-DD) — início do intervalo de 7 dias
+  adherence_percent: number | null;
+  total: number;
+}
+
 export interface AdherenceOverview {
   overall_percent: number | null; // null sem decisões no filtro
   total_decisions: number;
@@ -46,4 +52,5 @@ export interface AdherenceOverview {
   by_office: AdherenceByOffice[];
   by_confidence: AdherenceByConfidence[];
   divergence_reasons: DivergenceReasonCount[];
+  trend: AdherenceTrendPoint[];
 }

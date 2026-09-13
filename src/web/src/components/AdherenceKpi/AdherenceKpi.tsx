@@ -1,4 +1,3 @@
-import { KpiBox } from '../KpiRow/KpiRow';
 import { formatPercent } from '../../lib/format';
 import styles from './AdherenceKpi.module.css';
 
@@ -22,12 +21,13 @@ export function AdherenceKpi({ overallPercent, totalDecisions }: AdherenceKpiPro
 
   return (
     <div className={styles.row} role="group" aria-label="Aderência geral">
-      <div className={`${styles.hero} ${tone ? styles[tone] : ''}`}>
-        <span className={styles.heroLabel}>Aderência geral</span>
-        <span className={styles.heroValue}>{formatPercent(percent)}</span>
+      <div className={styles.box + ' ' + styles.hero}>
+        <span className={styles.label}>Aderência geral</span>
+        <span className={`${styles.value} ${tone ? styles[tone] : ''}`}>{formatPercent(percent)}</span>
       </div>
-      <div className={styles.support}>
-        <KpiBox label="Decisões no período" value={totalDecisions === undefined ? '–' : String(totalDecisions)} />
+      <div className={styles.box}>
+        <span className={styles.label}>Decisões no período</span>
+        <span className={styles.value}>{totalDecisions === undefined ? '–' : String(totalDecisions)}</span>
       </div>
     </div>
   );

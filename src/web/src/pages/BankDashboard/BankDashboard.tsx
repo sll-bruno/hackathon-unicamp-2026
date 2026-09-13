@@ -5,6 +5,7 @@ import { AdherenceBarCard } from '../../components/AdherenceBarCard/AdherenceBar
 import { AdherenceByConfidence } from '../../components/AdherenceByConfidence/AdherenceByConfidence';
 import { AdherenceFilterBar } from '../../components/AdherenceFilterBar/AdherenceFilterBar';
 import { AdherenceKpi } from '../../components/AdherenceKpi/AdherenceKpi';
+import { AdherenceTrendChart } from '../../components/AdherenceTrendChart/AdherenceTrendChart';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import type { AdherenceFilters } from '../../types/adherence';
 import { ACTION_LABEL, DIVERGENCE_REASON_LABEL } from '../../types/labels';
@@ -37,6 +38,8 @@ export default function BankDashboard() {
       {overview.isSuccess && (
         <>
           <AdherenceKpi overallPercent={overview.data.overall_percent} totalDecisions={overview.data.total_decisions} />
+
+          <AdherenceTrendChart data={overview.data.trend} />
 
           <div className={styles.grid}>
             <AdherenceBarCard

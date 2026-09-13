@@ -5,6 +5,7 @@ import type {
   AdherenceByOffice,
   AdherenceFilters,
   AdherenceOverview,
+  AdherenceTrendPoint,
   ConfidenceBand,
   DivergenceReason,
 } from '../types/adherence';
@@ -105,6 +106,37 @@ function buildDivergenceReasons(records: AdherenceRecord[]) {
   }));
 }
 
+const WEEK_MS = 7 * DAY_MS;
+const toISODate = (ms: number) => new Date(ms).toISOString().slice(0, 10);
+
+// Bucketiza os registros já filtrados em intervalos de 7 dias, ancorados no início
+// da janela do período (ou na decisão mais antiga do filtro, quando period === 'all',
+// já que não há um início de janela fixo nesse caso).
+function buildTrend(records: AdherenceRecord[], filters: AdherenceFilters, now: Date): AdherenceTrendPoint[] {
+  if (records.length === 0) return [];
+
+  const windowEnd = now.getTime();
+  const windowStart =
+    filters.period === 'all'
+      ? Math.min(...records.map((r) => new Date(r.decided_at).getTime()))
+      : windowEnd - PERIOD_DAYS[filters.period] * DAY_MS;
+
+  const bucketCount = Math.max(1, Math.floor((windowEnd - windowStart) / WEEK_MS) + 1);
+  const buckets: AdherenceRecord[][] = Array.from({ length: bucketCount }, () => []);
+
+  for (const record of records) {
+    const offset = new Date(record.decided_at).getTime() - windowStart;
+    const idx = Math.min(bucketCount - 1, Math.max(0, Math.floor(offset / WEEK_MS)));
+    buckets[idx].push(record);
+  }
+
+  return buckets.map((subset, i) => ({
+    week_start: toISODate(windowStart + i * WEEK_MS),
+    adherence_percent: adherencePercentOf(subset),
+    total: subset.length,
+  }));
+}
+
 export function buildAdherenceOverview(
   records: AdherenceRecord[],
   filters: AdherenceFilters,
@@ -118,5 +150,6 @@ export function buildAdherenceOverview(
     by_office: buildByOffice(filtered),
     by_confidence: buildByConfidence(filtered),
     divergence_reasons: buildDivergenceReasons(filtered),
+    trend: buildTrend(filtered, filters, now),
   };
 }
