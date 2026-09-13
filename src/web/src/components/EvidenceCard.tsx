@@ -16,9 +16,6 @@ export interface Citation {
   excerpts: string[];
 }
 
-/** Escala ilustrativa dos pesos por categoria; a tabela oficial ainda será definida pela equipe. */
-const WEIGHT_SCALE_MAX = 5;
-
 interface Props {
   evidence: Evidence;
   documents: Map<string, CaseDocument>;
@@ -39,7 +36,7 @@ export function EvidenceCard({ evidence, documents, activeCitation, onSelectCita
             <span className="evidence__category">
               {factTypeLabel[evidence.item.fact_type] ?? 'Categoria não mapeada'}
             </span>
-            <WeightDots weight={evidence.item.weight} version={evidence.item.weights_version} />
+            <WeightBadge weight={evidence.item.weight} version={evidence.item.weights_version} />
           </div>
         )}
         <p className="evidence__text">{item.description}</p>
@@ -82,7 +79,7 @@ function RelationBadge({ relation, claim }: { relation: FactRelation; claim?: st
   );
 }
 
-function WeightDots({ weight, version }: { weight: number | null; version: string }) {
+function WeightBadge({ weight, version }: { weight: number | null; version: string }) {
   if (weight === null) {
     return (
       <span className="weight weight--unmapped" title={`Tabela ${version}`}>
@@ -90,12 +87,9 @@ function WeightDots({ weight, version }: { weight: number | null; version: strin
       </span>
     );
   }
-  const filled = Math.max(0, Math.min(WEIGHT_SCALE_MAX, Math.round(weight)));
   return (
-    <span className="weight" role="img" aria-label={`Peso ${weight} de ${WEIGHT_SCALE_MAX}`} title={`Peso ${weight} · tabela ${version}`}>
-      {Array.from({ length: WEIGHT_SCALE_MAX }, (_, i) => (
-        <i key={i} data-on={i < filled || undefined} />
-      ))}
+    <span className="weight" title={`Tabela ${version}`}>
+      Peso {weight}
     </span>
   );
 }
