@@ -1,15 +1,16 @@
-import json
 from pathlib import Path
 
 from sqlmodel import Session, select
 
 from app.core.config import Settings
 from app.models import (
-    Action,
+    AnalysisJob,
+    AppMetadata,
     Case,
     CaseOutcome,
     CaseStatus,
     CaseStatusHistory,
+    ChatMessage,
     Document,
     DocumentOrigin,
     DocumentType,
@@ -18,19 +19,24 @@ from app.models import (
     LawyerDecision,
     NegotiationResult,
     Office,
-    OutcomeType,
     RecommendationRecord,
 )
+from app.models.domain import utc_now
+from app.services.analysis import persist_engine_output
+from app.services.demo_outputs import load_precomputed_output
 
 OFFICE_NAME = "Amaral Advocacia — Demo"
 LAWYER_EMAIL = "advogado.demo@enter.local"
+DEMO_BASELINE_KEY = "demo_baseline_version"
+DEMO_BASELINE_VERSION = "real-engine-v1"
 
 CASE_SPECS = (
     {
         "cnj": "0801234-56.2024.8.10.0001",
         "folder": "Caso_01_0801234-56-2024-8-10-0001",
         "uf": "MA",
-        "valor_causa": 10_000.0,
+        "valor_causa": 20_000.0,
+        "legacy_valor_causa": 10_000.0,
         "plaintiff_name": "Maria das Graças Silva Pereira",
         "court": "3ª Vara Cível · São Luís/MA",
         "contract_number": "502348719",
@@ -45,12 +51,14 @@ CASE_SPECS = (
             (DocumentType.LAUDO_REFERENCIADO, "07_Laudo_Referenciado.pdf"),
         ),
         "is_demo": True,
+        "initial_status": CaseStatus.AGUARDANDO_DECISAO,
     },
     {
         "cnj": "0654321-09.2024.8.04.0001",
         "folder": "Caso_02_0654321-09-2024-8-04-0001",
         "uf": "AM",
-        "valor_causa": 8_000.0,
+        "valor_causa": 25_000.0,
+        "legacy_valor_causa": 8_000.0,
         "plaintiff_name": "José Raimundo Oliveira Costa",
         "court": "5ª Vara Cível · Manaus/AM",
         "contract_number": "603827451",
@@ -62,6 +70,7 @@ CASE_SPECS = (
             (DocumentType.LAUDO_REFERENCIADO, "04_Laudo_Referenciado.pdf"),
         ),
         "is_demo": False,
+        "initial_status": CaseStatus.DOCUMENTOS_ENVIADOS,
     },
 )
 
@@ -91,6 +100,9 @@ def _create_case(session: Session, spec: dict) -> tuple[Case, bool]:
             if getattr(existing, field) is None:
                 setattr(existing, field, spec[field])
                 session.add(existing)
+        if existing.valor_causa == spec["legacy_valor_causa"]:
+            existing.valor_causa = spec["valor_causa"]
+            session.add(existing)
         return existing, False
     contrato, extrato, comprovante, dossie, demonstrativo, laudo = spec["flags"]
     case = Case(
@@ -108,7 +120,7 @@ def _create_case(session: Session, spec: dict) -> tuple[Case, bool]:
         dossie=dossie,
         demonstrativo_divida=demonstrativo,
         laudo_referenciado=laudo,
-        status=CaseStatus.ENCERRADO if spec["is_demo"] else CaseStatus.DOCUMENTOS_ENVIADOS,
+        status=spec["initial_status"],
         is_demo=spec["is_demo"],
     )
     session.add(case)
@@ -144,172 +156,100 @@ def _seed_documents(session: Session, case: Case, spec: dict, data_dir: Path) ->
     return documents
 
 
-def _seed_closed_fixture(
-    session: Session, case: Case, lawyer: Lawyer, documents: list[Document]
-) -> None:
-    contract = next(document for document in documents if document.type == DocumentType.CONTRATO)
-    sources = [
-        {
-            "document_id": contract.id,
-            "page": 1,
-            "excerpt": (
-                "O valor líquido liberado será creditado em conta de titularidade do TOMADOR, "
-                "junto ao Banco UFMG S.A., agência 0001, conta corrente 20.348.719-5, na data "
-                "prevista de 12/05/2022."
-            ),
-        }
-    ]
-    evidence_payload = [
-        {
-            "id": "demo-evidence-1",
-            "text": (
-                "O contrato registra crédito de R$ 5.000,00 na conta da titular em 12/05/2022."
-            ),
-            "type": "DOCUMENTACAO_COMPLETA",
-            "weight": 1.0,
-            "sources": sources,
-        }
-    ]
-    payload = {
-        "versions": {"pipeline": "demo-fixture-v1"},
-        "confidence_method_version": "demo-fixture-v1",
-        "risk": {
-            "probabilities": {
-                "extincao": 0.08,
-                "improcedencia": 0.12,
-                "parcial": 0.51,
-                "procedencia": 0.29,
-            },
-            "cohort_size": 196,
-        },
-        "recommendation": {
-            "action": "ACORDO",
-            "confidence_percent": 87.0,
-            "summary": "Fixture para demonstrar o ciclo completo de acordo.",
-            "reason_codes": ["DEMO_FIXTURE"],
-        },
-        "financial": {
-            "suggested_offer": 3200.0,
-            "expected_defense_cost": 6900.0,
-            "expected_savings": 3700.0,
-        },
-        "defense_cost_range": [5700.0, 8100.0],
-        "settlement_range": {
-            "opening": 2600.0,
-            "target": 3200.0,
-            "ceiling": 4200.0,
-        },
-        "what_changes": [
-            "Prova nova e autenticada da contratação pode tornar a defesa preferível.",
-            "Redução relevante do custo esperado da defesa exige nova comparação econômica.",
-        ],
-        "assumptions": [
-            "Valores e probabilidades deste processo encerrado são um fixture da demonstração.",
-            "A oferta-alvo de R$ 3.200 preserva R$ 3.700 frente ao custo esperado da defesa.",
-        ],
-        "facts": [
-            {
-                "id": evidence_payload[0]["id"],
-                "fact_type": "documentacao_disponivel",
-                "description": (
-                    "O contrato registra crédito de R$ 5.000,00 na conta da titular em 12/05/2022."
-                ),
-                "weight": 1.0,
-                "weights_version": "demo-fixture-v1",
-                "relation": "neutral",
-                "sources": sources,
-            }
-        ],
-        "contradictions": [],
-        "gaps": [],
-        "evidences": evidence_payload,
-        "source_kind": "DEMO_FIXTURE",
-    }
-    existing = session.exec(
+def _clear_case_workflow(session: Session, case: Case) -> None:
+    for model in (CaseOutcome, NegotiationResult, LawyerDecision, ChatMessage):
+        for record in session.exec(select(model).where(model.case_id == case.id)).all():
+            session.delete(record)
+    recommendations = session.exec(
         select(RecommendationRecord).where(RecommendationRecord.case_id == case.id)
+    ).all()
+    for recommendation in recommendations:
+        for evidence in session.exec(
+            select(EvidenceRecord).where(
+                EvidenceRecord.recommendation_id == recommendation.id
+            )
+        ).all():
+            session.delete(evidence)
+        session.delete(recommendation)
+    session.flush()
+    for job in session.exec(select(AnalysisJob).where(AnalysisJob.case_id == case.id)).all():
+        session.delete(job)
+    session.flush()
+
+
+def _set_baseline_status(session: Session, case: Case, status: CaseStatus) -> None:
+    previous = case.status
+    case.status = status
+    case.updated_at = utc_now()
+    session.add(case)
+    if previous != status:
+        session.add(
+            CaseStatusHistory(
+                case_id=case.id,
+                from_status=previous,
+                to_status=status,
+                actor="DEMO_BASELINE",
+            )
+        )
+
+
+def _reset_demo_baseline(
+    session: Session,
+    seeded_cases: list[tuple[Case, list[Document], dict]],
+) -> None:
+    for case, documents, spec in seeded_cases:
+        _clear_case_workflow(session, case)
+        _set_baseline_status(session, case, spec["initial_status"])
+        if spec["is_demo"]:
+            _persist_case_one_output(session, case, documents)
+
+
+def _persist_case_one_output(
+    session: Session, case: Case, documents: list[Document]
+) -> None:
+    existing = session.exec(
+        select(RecommendationRecord).where(
+            RecommendationRecord.case_id == case.id,
+            RecommendationRecord.is_current.is_(True),
+        )
     ).first()
-    if existing is not None:
-        if existing.source_kind == "DEMO_FIXTURE":
-            existing.payload_json = json.dumps(payload, ensure_ascii=False)
-            existing.versions_json = json.dumps(payload["versions"], ensure_ascii=False)
-            session.add(existing)
-            evidence = session.exec(
-                select(EvidenceRecord).where(
-                    EvidenceRecord.recommendation_id == existing.id,
-                    EvidenceRecord.external_id == evidence_payload[0]["id"],
-                )
-            ).first()
-            if evidence is not None:
-                evidence.text = evidence_payload[0]["text"]
-                evidence.type = evidence_payload[0]["type"]
-                evidence.weight = evidence_payload[0]["weight"]
-                evidence.sources_json = json.dumps(
-                    evidence_payload[0]["sources"], ensure_ascii=False
-                )
-                session.add(evidence)
-        return
-    recommendation = RecommendationRecord(
-        case_id=case.id,
-        action=Action.ACORDO,
-        confidence_percent=87.0,
-        summary="Fixture para demonstrar o ciclo completo de acordo.",
-        reason_codes_json=json.dumps(["DEMO_FIXTURE"]),
-        suggested_offer=3200.0,
-        expected_defense_cost=6900.0,
-        expected_savings=3700.0,
-        versions_json=json.dumps({"pipeline": "demo-fixture-v1"}),
-        payload_json=json.dumps(payload, ensure_ascii=False),
-        source_kind="DEMO_FIXTURE",
-    )
-    session.add(recommendation)
-    session.flush()
-    evidence = evidence_payload[0]
-    session.add(
-        EvidenceRecord(
-            recommendation_id=recommendation.id,
-            external_id=evidence["id"],
-            text=evidence["text"],
-            type=evidence["type"],
-            weight=evidence["weight"],
-            sources_json=json.dumps(evidence["sources"], ensure_ascii=False),
-        )
-    )
-    decision = LawyerDecision(
-        case_id=case.id,
-        recommendation_id=recommendation.id,
-        lawyer_id=lawyer.id,
-        action=Action.ACORDO,
-        adhered=True,
-    )
-    session.add(decision)
-    session.flush()
-    session.add(
-        NegotiationResult(
+    if existing is None:
+        output = load_precomputed_output(case.cnj, documents)
+        if output is None:
+            raise ValueError(f"Missing precomputed engine output for {case.cnj}")
+        persist_engine_output(
+            session,
+            None,
+            output,
             case_id=case.id,
-            decision_id=decision.id,
-            accepted=True,
-            final_value=3000.0,
+            source_kind="ENGINE_PRECOMPUTED",
         )
-    )
-    session.add(
-        CaseOutcome(
-            case_id=case.id,
-            outcome=OutcomeType.ACORDO,
-            final_value=3000.0,
-            legal_costs=250.0,
-            notes="Registro demonstrativo criado pelo seed.",
-            source_kind="DEMO_FIXTURE",
-        )
-    )
+
+
+def _baseline_marker(session: Session) -> AppMetadata | None:
+    return session.get(AppMetadata, DEMO_BASELINE_KEY)
 
 
 def seed_demo_data(session: Session, settings: Settings) -> None:
     if not settings.demo_seed:
         return
-    lawyer = _get_or_create_profile(session)
+    _get_or_create_profile(session)
+    seeded_cases: list[tuple[Case, list[Document], dict]] = []
     for spec in CASE_SPECS:
         case, _created = _create_case(session, spec)
         documents = _seed_documents(session, case, spec, settings.data_dir)
-        if spec["is_demo"]:
-            _seed_closed_fixture(session, case, lawyer, documents)
+        seeded_cases.append((case, documents, spec))
+
+    marker = _baseline_marker(session)
+    if marker is None or marker.value != DEMO_BASELINE_VERSION:
+        _reset_demo_baseline(session, seeded_cases)
+        if marker is None:
+            marker = AppMetadata(key=DEMO_BASELINE_KEY, value=DEMO_BASELINE_VERSION)
+        else:
+            marker.value = DEMO_BASELINE_VERSION
+            marker.updated_at = utc_now()
+        session.add(marker)
+    else:
+        case_one, case_one_documents, _spec = seeded_cases[0]
+        _persist_case_one_output(session, case_one, case_one_documents)
     session.commit()

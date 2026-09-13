@@ -1,5 +1,11 @@
 import { lazy, Suspense, useMemo, useState } from 'react';
-import { sampleCaseIds, startAnalysis, useWorkspace } from '../../api/workspace';
+import {
+  sampleCaseIds,
+  startAnalysis,
+  submitClosure,
+  submitNegotiation,
+  useWorkspace,
+} from '../../api/workspace';
 import { ChatPanel } from '../../components/ChatPanel';
 import { EvidenceCard, KindIcon, type Citation, type Evidence, type EvidenceKind } from '../../components/EvidenceCard';
 import { RecommendationCard } from '../../components/RecommendationCard';
@@ -9,7 +15,7 @@ import { SourcePanel } from '../../components/SourcePanel';
 import { WhatChangesCard } from '../../components/WhatChangesCard';
 import { buildCitationIndex } from '../../components/documentViewer';
 import type { Workspace } from '../../types/workspace';
-import { formatDateTime } from './format';
+import { formatBRL, formatDateTime } from './format';
 import './workspace.css';
 
 const DocumentViewerPanel = lazy(() => import('../../components/DocumentViewerPanel'));
@@ -136,7 +142,14 @@ function WorkspaceView({
         <span aria-current="page">Área de trabalho</span>
       </nav>
 
-      <RecommendationCard recommendation={rec} caseInfo={c} />
+      <RecommendationCard
+        recommendation={rec}
+        caseInfo={c}
+        decision={data.decision}
+        onChanged={onAnalysisStarted}
+      />
+
+      <WorkflowActionPanel data={data} onChanged={onAnalysisStarted} />
 
       <section className="explain" aria-labelledby="explain-title">
         <header className="section-header">
@@ -293,7 +306,7 @@ function WorkspacePending({
   const [submitting, setSubmitting] = useState(false);
   const [startedJob, setStartedJob] = useState<NonNullable<Workspace['analysis_job']> | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const job = startedJob ?? data.analysis_job;
+  const job = data.analysis_job ?? startedJob;
   const running = job?.status === 'QUEUED' || job?.status === 'RUNNING';
 
   const analyze = async () => {
@@ -314,6 +327,9 @@ function WorkspacePending({
     const progress = job?.progress_percent ?? 0;
     const currentStep = analysisSteps.findIndex((step) => step.stage === stage);
     const activeStep = currentStep >= 0 ? currentStep : stage === 'RUNNING_ENGINE' || stage === 'QUEUED' ? 0 : 5;
+    const visibleDocumentCount = progress < 10
+      ? 0
+      : Math.min(data.documents.length, Math.max(1, Math.ceil(((progress - 10) / 48) * data.documents.length)));
 
     return (
       <main className="ws ws--analysis" aria-busy="true">
@@ -344,6 +360,21 @@ function WorkspacePending({
             <p className="analysis-loading__context">
               O OCR já foi concluído. Agora a engine cruza os documentos com o histórico e a política econômica.
             </p>
+
+            <div className="analysis-documents" aria-live="polite">
+              <div className="analysis-documents__header">
+                <span>Documentos processados</span>
+                <strong>{visibleDocumentCount}/{data.documents.length}</strong>
+              </div>
+              <ul>
+                {data.documents.slice(0, visibleDocumentCount).map((document) => (
+                  <li key={document.document_id}>
+                    <span aria-hidden="true">✓</span>
+                    <span>{document.filename}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
             <div
               className="analysis-loading__bar"
@@ -391,6 +422,129 @@ function WorkspacePending({
       {error && <p className="analysis-ready__error" role="alert">{error}</p>}
     </main>
   );
+}
+
+function WorkflowActionPanel({ data, onChanged }: { data: Workspace; onChanged: () => void }) {
+  const [finalValue, setFinalValue] = useState(
+    data.recommendation?.settlement_range.target.toFixed(2) ?? '',
+  );
+  const [outcome, setOutcome] = useState<'IMPROCEDENCIA' | 'EXTINCAO' | 'PARCIAL' | 'PROCEDENCIA'>('IMPROCEDENCIA');
+  const [defenseCost, setDefenseCost] = useState('');
+  const [courtAward, setCourtAward] = useState('');
+  const [legalCosts, setLegalCosts] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const run = async (action: () => Promise<unknown>) => {
+    setSubmitting(true);
+    setError(null);
+    try {
+      await action();
+      onChanged();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setSubmitting(false);
+    }
+  };
+
+  if (data.case.status === 'EM_NEGOCIACAO') {
+    const value = Number(finalValue.replace(',', '.'));
+    return (
+      <section className="workflow-action card" aria-labelledby="negotiation-title">
+        <div>
+          <span className="eyebrow">Etapa humana · negociação</span>
+          <h2 id="negotiation-title">Registrar resposta da parte autora</h2>
+          <p>A recomendação já foi decidida. Informe agora o resultado real da negociação.</p>
+        </div>
+        <div className="workflow-action__controls">
+          <label>
+            Valor final do acordo
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={finalValue}
+              onChange={(event) => setFinalValue(event.target.value)}
+            />
+          </label>
+          <div className="workflow-action__buttons">
+            <button
+              type="button"
+              className="button button--primary"
+              disabled={submitting || !Number.isFinite(value)}
+              onClick={() => void run(() => submitNegotiation(data.case.case_id, true, value))}
+            >
+              Acordo aceito
+            </button>
+            <button
+              type="button"
+              className="button"
+              disabled={submitting}
+              onClick={() => void run(() => submitNegotiation(data.case.case_id, false))}
+            >
+              Acordo recusado
+            </button>
+          </div>
+          {error && <p className="workflow-action__error" role="alert">{error}</p>}
+        </div>
+      </section>
+    );
+  }
+
+  if (data.case.status === 'AGUARDANDO_ENCERRAMENTO') {
+    const optionalNumber = (value: string) => value ? Number(value.replace(',', '.')) : undefined;
+    return (
+      <section className="workflow-action card" aria-labelledby="closure-title">
+        <div>
+          <span className="eyebrow">Etapa humana · encerramento</span>
+          <h2 id="closure-title">Registrar desfecho observado</h2>
+          <p>Esses valores são eventos posteriores; nunca entram como dados de entrada da recomendação.</p>
+        </div>
+        <form
+          className="workflow-action__form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void run(() => submitClosure(data.case.case_id, {
+              outcome,
+              defense_cost: optionalNumber(defenseCost),
+              court_award: optionalNumber(courtAward),
+              legal_costs: optionalNumber(legalCosts),
+            }));
+          }}
+        >
+          <label>
+            Desfecho
+            <select value={outcome} onChange={(event) => setOutcome(event.target.value as typeof outcome)}>
+              <option value="IMPROCEDENCIA">Improcedência</option>
+              <option value="EXTINCAO">Extinção</option>
+              <option value="PARCIAL">Parcial procedência</option>
+              <option value="PROCEDENCIA">Procedência</option>
+            </select>
+          </label>
+          <label>Custo da defesa<input type="number" min="0" step="0.01" value={defenseCost} onChange={(event) => setDefenseCost(event.target.value)} /></label>
+          <label>Condenação<input type="number" min="0" step="0.01" value={courtAward} onChange={(event) => setCourtAward(event.target.value)} /></label>
+          <label>Custas jurídicas<input type="number" min="0" step="0.01" value={legalCosts} onChange={(event) => setLegalCosts(event.target.value)} /></label>
+          <button type="submit" className="button button--primary" disabled={submitting}>
+            {submitting ? 'Registrando…' : 'Encerrar processo'}
+          </button>
+          {error && <p className="workflow-action__error" role="alert">{error}</p>}
+        </form>
+      </section>
+    );
+  }
+
+  if (data.case.status === 'ENCERRADO' && data.outcome) {
+    const observedValue = data.outcome.final_value ?? data.outcome.court_award;
+    return (
+      <section className="workflow-result" aria-label="Desfecho observado">
+        <span>Desfecho observado</span>
+        <strong>{data.outcome.outcome.replaceAll('_', ' ')}</strong>
+        {observedValue != null && <strong>{formatBRL(observedValue)}</strong>}
+      </section>
+    );
+  }
+
+  return null;
 }
 
 function ChatIcon() {

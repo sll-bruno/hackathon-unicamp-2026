@@ -175,4 +175,7 @@ export const caso02: Workspace = {
   ],
   versions: { pipeline: '0.1.0-exemplo', policy: 'v1.0', weights: 'exemplo-v0' },
   analyzed_at: '2026-09-12T11:05:00-03:00',
+  decision: null,
+  negotiation: null,
+  outcome: null,
 };

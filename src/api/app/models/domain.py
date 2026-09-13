@@ -102,6 +102,14 @@ class Lawyer(SQLModel, table=True):
     created_at: datetime = Field(default_factory=utc_now)
 
 
+class AppMetadata(SQLModel, table=True):
+    __tablename__ = "app_metadata"
+
+    key: str = Field(primary_key=True)
+    value: str
+    updated_at: datetime = Field(default_factory=utc_now)
+
+
 class Case(SQLModel, table=True):
     __tablename__ = "cases"
 

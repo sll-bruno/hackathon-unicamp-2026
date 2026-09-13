@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     storage_dir: Path = Path("./storage")
     data_dir: Path = Path("./data")
     demo_seed: bool = True
+    demo_replay_enabled: bool = True
+    demo_replay_seconds: float = 35.0
     openai_api_key: str = ""
     openai_model: str = "gpt-5"
     cors_origins: str = "http://localhost:5173"

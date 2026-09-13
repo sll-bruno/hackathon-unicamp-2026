@@ -1,0 +1,2130 @@
+{
+  "versions": {
+    "pipeline": "engine-v1",
+    "risk_model": "risco_v1",
+    "engine_params": "engine_v1",
+    "pesos": "pesos_embasamento_v1",
+    "llm_model": "gpt-5",
+    "prompt_p1_classificacao_pagina": "v1-bda65e4dceae",
+    "prompt_p2_triagem_peticao": "v2-e950eda11f92",
+    "prompt_p3_acusacoes": "v1-fd78d14e9e83",
+    "prompt_p4_embasamentos": "v3-b8e64bac91a8",
+    "prompt_p5_fichamento": "v1-c5d05fd74c6f",
+    "prompt_p6_validador": "v3-1b0969dac910",
+    "prompt_p7_decisora": "v2-c220547739ab"
+  },
+  "recommendation": {
+    "action": "DEFESA",
+    "confidence_percent": 100.0,
+    "summary": "Defesa é claramente mais econômica: custo de defesa esperado de R$ 243,61 versus custo total do acordo no alvo de R$ 5.740,12, com 0,0% de simulações em que o acordo sai mais barato. Há risco de cauda (pior cenário da defesa em R$ 20.051,60 acima da alçada de R$ 12.000,00), mas a probabilidade de derrota é baixa (1,8%) e as provas de contratação são robustas. Recomendo contestar com foco na autenticidade e no uso/compensação, sanando inconsistências documentais apontadas.",
+    "reason_codes": []
+  },
+  "financial": {
+    "suggested_offer": null,
+    "expected_defense_cost": 243.61,
+    "expected_savings": 0.0
+  },
+  "evidences": [
+    {
+      "id": "EMB-01-001",
+      "text": "Contrato assinado pela autora — Cédula nº 502348719 indica firma manual do tomador em 10/05/2022.",
+      "type": "provas_contratacao",
+      "weight": 3.0,
+      "sources": [
+        {
+          "document_id": "02_Contrato_502348719",
+          "page": 2,
+          "excerpt": "E por estarem assim justos e contratados, o TOMADOR firma a presente Cédula de forma manual, em 10/05/2022, tendo o EMITENTE promovido o depósito do valor líquido em 12/05/2022."
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-002",
+      "text": "Gravação telefônica preservada (07m42s) — Laudo referenciado informa gravação de voz do atendimento telefônico armazenada (07m42s).",
+      "type": "provas_contratacao",
+      "weight": 3.0,
+      "sources": [
+        {
+          "document_id": "07_Laudo_Referenciado",
+          "page": 1,
+          "excerpt": "Gravação de voz do atendimento telefônico: arquivo MP3 armazenado em cofre digital (duração 07m42s)"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-003",
+      "text": "Retorno do INSS à autorização de consignação — Registro de envio de autorização de consignação ao INSS com ACK em 11/05/2022.",
+      "type": "provas_contratacao",
+      "weight": 3.0,
+      "sources": [
+        {
+          "document_id": "07_Laudo_Referenciado",
+          "page": 2,
+          "excerpt": "Autorização de consignação enviada ao INSS com ACK de retorno em 11/05/2022"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-004",
+      "text": "Perícia grafotécnica compatível (91%) — Dossiê aponta compatibilidade elevada da assinatura do contrato com padrões da autora (índice 91%).",
+      "type": "autenticacao_forte",
+      "weight": 3.0,
+      "sources": [
+        {
+          "document_id": "05_Dossie_Veritas",
+          "page": 1,
+          "excerpt": "Assinatura manuscrita no contrato COMPATÍVEL (índice 91%)"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-005",
+      "text": "Selfie/liveness confirmada (97,3%) — Dossiê registra liveness com match facial de 97,3% com o RG da autora.",
+      "type": "autenticacao_forte",
+      "weight": 3.0,
+      "sources": [
+        {
+          "document_id": "05_Dossie_Veritas",
+          "page": 1,
+          "excerpt": "Selfie / liveness CONFIRMADA - match facial 97,3%"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-006",
+      "text": "Documentos pessoais validados em bases oficiais — Validação de RG e comprovante de residência em SERPRO/Denatran/RFB, sem adulteração.",
+      "type": "autenticacao_forte",
+      "weight": 3.0,
+      "sources": [
+        {
+          "document_id": "05_Dossie_Veritas",
+          "page": 1,
+          "excerpt": "A validação dos documentos pessoais adotou as rotinas de verificação em bases governamentais (SERPRO/Denatran/RFB)"
+        },
+        {
+          "document_id": "05_Dossie_Veritas",
+          "page": 1,
+          "excerpt": "Documento de identidade (RG) VÁLIDO - sem adulteração aparente"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-007",
+      "text": "Crédito de R$5.000 na conta da autora — Extrato da conta 20.348.719-5, em nome da autora, registra crédito do contrato 502348719 em 12/05/2022.",
+      "type": "credito_em_conta_do_autor",
+      "weight": 2.0,
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "Cliente: MARIA DAS GRAÇAS SILVA PEREIRA CPF: 456.789.123-45 Agência: 0001 Conta: 20.348.719-5"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "12/05/2022 CRÉDITO - EMPRÉSTIMO CONSIGNADO Contr. 502348719 +5.000,00 5.000,00"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-008",
+      "text": "TED enviada no dia seguinte ao crédito — Em 13/05/2022, houve TED enviada para Bradesco Ag 3421 CC 98765-4 no valor de R$ 3.000,00.",
+      "type": "uso_do_credito_pelo_autor",
+      "weight": 2.0,
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "13/05/2022 TED ENVIADA - CTA TITULARIDADE Bradesco / Ag 3421 CC 98765-4 -3.000,00 2.000,00"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-009",
+      "text": "PIX enviado a familiar — Em 15/05/2022, houve transferência PIX enviada com indicação de beneficiário familiar no valor de R$ 1.500,00.",
+      "type": "uso_do_credito_pelo_autor",
+      "weight": 2.0,
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "15/05/2022 TRANSFERÊNCIA PIX - ENVIADA Chave CPF - beneficiário familiar -1.500,00 500,00"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-010",
+      "text": "Saque em ATM na mesma semana — Em 17/05/2022, foi realizado saque em ATM Rede 24H em São Luís, de R$ 485,00.",
+      "type": "uso_do_credito_pelo_autor",
+      "weight": 2.0,
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "17/05/2022 SAQUE ATM REDE 24H - SÃO LUÍS NSU 00128393 -485,00 15,00"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-011",
+      "text": "Negativa de uso versus extrato com movimentações — Autora afirma não ter utilizado os valores nem ter extratos com movimentação; o extrato da conta em seu nome registra TED, PIX e saque após o crédito.",
+      "type": "contradicoes_do_autor",
+      "weight": 2.0,
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 2,
+          "excerpt": "Tampouco jamais utilizou os valores indicados pela instituição como sendo objeto da suposta operação de crédito, inexistindo nos extratos de sua conta corrente qualquer movimentação compatível"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "13/05/2022 TED ENVIADA ... -3.000,00 ... 15/05/2022 TRANSFERÊNCIA PIX - ENVIADA ... -1.500,00 ... 17/05/2022 SAQUE ATM REDE 24H ... -485,00"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-012",
+      "text": "Sem comprovação de reclamação administrativa — Autora alega ter procurado o banco administrativamente, sem juntar protocolo, resposta ou comprovante da tentativa.",
+      "type": "lacunas_argumentativas_autor",
+      "weight": 1.0,
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 1,
+          "excerpt": "Ao tomar ciência dos descontos, a Autora procurou, de forma administrativa, o Banco Réu, solicitando esclarecimentos acerca da origem do débito."
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-013",
+      "text": "Negativa de movimento sem extrato próprio — Alega inexistência de movimentação compatível em seus extratos, mas não juntou extrato da conta onde recebe o benefício.",
+      "type": "lacunas_argumentativas_autor",
+      "weight": 1.0,
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 2,
+          "excerpt": "inexistindo nos extratos de sua conta corrente qualquer movimentação compatível com depósito ou saque dos montantes alegadamente contratados."
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-014",
+      "text": "Longa inércia diante de descontos — Descontos desde 06/2022 e 21 de 72 parcelas liquidadas até a data do demonstrativo, sem prova de impugnação imediata.",
+      "type": "comportamento_do_autor",
+      "weight": 1.0,
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 1,
+          "excerpt": "No mês de janeiro de 2024, ao verificar o extrato de pagamento de seu benefício, a Autora constatou a existência de descontos mensais no valor de R$ 120,00, efetuados desde Junho/2022"
+        },
+        {
+          "document_id": "06_Demonstrativo_Evolucao_Divida",
+          "page": 3,
+          "excerpt": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66 (cálculo meramente indicativo),"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-016",
+      "text": "Quadro financeiro do contrato inconsistente — Contrato lista IOF e seguro financiados, mas mantém \"Valor total financiado\" igual ao valor líquido (R$ 5.000,00).",
+      "type": "inconsistencias_documentos_banco",
+      "weight": -2.0,
+      "sources": [
+        {
+          "document_id": "02_Contrato_502348719",
+          "page": 1,
+          "excerpt": "Valor líquido liberado R$ 5.000,00 IOF financiado R$ 186,25 Seguro prestamista R$ 87,50 Valor total financiado R$ 5.000,00"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-017",
+      "text": "Resumo do demonstrativo diverge da tabela — Resumo indica saldo devedor aproximado de R$ 1.037,66 após 21 parcelas; tabela mostra saldo superior a R$ 4 mil já na 22ª parcela.",
+      "type": "inconsistencias_documentos_banco",
+      "weight": -2.0,
+      "sources": [
+        {
+          "document_id": "06_Demonstrativo_Evolucao_Divida",
+          "page": 3,
+          "excerpt": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66 (cálculo meramente indicativo),"
+        },
+        {
+          "document_id": "06_Demonstrativo_Evolucao_Divida",
+          "page": 1,
+          "excerpt": "22 10/03/2024 4.326,00 80,90 39,10 120,00 4.286,90 EM ABERTO"
+        }
+      ]
+    },
+    {
+      "id": "EMB-02-001",
+      "text": "Descontos consignados comprovados — Demonstrativo do banco indica 21 parcelas liquidadas por desconto em folha até 10/02/2024 no contrato 502348719.",
+      "type": "fatos_comprovados_autor",
+      "weight": -2.0,
+      "sources": [
+        {
+          "document_id": "06_Demonstrativo_Evolucao_Divida",
+          "page": 3,
+          "excerpt": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66 (cálculo meramente indicativo),"
+        }
+      ]
+    },
+    {
+      "id": "EMB-02-002",
+      "text": "Sem extrato do INSS nos autos — A autora não juntou extrato/contracheques do benefício confirmando período e valores dos descontos desde 06/2022.",
+      "type": "lacunas_argumentativas_autor",
+      "weight": 1.0,
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 1,
+          "excerpt": "No mês de janeiro de 2024, ao verificar o extrato de pagamento de seu benefício, a Autora constatou a existência de descontos mensais no valor de R$ 120,00, efetuados desde Junho/2022,"
+        }
+      ]
+    },
+    {
+      "id": "EMB-02-003",
+      "text": "Pedido em dobro sem prova fática — Não há comprovação específica de fatos que afastem engano justificável do fornecedor para fins de devolução em dobro (art. 42, par. único, CDC).",
+      "type": "lacunas_argumentativas_autor",
+      "weight": 1.0,
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 3,
+          "excerpt": "Tendo sido os valores cobrados indevidamente, impõe-se a restituição em dobro dos montantes já descontados do benefício previdenciário da Autora, nos exatos termos do artigo 42, parágrafo único, do Código de Defesa do Consumidor, [...] uma vez inexistente engano justificável por parte do Banco Réu."
+        }
+      ]
+    },
+    {
+      "id": "EMB-02-004",
+      "text": "Crédito liberado na conta da autora — Crédito de R$ 5.000,00 em 12/05/2022 na conta Banco UFMG ag. 0001, CC 20.348.719-5, indicada como de titularidade da autora.",
+      "type": "compensacao_valor_creditado",
+      "weight": 2.0,
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "12/05/2022 CRÉDITO - EMPRÉSTIMO CONSIGNADO Contr. 502348719 +5.000,00 5.000,00"
+        },
+        {
+          "document_id": "04_Comprovante_de_Credito_BACEN",
+          "page": 1,
+          "excerpt": "Instituição depositária Banco UFMG S.A. - Ag. 0001 - CC 20.348.719-5"
+        },
+        {
+          "document_id": "04_Comprovante_de_Credito_BACEN",
+          "page": 1,
+          "excerpt": "Data da liberação do crédito 12/05/2022"
+        },
+        {
+          "document_id": "04_Comprovante_de_Credito_BACEN",
+          "page": 1,
+          "excerpt": "foi formalizada e o respectivo valor líquido efetivamente liberado em favor do tomador na data de 12/05/2022, em conta de sua titularidade junto ao Banco UFMG S.A."
+        },
+        {
+          "document_id": "02_Contrato_502348719",
+          "page": 1,
+          "excerpt": "O valor líquido liberado será creditado em conta de titularidade do TOMADOR, junto ao Banco UFMG S.A., agência 0001, conta corrente 20.348.719-5, na data prevista de 12/05/2022."
+        }
+      ]
+    },
+    {
+      "id": "EMB-02-005",
+      "text": "Uso dos recursos creditados — Após o crédito, houve TED, PIX e saque na conta da autora, indicando utilização integral dos R$ 5.000,00.",
+      "type": "compensacao_valor_creditado",
+      "weight": 2.0,
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "13/05/2022 TED ENVIADA - CTA TITULARIDADE Bradesco / Ag 3421 CC 98765-4 -3.000,00 2.000,00"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "15/05/2022 TRANSFERÊNCIA PIX - ENVIADA Chave CPF - beneficiário familiar -1.500,00 500,00"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "17/05/2022 SAQUE ATM REDE 24H - SÃO LUÍS NSU 00128393 -485,00 15,00"
+        }
+      ]
+    },
+    {
+      "id": "EMB-03-001",
+      "text": "Longa duração dos descontos — Os descontos perduraram por, ao menos, 21 parcelas entre 06/2022 e 02/2024.",
+      "type": "agravantes_dano_moral",
+      "weight": -2.0,
+      "sources": [
+        {
+          "document_id": "06_Demonstrativo_Evolucao_Divida",
+          "page": 3,
+          "excerpt": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66 (cálculo meramente indicativo),"
+        }
+      ]
+    },
+    {
+      "id": "EMB-03-002",
+      "text": "Pessoa idosa comprovada no RG — Documento de identidade indica data de nascimento em 15/03/1958, caracterizando idade superior a 60 anos.",
+      "type": "vulnerabilidade_autor",
+      "weight": -1.0,
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 7,
+          "excerpt": "DATA DE NASCIMENTO\n15/03/1958"
+        }
+      ]
+    },
+    {
+      "id": "EMB-03-003",
+      "text": "Crédito recebido e movimentado — Extrato da conta em nome da autora mostra crédito de R$ 5.000,00 referente ao contrato e movimentações subsequentes (TED, PIX e saque).",
+      "type": "atenuantes_dano_moral",
+      "weight": 2.0,
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "Cliente: MARIA DAS GRAÇAS SILVA PEREIRA\nCPF: 456.789.123-45 Agência: 0001 Conta: 20.348.719-5"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "12/05/2022 CRÉDITO - EMPRÉSTIMO CONSIGNADO Contr. 502348719 +5.000,00 5.000,00"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "13/05/2022 TED ENVIADA - CTA TITULARIDADE Bradesco / Ag 3421 CC 98765-4 -3.000,00 2.000,00"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "15/05/2022 TRANSFERÊNCIA PIX - ENVIADA Chave CPF - beneficiário familiar -1.500,00 500,00"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "17/05/2022 SAQUE ATM REDE 24H - SÃO LUÍS NSU 00128393 -485,00 15,00"
+        }
+      ]
+    },
+    {
+      "id": "EMB-03-004",
+      "text": "Abalo moral genérico, sem provas — A inicial descreve angústia e transtornos sem apresentar fatos concretos ou documentos que demonstrem repercussões específicas.",
+      "type": "lacunas_argumentativas_autor",
+      "weight": 1.0,
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 3,
+          "excerpt": "causou-lhe inegáveis transtornos emocionais, angústia, sentimento de impotência e comprometimento de sua subsistência, extrapolando o mero aborrecimento cotidiano e configurando efetivo dano moral indenizável."
+        }
+      ]
+    },
+    {
+      "id": "EMB-03-005",
+      "text": "Comprometimento da renda sem comprovação — Não há documentos que indiquem o valor do benefício previdenciário ou demonstração objetiva do impacto do desconto de R$ 120,00 na renda da autora.",
+      "type": "lacunas_argumentativas_autor",
+      "weight": 1.0,
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 4,
+          "excerpt": "os descontos recaem sobre verba alimentar destinada ao sustento da Autora, pessoa idosa, comprometendo sua subsistência e dignidade."
+        }
+      ]
+    },
+    {
+      "id": "EMB-03-006",
+      "text": "Reclamação administrativa sem comprovação — Alegada busca de solução administrativa não veio acompanhada de protocolos, respostas do banco, ou registros oficiais do atendimento.",
+      "type": "lacunas_argumentativas_autor",
+      "weight": 1.0,
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 1,
+          "excerpt": "Ao tomar ciência dos descontos, a Autora procurou, de forma administrativa, o Banco Réu, solicitando esclarecimentos acerca da origem do débito."
+        }
+      ]
+    }
+  ],
+  "features": {
+    "uf": "MA",
+    "sub_assunto": "GENERICO",
+    "sub_assunto_ambiguo": false,
+    "valor_causa": 20000.0,
+    "flags": {
+      "contrato": true,
+      "extrato": true,
+      "comprovante_credito": true,
+      "dossie": true,
+      "demonstrativo_divida": true,
+      "laudo_referenciado": true
+    },
+    "demonstrativo": {
+      "parcelas_pagas": 21,
+      "parcelas_totais": 72,
+      "valor_parcela": 120.0,
+      "saldo_apos_ultima_paga": 4326.0,
+      "total_descontado": 2520.0
+    }
+  },
+  "risk": {
+    "probabilities": {
+      "extincao": 0.3257,
+      "improcedencia": 0.6574,
+      "parcial": 0.014,
+      "procedencia": 0.0029
+    },
+    "p_derrota": 0.0169,
+    "perda_se_condenado": 13406.45,
+    "cohort_size": 196,
+    "certeza_modelo": 0.4821,
+    "efeitos_pp": {
+      "uf": -0.8,
+      "subassunto": -1.9,
+      "contrato": -18.4,
+      "extrato": -24.4,
+      "comprovante_credito": -2.6,
+      "dossie": 0.1,
+      "demonstrativo_divida": -0.7,
+      "laudo_referenciado": 0.0
+    }
+  },
+  "contexto_regional": {
+    "uf": "MA",
+    "perfil": {
+      "n": 2298,
+      "taxa_derrota": 0.2045,
+      "taxa_derrota_golpe": 0.2608,
+      "taxa_derrota_generico": 0.0758,
+      "ranking_derrota": 26,
+      "diferenca_nacional_pp": -9.7
+    },
+    "taxa_derrota_nacional": 0.3012,
+    "efeito_uf_pp": -0.8
+  },
+  "settlement_range": {
+    "opening": 4462.48,
+    "target": 5240.12,
+    "ceiling": 6961.67
+  },
+  "financeiro": {
+    "alfa": 0.6,
+    "beta": 0.4,
+    "p_derrota": 0.0181,
+    "perda_se_condenado": 12790.14,
+    "perda_esperada": 232.01,
+    "custo_defesa": 11.6,
+    "custo_defesa_esperado": 243.61,
+    "faixa": {
+      "abertura": 4462.48,
+      "alvo": 5240.12,
+      "maximo": 6961.67
+    },
+    "alcada": 12000.0,
+    "custo_negociacao": 500.0,
+    "custo_acordo_alvo": 5740.12,
+    "vantagem_economica_acordo": -5496.51,
+    "p_acordo_mais_barato": 0.0,
+    "aceite_minimo_para_compensar": null,
+    "p_derrota_equilibrio": 0.4274,
+    "cenarios": {
+      "defesa": {
+        "melhor": 11.6,
+        "medio": 243.61,
+        "pior": 20051.6
+      },
+      "acordo": {
+        "melhor": 4962.48,
+        "medio": 5740.12,
+        "pior": 7461.67
+      }
+    },
+    "divergencia_subfluxos": {
+      "p_derrota": 0.0031,
+      "perda_se_condenado_sobre_valor_causa": 0.077
+    },
+    "faixa_custo_defesa": [
+      159.72,
+      333.91
+    ],
+    "alertas": []
+  },
+  "defense_cost_range": [
+    159.72,
+    333.91
+  ],
+  "acusacoes": [
+    {
+      "id": "ACU-01",
+      "tipo": "inexistencia_contratacao",
+      "descricao": "Declaração de inexistência do débito/contrato consignado nº 502348719.",
+      "contagens": {
+        "provas_contratacao": 3,
+        "autenticacao_forte": 3,
+        "registros_digitais": 0,
+        "credito_em_conta_do_autor": 1,
+        "uso_do_credito_pelo_autor": 3,
+        "contradicoes_do_autor": 1,
+        "lacunas_argumentativas_autor": 2,
+        "comportamento_do_autor": 1,
+        "questoes_processuais": 0,
+        "fatos_comprovados_autor": 0,
+        "lacunas_probatorias_banco": 0,
+        "indicios_de_fraude": 0,
+        "inconsistencias_documentos_banco": 2
+      },
+      "score": 27.0,
+      "valor_pedido": 0.0,
+      "valor_estimado": false,
+      "p_vitoria_condicional": null,
+      "p_vitoria": 0.98,
+      "perda_se_condenado": 0.0,
+      "embasamentos": {
+        "provas_contratacao": [
+          {
+            "id": "EMB-01-001",
+            "titulo": "Contrato assinado pela autora",
+            "descricao": "Cédula nº 502348719 indica firma manual do tomador em 10/05/2022.",
+            "justificativa": "Instrumento contratual com indicação de assinatura manual da autora é prova direta do ato de contratar, desfavorecendo a tese de inexistência do contrato.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D02:p2:c1",
+                "trecho": "E por estarem assim justos e contratados, o TOMADOR firma a presente Cédula de forma manual, em 10/05/2022, tendo o EMITENTE promovido o depósito do valor líquido em 12/05/2022.",
+                "documentos_esperados": []
+              }
+            ]
+          },
+          {
+            "id": "EMB-01-002",
+            "titulo": "Gravação telefônica preservada (07m42s)",
+            "descricao": "Laudo referenciado informa gravação de voz do atendimento telefônico armazenada (07m42s).",
+            "justificativa": "Gravação de atendimento com duração e preservação indicada comprova a existência de aceite em canal controlado, favorecendo o banco nesta acusação.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D07:p1:c1",
+                "trecho": "Gravação de voz do atendimento telefônico: arquivo MP3 armazenado em cofre digital (duração 07m42s)",
+                "documentos_esperados": []
+              }
+            ]
+          },
+          {
+            "id": "EMB-01-003",
+            "titulo": "Retorno do INSS à autorização de consignação",
+            "descricao": "Registro de envio de autorização de consignação ao INSS com ACK em 11/05/2022.",
+            "justificativa": "Confirmação de autorização junto ao INSS evidencia regularidade formal da consignação, o que contraria a inexistência da contratação.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D07:p2:c1",
+                "trecho": "Autorização de consignação enviada ao INSS com ACK de retorno em 11/05/2022",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ],
+        "autenticacao_forte": [
+          {
+            "id": "EMB-01-004",
+            "titulo": "Perícia grafotécnica compatível (91%)",
+            "descricao": "Dossiê aponta compatibilidade elevada da assinatura do contrato com padrões da autora (índice 91%).",
+            "justificativa": "Compatibilidade grafotécnica liga a assinatura do contrato à autora, reforçando a autoria da contratação.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D05:p1:c1",
+                "trecho": "Assinatura manuscrita no contrato COMPATÍVEL (índice 91%)",
+                "documentos_esperados": []
+              }
+            ]
+          },
+          {
+            "id": "EMB-01-005",
+            "titulo": "Selfie/liveness confirmada (97,3%)",
+            "descricao": "Dossiê registra liveness com match facial de 97,3% com o RG da autora.",
+            "justificativa": "Biometria facial com liveness confirmada vincula a autora ao ato de contratação, favorecendo o banco.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D05:p1:c1",
+                "trecho": "Selfie / liveness CONFIRMADA - match facial 97,3%",
+                "documentos_esperados": []
+              }
+            ]
+          },
+          {
+            "id": "EMB-01-006",
+            "titulo": "Documentos pessoais validados em bases oficiais",
+            "descricao": "Validação de RG e comprovante de residência em SERPRO/Denatran/RFB, sem adulteração.",
+            "justificativa": "Validação oficial de documentos reduz o risco de identidade falsa e sustenta a regularidade da formalização.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D05:p1:c1",
+                "trecho": "A validação dos documentos pessoais adotou as rotinas de verificação em bases governamentais (SERPRO/Denatran/RFB)",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D05:p1:c1",
+                "trecho": "Documento de identidade (RG) VÁLIDO - sem adulteração aparente",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ],
+        "registros_digitais": [],
+        "credito_em_conta_do_autor": [
+          {
+            "id": "EMB-01-007",
+            "titulo": "Crédito de R$5.000 na conta da autora",
+            "descricao": "Extrato da conta 20.348.719-5, em nome da autora, registra crédito do contrato 502348719 em 12/05/2022.",
+            "justificativa": "Crédito em conta identificada em nome da autora, comprovado por extrato, indica recebimento do valor contratado, desfavorecendo a alegação de inexistência do contrato.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "Cliente: MARIA DAS GRAÇAS SILVA PEREIRA CPF: 456.789.123-45 Agência: 0001 Conta: 20.348.719-5",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "12/05/2022 CRÉDITO - EMPRÉSTIMO CONSIGNADO Contr. 502348719 +5.000,00 5.000,00",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ],
+        "uso_do_credito_pelo_autor": [
+          {
+            "id": "EMB-01-008",
+            "titulo": "TED enviada no dia seguinte ao crédito",
+            "descricao": "Em 13/05/2022, houve TED enviada para Bradesco Ag 3421 CC 98765-4 no valor de R$ 3.000,00.",
+            "justificativa": "Movimentação imediata do valor creditado indica uso do crédito, contrariando a narrativa de não utilização.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "13/05/2022 TED ENVIADA - CTA TITULARIDADE Bradesco / Ag 3421 CC 98765-4 -3.000,00 2.000,00",
+                "documentos_esperados": []
+              }
+            ]
+          },
+          {
+            "id": "EMB-01-009",
+            "titulo": "PIX enviado a familiar",
+            "descricao": "Em 15/05/2022, houve transferência PIX enviada com indicação de beneficiário familiar no valor de R$ 1.500,00.",
+            "justificativa": "Transferência mediante PIX após o crédito reforça o uso pessoal dos recursos.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "15/05/2022 TRANSFERÊNCIA PIX - ENVIADA Chave CPF - beneficiário familiar -1.500,00 500,00",
+                "documentos_esperados": []
+              }
+            ]
+          },
+          {
+            "id": "EMB-01-010",
+            "titulo": "Saque em ATM na mesma semana",
+            "descricao": "Em 17/05/2022, foi realizado saque em ATM Rede 24H em São Luís, de R$ 485,00.",
+            "justificativa": "Saque subsequente ao crédito é uso direto dos valores, o que enfraquece a negativa de utilização.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "17/05/2022 SAQUE ATM REDE 24H - SÃO LUÍS NSU 00128393 -485,00 15,00",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ],
+        "contradicoes_do_autor": [
+          {
+            "id": "EMB-01-011",
+            "titulo": "Negativa de uso versus extrato com movimentações",
+            "descricao": "Autora afirma não ter utilizado os valores nem ter extratos com movimentação; o extrato da conta em seu nome registra TED, PIX e saque após o crédito.",
+            "justificativa": "A negativa é contrariada por extrato com movimentações do valor creditado, documento objetivo que independe da versão do banco sobre o canal da operação.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D01:p2:c1",
+                "trecho": "Tampouco jamais utilizou os valores indicados pela instituição como sendo objeto da suposta operação de crédito, inexistindo nos extratos de sua conta corrente qualquer movimentação compatível",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "13/05/2022 TED ENVIADA ... -3.000,00 ... 15/05/2022 TRANSFERÊNCIA PIX - ENVIADA ... -1.500,00 ... 17/05/2022 SAQUE ATM REDE 24H ... -485,00",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ],
+        "lacunas_argumentativas_autor": [
+          {
+            "id": "EMB-01-012",
+            "titulo": "Sem comprovação de reclamação administrativa",
+            "descricao": "Autora alega ter procurado o banco administrativamente, sem juntar protocolo, resposta ou comprovante da tentativa.",
+            "justificativa": "A ausência de comprovação documental da tentativa administrativa fragiliza a narrativa e impede verificar o teor e a data da reclamação.",
+            "referencias": [
+              {
+                "tipo": "ausencia_documental",
+                "chunk_id": null,
+                "trecho": null,
+                "documentos_esperados": [
+                  "protocolo de atendimento no banco",
+                  "resposta formal do banco",
+                  "reclamação no INSS/MEU INSS ou Procon"
+                ]
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D01:p1:c1",
+                "trecho": "Ao tomar ciência dos descontos, a Autora procurou, de forma administrativa, o Banco Réu, solicitando esclarecimentos acerca da origem do débito.",
+                "documentos_esperados": []
+              }
+            ]
+          },
+          {
+            "id": "EMB-01-013",
+            "titulo": "Negativa de movimento sem extrato próprio",
+            "descricao": "Alega inexistência de movimentação compatível em seus extratos, mas não juntou extrato da conta onde recebe o benefício.",
+            "justificativa": "Sem o extrato próprio alegado, não há suporte documental à negativa de recebimento/uso na conta da autora de outro banco.",
+            "referencias": [
+              {
+                "tipo": "ausencia_documental",
+                "chunk_id": null,
+                "trecho": null,
+                "documentos_esperados": [
+                  "extrato do benefício/conta salário do INSS",
+                  "extratos da conta corrente pessoal no período do crédito"
+                ]
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D01:p2:c1",
+                "trecho": "inexistindo nos extratos de sua conta corrente qualquer movimentação compatível com depósito ou saque dos montantes alegadamente contratados.",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ],
+        "comportamento_do_autor": [
+          {
+            "id": "EMB-01-014",
+            "titulo": "Longa inércia diante de descontos",
+            "descricao": "Descontos desde 06/2022 e 21 de 72 parcelas liquidadas até a data do demonstrativo, sem prova de impugnação imediata.",
+            "justificativa": "A demora em contestar pode ser interpretada como anuência tácita aos descontos, o que enfraquece a alegação de inexistência do contrato.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D01:p1:c1",
+                "trecho": "No mês de janeiro de 2024, ao verificar o extrato de pagamento de seu benefício, a Autora constatou a existência de descontos mensais no valor de R$ 120,00, efetuados desde Junho/2022",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D06:p3:c1",
+                "trecho": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66 (cálculo meramente indicativo),",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ],
+        "questoes_processuais": [],
+        "fatos_comprovados_autor": [],
+        "lacunas_probatorias_banco": [],
+        "indicios_de_fraude": [],
+        "inconsistencias_documentos_banco": [
+          {
+            "id": "EMB-01-016",
+            "titulo": "Quadro financeiro do contrato inconsistente",
+            "descricao": "Contrato lista IOF e seguro financiados, mas mantém \"Valor total financiado\" igual ao valor líquido (R$ 5.000,00).",
+            "justificativa": "Divergência interna no quadro resumo fragiliza a confiabilidade do documento contratual, favorecendo a autora na impugnação da regularidade.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D02:p1:c1",
+                "trecho": "Valor líquido liberado R$ 5.000,00 IOF financiado R$ 186,25 Seguro prestamista R$ 87,50 Valor total financiado R$ 5.000,00",
+                "documentos_esperados": []
+              }
+            ]
+          },
+          {
+            "id": "EMB-01-017",
+            "titulo": "Resumo do demonstrativo diverge da tabela",
+            "descricao": "Resumo indica saldo devedor aproximado de R$ 1.037,66 após 21 parcelas; tabela mostra saldo superior a R$ 4 mil já na 22ª parcela.",
+            "justificativa": "Inconsistência numérica dentro do demonstrativo do banco reduz a credibilidade do controle da operação, o que beneficia a autora nesta acusação.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D06:p3:c1",
+                "trecho": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66 (cálculo meramente indicativo),",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D06:p1:c1",
+                "trecho": "22 10/03/2024 4.326,00 80,90 39,10 120,00 4.286,90 EM ABERTO",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ACU-02",
+      "tipo": "dano_material",
+      "descricao": "Repetição de indébito em dobro dos valores descontados do benefício previdenciário.",
+      "contagens": {
+        "fatos_comprovados_autor": 1,
+        "lacunas_argumentativas_autor": 2,
+        "compensacao_valor_creditado": 2,
+        "questoes_processuais": 0
+      },
+      "score": 3.0,
+      "valor_pedido": 5040.0,
+      "valor_estimado": false,
+      "p_vitoria_condicional": 0.1684,
+      "p_vitoria": 0.9834,
+      "perda_se_condenado": 3770.18,
+      "embasamentos": {
+        "fatos_comprovados_autor": [
+          {
+            "id": "EMB-02-001",
+            "titulo": "Descontos consignados comprovados",
+            "descricao": "Demonstrativo do banco indica 21 parcelas liquidadas por desconto em folha até 10/02/2024 no contrato 502348719.",
+            "justificativa": "Comprova descontos efetivos no benefício, base do pedido de repetição do indébito nesta acusação, independentemente da existência do contrato.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D06:p3:c1",
+                "trecho": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66 (cálculo meramente indicativo),",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ],
+        "lacunas_argumentativas_autor": [
+          {
+            "id": "EMB-02-002",
+            "titulo": "Sem extrato do INSS nos autos",
+            "descricao": "A autora não juntou extrato/contracheques do benefício confirmando período e valores dos descontos desde 06/2022.",
+            "justificativa": "A falta de documentos oficiais do benefício dificulta a aferição precisa do quantum a restituir e do intervalo exato dos descontos, o que favorece a defesa nesta acusação.",
+            "referencias": [
+              {
+                "tipo": "ausencia_documental",
+                "chunk_id": null,
+                "trecho": null,
+                "documentos_esperados": [
+                  "EXTRATO_BENEFICIO_INSS",
+                  "CONTRACHEQUE_INSS",
+                  "HISTORICO_DESCONTOS_INSS"
+                ]
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D01:p1:c1",
+                "trecho": "No mês de janeiro de 2024, ao verificar o extrato de pagamento de seu benefício, a Autora constatou a existência de descontos mensais no valor de R$ 120,00, efetuados desde Junho/2022,",
+                "documentos_esperados": []
+              }
+            ]
+          },
+          {
+            "id": "EMB-02-003",
+            "titulo": "Pedido em dobro sem prova fática",
+            "descricao": "Não há comprovação específica de fatos que afastem engano justificável do fornecedor para fins de devolução em dobro (art. 42, par. único, CDC).",
+            "justificativa": "O pleito em dobro exige base fática concreta sobre a ausência de engano justificável; sua não demonstração enfraquece o pedido de repetição em dobro, favorecendo o banco.",
+            "referencias": [
+              {
+                "tipo": "ausencia_documental",
+                "chunk_id": null,
+                "trecho": null,
+                "documentos_esperados": [
+                  "ELEMENTOS_FATICOS_SOBRE_ENGANO_NAO_JUSTIFICAVEL",
+                  "PROVAS_DE_MA_FE_OU_REITERACAO_DE_COBRANCAS"
+                ]
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D01:p3:c1",
+                "trecho": "Tendo sido os valores cobrados indevidamente, impõe-se a restituição em dobro dos montantes já descontados do benefício previdenciário da Autora, nos exatos termos do artigo 42, parágrafo único, do Código de Defesa do Consumidor, [...] uma vez inexistente engano justificável por parte do Banco Réu.",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ],
+        "compensacao_valor_creditado": [
+          {
+            "id": "EMB-02-004",
+            "titulo": "Crédito liberado na conta da autora",
+            "descricao": "Crédito de R$ 5.000,00 em 12/05/2022 na conta Banco UFMG ag. 0001, CC 20.348.719-5, indicada como de titularidade da autora.",
+            "justificativa": "Se a contratação for declarada inexistente, o valor efetivamente recebido é passível de compensação com a restituição para evitar enriquecimento sem causa.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "12/05/2022 CRÉDITO - EMPRÉSTIMO CONSIGNADO Contr. 502348719 +5.000,00 5.000,00",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D04:p1:c1",
+                "trecho": "Instituição depositária Banco UFMG S.A. - Ag. 0001 - CC 20.348.719-5",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D04:p1:c1",
+                "trecho": "Data da liberação do crédito 12/05/2022",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D04:p1:c1",
+                "trecho": "foi formalizada e o respectivo valor líquido efetivamente liberado em favor do tomador na data de 12/05/2022, em conta de sua titularidade junto ao Banco UFMG S.A.",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D02:p1:c1",
+                "trecho": "O valor líquido liberado será creditado em conta de titularidade do TOMADOR, junto ao Banco UFMG S.A., agência 0001, conta corrente 20.348.719-5, na data prevista de 12/05/2022.",
+                "documentos_esperados": []
+              }
+            ]
+          },
+          {
+            "id": "EMB-02-005",
+            "titulo": "Uso dos recursos creditados",
+            "descricao": "Após o crédito, houve TED, PIX e saque na conta da autora, indicando utilização integral dos R$ 5.000,00.",
+            "justificativa": "A utilização dos valores pelo titular reforça a possibilidade de compensação com a repetição do indébito, diminuindo o montante a devolver.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "13/05/2022 TED ENVIADA - CTA TITULARIDADE Bradesco / Ag 3421 CC 98765-4 -3.000,00 2.000,00",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "15/05/2022 TRANSFERÊNCIA PIX - ENVIADA Chave CPF - beneficiário familiar -1.500,00 500,00",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "17/05/2022 SAQUE ATM REDE 24H - SÃO LUÍS NSU 00128393 -485,00 15,00",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ],
+        "questoes_processuais": []
+      }
+    },
+    {
+      "id": "ACU-03",
+      "tipo": "dano_moral",
+      "descricao": "Indenização por danos morais decorrentes dos descontos indevidos.",
+      "contagens": {
+        "agravantes_dano_moral": 1,
+        "vulnerabilidade_autor": 1,
+        "atenuantes_dano_moral": 1,
+        "lacunas_argumentativas_autor": 3
+      },
+      "score": 0.0,
+      "valor_pedido": 15000.0,
+      "valor_estimado": false,
+      "p_vitoria_condicional": 0.4,
+      "p_vitoria": 0.988,
+      "perda_se_condenado": 8095.5,
+      "embasamentos": {
+        "agravantes_dano_moral": [
+          {
+            "id": "EMB-03-001",
+            "titulo": "Longa duração dos descontos",
+            "descricao": "Os descontos perduraram por, ao menos, 21 parcelas entre 06/2022 e 02/2024.",
+            "justificativa": "A prolongada manutenção de descontos indevidos em benefício previdenciário tende a agravar o dano moral pela persistência da lesão ao patrimônio de natureza alimentar.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D06:p3:c1",
+                "trecho": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66 (cálculo meramente indicativo),",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ],
+        "vulnerabilidade_autor": [
+          {
+            "id": "EMB-03-002",
+            "titulo": "Pessoa idosa comprovada no RG",
+            "descricao": "Documento de identidade indica data de nascimento em 15/03/1958, caracterizando idade superior a 60 anos.",
+            "justificativa": "A condição de pessoa idosa aumenta a vulnerabilidade do consumidor e pode influenciar na extensão do dano moral decorrente de descontos indevidos.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D01:p7:c1",
+                "trecho": "DATA DE NASCIMENTO\n15/03/1958",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ],
+        "atenuantes_dano_moral": [
+          {
+            "id": "EMB-03-003",
+            "titulo": "Crédito recebido e movimentado",
+            "descricao": "Extrato da conta em nome da autora mostra crédito de R$ 5.000,00 referente ao contrato e movimentações subsequentes (TED, PIX e saque).",
+            "justificativa": "Se os valores creditados foram recebidos e utilizados na conta identificada com o nome e CPF da autora, isso pode mitigar a extensão do dano moral mesmo supondo a inexistência do contrato.",
+            "referencias": [
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "Cliente: MARIA DAS GRAÇAS SILVA PEREIRA\nCPF: 456.789.123-45 Agência: 0001 Conta: 20.348.719-5",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "12/05/2022 CRÉDITO - EMPRÉSTIMO CONSIGNADO Contr. 502348719 +5.000,00 5.000,00",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "13/05/2022 TED ENVIADA - CTA TITULARIDADE Bradesco / Ag 3421 CC 98765-4 -3.000,00 2.000,00",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "15/05/2022 TRANSFERÊNCIA PIX - ENVIADA Chave CPF - beneficiário familiar -1.500,00 500,00",
+                "documentos_esperados": []
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D03:p1:c1",
+                "trecho": "17/05/2022 SAQUE ATM REDE 24H - SÃO LUÍS NSU 00128393 -485,00 15,00",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ],
+        "lacunas_argumentativas_autor": [
+          {
+            "id": "EMB-03-004",
+            "titulo": "Abalo moral genérico, sem provas",
+            "descricao": "A inicial descreve angústia e transtornos sem apresentar fatos concretos ou documentos que demonstrem repercussões específicas.",
+            "justificativa": "Para a condenação em dano moral, a descrição genérica sem elementos objetivos reduz a força probatória do abalo alegado, favorecendo a tese de inexistência ou menor gravidade do dano.",
+            "referencias": [
+              {
+                "tipo": "ausencia_documental",
+                "chunk_id": null,
+                "trecho": null,
+                "documentos_esperados": [
+                  "laudo/atestado médico ou psicológico",
+                  "comprovantes de negativa de crédito",
+                  "comunicações de constrangimento ou protesto",
+                  "documentos de negativação (SERASA/ SPC)"
+                ]
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D01:p3:c1",
+                "trecho": "causou-lhe inegáveis transtornos emocionais, angústia, sentimento de impotência e comprometimento de sua subsistência, extrapolando o mero aborrecimento cotidiano e configurando efetivo dano moral indenizável.",
+                "documentos_esperados": []
+              }
+            ]
+          },
+          {
+            "id": "EMB-03-005",
+            "titulo": "Comprometimento da renda sem comprovação",
+            "descricao": "Não há documentos que indiquem o valor do benefício previdenciário ou demonstração objetiva do impacto do desconto de R$ 120,00 na renda da autora.",
+            "justificativa": "O agravante de comprometimento relevante da renda depende de prova do valor dos rendimentos e da proporção afetada; sua ausência enfraquece a pretensão de maior indenização.",
+            "referencias": [
+              {
+                "tipo": "ausencia_documental",
+                "chunk_id": null,
+                "trecho": null,
+                "documentos_esperados": [
+                  "extrato de pagamento do benefício do INSS",
+                  "comprovante de rendimentos/margem consignável",
+                  "demonstrativo de consignações do benefício"
+                ]
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D01:p4:c1",
+                "trecho": "os descontos recaem sobre verba alimentar destinada ao sustento da Autora, pessoa idosa, comprometendo sua subsistência e dignidade.",
+                "documentos_esperados": []
+              }
+            ]
+          },
+          {
+            "id": "EMB-03-006",
+            "titulo": "Reclamação administrativa sem comprovação",
+            "descricao": "Alegada busca de solução administrativa não veio acompanhada de protocolos, respostas do banco, ou registros oficiais do atendimento.",
+            "justificativa": "Para caracterizar agravante de manutenção dos descontos após reclamação, é necessária prova do contato e de sua data; a falta desses documentos favorece o réu.",
+            "referencias": [
+              {
+                "tipo": "ausencia_documental",
+                "chunk_id": null,
+                "trecho": null,
+                "documentos_esperados": [
+                  "protocolos de atendimento do banco",
+                  "manifestação na ouvidoria",
+                  "reclamação em PROCON ou BACEN",
+                  "e-mails/AR de notificação ao banco"
+                ]
+              },
+              {
+                "tipo": "trecho",
+                "chunk_id": "D01:p1:c1",
+                "trecho": "Ao tomar ciência dos descontos, a Autora procurou, de forma administrativa, o Banco Réu, solicitando esclarecimentos acerca da origem do débito.",
+                "documentos_esperados": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "pedidos_processuais": [
+    {
+      "tipo": "tutela_urgencia",
+      "descricao": "Suspensão imediata dos descontos do contrato nº 502348719 no benefício previdenciário.",
+      "referencias": [
+        {
+          "chunk_id": "D01:p3:c1",
+          "trecho": "seja deferida a tutela provisória de urgência para que o Banco Réu, desde já, suspenda imediatamente os descontos mensais relativos ao contrato nº 502348719 em seu benefício previdenciário"
+        },
+        {
+          "chunk_id": "D01:p4:c1",
+          "trecho": "a concessão da tutela provisória de urgência, para suspensão imediata dos descontos em benefício previdenciário relativos ao contrato nº 502348719;"
+        }
+      ]
+    },
+    {
+      "tipo": "gratuidade",
+      "descricao": "Concessão dos benefícios da gratuidade da justiça.",
+      "referencias": [
+        {
+          "chunk_id": "D01:p4:c1",
+          "trecho": "a a concessão dos benefícios da gratuidade da justiça, nos termos dos artigos 98 e seguintes do CPC, diante da hipossuficiência financeira declarada em anexo;"
+        }
+      ]
+    },
+    {
+      "tipo": "inversao_onus",
+      "descricao": "Inversão do ônus da prova em favor da autora.",
+      "referencias": [
+        {
+          "chunk_id": "D01:p4:c1",
+          "trecho": "b a inversão do ônus da prova, com fulcro no artigo 6º, VIII, do CDC;"
+        }
+      ]
+    },
+    {
+      "tipo": "citacao",
+      "descricao": "Citação do Banco Réu para contestar, sob pena de revelia e confissão.",
+      "referencias": [
+        {
+          "chunk_id": "D01:p4:c1",
+          "trecho": "d a citação do Banco Réu, no endereço declinado, para, querendo, contestar a presente ação, sob pena de revelia e confissão;"
+        }
+      ]
+    },
+    {
+      "tipo": "custas_honorarios",
+      "descricao": "Condenação do Réu ao pagamento de custas processuais e honorários sucumbenciais.",
+      "referencias": [
+        {
+          "chunk_id": "D01:p4:c1",
+          "trecho": "f a condenação do Banco Réu ao pagamento das custas processuais e honorários advocatícios sucumbenciais, no percentual máximo legalmente previsto;"
+        }
+      ]
+    },
+    {
+      "tipo": "producao_provas",
+      "descricao": "Produção de prova documental, pericial e testemunhal.",
+      "referencias": [
+        {
+          "chunk_id": "D01:p4:c1",
+          "trecho": "g provar o alegado por todos os meios em direito admitidos, em especial pela produção de prova documental, pericial e testemunhal, caso necessário."
+        }
+      ]
+    }
+  ],
+  "cronologia": [
+    {
+      "evento": "contratacao",
+      "data": "2022-05-10",
+      "referencias": [
+        {
+          "chunk_id": "D01:p1:c1",
+          "trecho": "contrato nº 502348719, celebrado em 10/05/2022, com valor liberado de R$ 5.000,00"
+        }
+      ]
+    },
+    {
+      "evento": "primeiro_desconto",
+      "data": "2022-06",
+      "referencias": [
+        {
+          "chunk_id": "D01:p1:c1",
+          "trecho": "descontos mensais no valor de R$ 120,00, efetuados desde Junho/2022"
+        }
+      ]
+    },
+    {
+      "evento": "ciencia_autor",
+      "data": "2024-01",
+      "referencias": [
+        {
+          "chunk_id": "D01:p1:c1",
+          "trecho": "No mês de janeiro de 2024, ao verificar o extrato de pagamento de seu benefício, a Autora constatou a existência de descontos mensais"
+        }
+      ]
+    },
+    {
+      "evento": "ajuizamento",
+      "data": "2024-02-05",
+      "referencias": [
+        {
+          "chunk_id": "D01:p4:c1",
+          "trecho": "São Luís/MA, 05/02/2024."
+        }
+      ]
+    }
+  ],
+  "validacao": {
+    "taxa_reprovacao": 0.069,
+    "revisoes": {
+      "EMB-01-001": {
+        "id": "EMB-01-001",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Contrato indica firma manual do tomador e data; prova do instrumento contratual."
+      },
+      "EMB-01-002": {
+        "id": "EMB-01-002",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Laudo refere gravação preservada com duração; atende à prova de contratação."
+      },
+      "EMB-01-003": {
+        "id": "EMB-01-003",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Laudo informa ACK do INSS à autorização; prova de consignação."
+      },
+      "EMB-01-004": {
+        "id": "EMB-01-004",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Dossiê indica compatibilidade de assinatura (91%); autenticação forte."
+      },
+      "EMB-01-005": {
+        "id": "EMB-01-005",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Dossiê registra liveness com match 97,3%; autenticação biométrica confirmada."
+      },
+      "EMB-01-006": {
+        "id": "EMB-01-006",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Dossiê valida RG e endereço em bases oficiais; autenticação documental."
+      },
+      "EMB-01-007": {
+        "id": "EMB-01-007",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Extrato em nome da autora mostra crédito do contrato; conta de titularidade comprovada."
+      },
+      "EMB-01-008": {
+        "id": "EMB-01-008",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Extrato registra TED após o crédito; indício de uso do valor pela autora."
+      },
+      "EMB-01-009": {
+        "id": "EMB-01-009",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Extrato mostra PIX a familiar; uso do crédito comprovado."
+      },
+      "EMB-01-010": {
+        "id": "EMB-01-010",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Extrato mostra saque em ATM; uso do crédito."
+      },
+      "EMB-01-011": {
+        "id": "EMB-01-011",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Autora negou movimentação; extrato comprova TED/PIX/saque. Contradição objetiva."
+      },
+      "EMB-01-012": {
+        "id": "EMB-01-012",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Alegada reclamação administrativa sem protocolos ou comprovantes nos autos."
+      },
+      "EMB-01-013": {
+        "id": "EMB-01-013",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Negou movimentação sem juntar extratos próprios do período."
+      },
+      "EMB-01-014": {
+        "id": "EMB-01-014",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Descontos desde 06/2022 e 21 parcelas pagas; ausência de impugnação imediata."
+      },
+      "EMB-01-015": {
+        "id": "EMB-01-015",
+        "status": "reprovado",
+        "categoria_sugerida": null,
+        "motivo": "Idade não se relaciona à existência da contratação; irrelevante à acusação."
+      },
+      "EMB-01-016": {
+        "id": "EMB-01-016",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Quadro financeiro indica IOF/seguro financiados sem somar ao total; inconsistência interna."
+      },
+      "EMB-01-017": {
+        "id": "EMB-01-017",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Resumo aponta saldo ~R$1.037,66 com 21 parcelas; tabela indica >R$4 mil. Divergência patente."
+      },
+      "EMB-02-001": {
+        "id": "EMB-02-001",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Demonstrativo indica 21 parcelas liquidadas; descontos comprovados."
+      },
+      "EMB-02-002": {
+        "id": "EMB-02-002",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Período e valores não comprovados por extratos/contracheques do INSS."
+      },
+      "EMB-02-003": {
+        "id": "EMB-02-003",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Pedido em dobro sem elementos que afastem engano justificável."
+      },
+      "EMB-02-004": {
+        "id": "EMB-02-004",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Crédito de R$5.000,00 lançado em conta da autora; compensação possível."
+      },
+      "EMB-02-005": {
+        "id": "EMB-02-005",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "TED, PIX e saque após o crédito; uso dos recursos indicado."
+      },
+      "EMB-03-001": {
+        "id": "EMB-03-001",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Descontos por 21 parcelas; longa duração configurada."
+      },
+      "EMB-03-002": {
+        "id": "EMB-03-002",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "RG comprova idade >60; vulnerabilidade caracterizada."
+      },
+      "EMB-03-003": {
+        "id": "EMB-03-003",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Extrato comprova recebimento e uso do crédito; atenuante aplicável."
+      },
+      "EMB-03-004": {
+        "id": "EMB-03-004",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Abalo moral alegado genericamente, sem documentos comprobatórios."
+      },
+      "EMB-03-005": {
+        "id": "EMB-03-005",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Sem prova do valor do benefício ou impacto objetivo do desconto."
+      },
+      "EMB-03-006": {
+        "id": "EMB-03-006",
+        "status": "aprovado",
+        "categoria_sugerida": null,
+        "motivo": "Reclamação administrativa alegada sem protocolos ou respostas."
+      },
+      "EMB-03-007": {
+        "id": "EMB-03-007",
+        "status": "reprovado",
+        "categoria_sugerida": null,
+        "motivo": "Trata apenas da contratação/uso; em dano moral é matéria da acusação principal."
+      }
+    }
+  },
+  "facts": [
+    {
+      "id": "EMB-01-001",
+      "fact_type": "provas_contratacao",
+      "description": "Cédula nº 502348719 indica firma manual do tomador em 10/05/2022.",
+      "weight": 3,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Declaração de inexistência do débito/contrato consignado nº 502348719.",
+      "sources": [
+        {
+          "document_id": "02_Contrato_502348719",
+          "page": 2,
+          "excerpt": "E por estarem assim justos e contratados, o TOMADOR firma a presente Cédula de forma manual, em 10/05/2022, tendo o EMITENTE promovido o depósito do valor líquido em 12/05/2022."
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-002",
+      "fact_type": "provas_contratacao",
+      "description": "Laudo referenciado informa gravação de voz do atendimento telefônico armazenada (07m42s).",
+      "weight": 3,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Declaração de inexistência do débito/contrato consignado nº 502348719.",
+      "sources": [
+        {
+          "document_id": "07_Laudo_Referenciado",
+          "page": 1,
+          "excerpt": "Gravação de voz do atendimento telefônico: arquivo MP3 armazenado em cofre digital (duração 07m42s)"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-003",
+      "fact_type": "provas_contratacao",
+      "description": "Registro de envio de autorização de consignação ao INSS com ACK em 11/05/2022.",
+      "weight": 3,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Declaração de inexistência do débito/contrato consignado nº 502348719.",
+      "sources": [
+        {
+          "document_id": "07_Laudo_Referenciado",
+          "page": 2,
+          "excerpt": "Autorização de consignação enviada ao INSS com ACK de retorno em 11/05/2022"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-004",
+      "fact_type": "autenticacao_forte",
+      "description": "Dossiê aponta compatibilidade elevada da assinatura do contrato com padrões da autora (índice 91%).",
+      "weight": 3,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Declaração de inexistência do débito/contrato consignado nº 502348719.",
+      "sources": [
+        {
+          "document_id": "05_Dossie_Veritas",
+          "page": 1,
+          "excerpt": "Assinatura manuscrita no contrato COMPATÍVEL (índice 91%)"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-005",
+      "fact_type": "autenticacao_forte",
+      "description": "Dossiê registra liveness com match facial de 97,3% com o RG da autora.",
+      "weight": 3,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Declaração de inexistência do débito/contrato consignado nº 502348719.",
+      "sources": [
+        {
+          "document_id": "05_Dossie_Veritas",
+          "page": 1,
+          "excerpt": "Selfie / liveness CONFIRMADA - match facial 97,3%"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-006",
+      "fact_type": "autenticacao_forte",
+      "description": "Validação de RG e comprovante de residência em SERPRO/Denatran/RFB, sem adulteração.",
+      "weight": 3,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Declaração de inexistência do débito/contrato consignado nº 502348719.",
+      "sources": [
+        {
+          "document_id": "05_Dossie_Veritas",
+          "page": 1,
+          "excerpt": "A validação dos documentos pessoais adotou as rotinas de verificação em bases governamentais (SERPRO/Denatran/RFB)"
+        },
+        {
+          "document_id": "05_Dossie_Veritas",
+          "page": 1,
+          "excerpt": "Documento de identidade (RG) VÁLIDO - sem adulteração aparente"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-007",
+      "fact_type": "credito_em_conta_do_autor",
+      "description": "Extrato da conta 20.348.719-5, em nome da autora, registra crédito do contrato 502348719 em 12/05/2022.",
+      "weight": 2,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Declaração de inexistência do débito/contrato consignado nº 502348719.",
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "Cliente: MARIA DAS GRAÇAS SILVA PEREIRA CPF: 456.789.123-45 Agência: 0001 Conta: 20.348.719-5"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "12/05/2022 CRÉDITO - EMPRÉSTIMO CONSIGNADO Contr. 502348719 +5.000,00 5.000,00"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-008",
+      "fact_type": "uso_do_credito_pelo_autor",
+      "description": "Em 13/05/2022, houve TED enviada para Bradesco Ag 3421 CC 98765-4 no valor de R$ 3.000,00.",
+      "weight": 2,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Declaração de inexistência do débito/contrato consignado nº 502348719.",
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "13/05/2022 TED ENVIADA - CTA TITULARIDADE Bradesco / Ag 3421 CC 98765-4 -3.000,00 2.000,00"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-009",
+      "fact_type": "uso_do_credito_pelo_autor",
+      "description": "Em 15/05/2022, houve transferência PIX enviada com indicação de beneficiário familiar no valor de R$ 1.500,00.",
+      "weight": 2,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Declaração de inexistência do débito/contrato consignado nº 502348719.",
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "15/05/2022 TRANSFERÊNCIA PIX - ENVIADA Chave CPF - beneficiário familiar -1.500,00 500,00"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-010",
+      "fact_type": "uso_do_credito_pelo_autor",
+      "description": "Em 17/05/2022, foi realizado saque em ATM Rede 24H em São Luís, de R$ 485,00.",
+      "weight": 2,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Declaração de inexistência do débito/contrato consignado nº 502348719.",
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "17/05/2022 SAQUE ATM REDE 24H - SÃO LUÍS NSU 00128393 -485,00 15,00"
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-014",
+      "fact_type": "comportamento_do_autor",
+      "description": "Descontos desde 06/2022 e 21 de 72 parcelas liquidadas até a data do demonstrativo, sem prova de impugnação imediata.",
+      "weight": 1,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Declaração de inexistência do débito/contrato consignado nº 502348719.",
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 1,
+          "excerpt": "No mês de janeiro de 2024, ao verificar o extrato de pagamento de seu benefício, a Autora constatou a existência de descontos mensais no valor de R$ 120,00, efetuados desde Junho/2022"
+        },
+        {
+          "document_id": "06_Demonstrativo_Evolucao_Divida",
+          "page": 3,
+          "excerpt": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66 (cálculo meramente indicativo),"
+        }
+      ]
+    },
+    {
+      "id": "EMB-02-001",
+      "fact_type": "fatos_comprovados_autor",
+      "description": "Demonstrativo do banco indica 21 parcelas liquidadas por desconto em folha até 10/02/2024 no contrato 502348719.",
+      "weight": -2,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "supports",
+      "claim": "Repetição de indébito em dobro dos valores descontados do benefício previdenciário.",
+      "sources": [
+        {
+          "document_id": "06_Demonstrativo_Evolucao_Divida",
+          "page": 3,
+          "excerpt": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66 (cálculo meramente indicativo),"
+        }
+      ]
+    },
+    {
+      "id": "EMB-02-004",
+      "fact_type": "compensacao_valor_creditado",
+      "description": "Crédito de R$ 5.000,00 em 12/05/2022 na conta Banco UFMG ag. 0001, CC 20.348.719-5, indicada como de titularidade da autora.",
+      "weight": 2,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Repetição de indébito em dobro dos valores descontados do benefício previdenciário.",
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "12/05/2022 CRÉDITO - EMPRÉSTIMO CONSIGNADO Contr. 502348719 +5.000,00 5.000,00"
+        },
+        {
+          "document_id": "04_Comprovante_de_Credito_BACEN",
+          "page": 1,
+          "excerpt": "Instituição depositária Banco UFMG S.A. - Ag. 0001 - CC 20.348.719-5"
+        },
+        {
+          "document_id": "04_Comprovante_de_Credito_BACEN",
+          "page": 1,
+          "excerpt": "Data da liberação do crédito 12/05/2022"
+        },
+        {
+          "document_id": "04_Comprovante_de_Credito_BACEN",
+          "page": 1,
+          "excerpt": "foi formalizada e o respectivo valor líquido efetivamente liberado em favor do tomador na data de 12/05/2022, em conta de sua titularidade junto ao Banco UFMG S.A."
+        },
+        {
+          "document_id": "02_Contrato_502348719",
+          "page": 1,
+          "excerpt": "O valor líquido liberado será creditado em conta de titularidade do TOMADOR, junto ao Banco UFMG S.A., agência 0001, conta corrente 20.348.719-5, na data prevista de 12/05/2022."
+        }
+      ]
+    },
+    {
+      "id": "EMB-02-005",
+      "fact_type": "compensacao_valor_creditado",
+      "description": "Após o crédito, houve TED, PIX e saque na conta da autora, indicando utilização integral dos R$ 5.000,00.",
+      "weight": 2,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Repetição de indébito em dobro dos valores descontados do benefício previdenciário.",
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "13/05/2022 TED ENVIADA - CTA TITULARIDADE Bradesco / Ag 3421 CC 98765-4 -3.000,00 2.000,00"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "15/05/2022 TRANSFERÊNCIA PIX - ENVIADA Chave CPF - beneficiário familiar -1.500,00 500,00"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "17/05/2022 SAQUE ATM REDE 24H - SÃO LUÍS NSU 00128393 -485,00 15,00"
+        }
+      ]
+    },
+    {
+      "id": "EMB-03-001",
+      "fact_type": "agravantes_dano_moral",
+      "description": "Os descontos perduraram por, ao menos, 21 parcelas entre 06/2022 e 02/2024.",
+      "weight": -2,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "supports",
+      "claim": "Indenização por danos morais decorrentes dos descontos indevidos.",
+      "sources": [
+        {
+          "document_id": "06_Demonstrativo_Evolucao_Divida",
+          "page": 3,
+          "excerpt": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66 (cálculo meramente indicativo),"
+        }
+      ]
+    },
+    {
+      "id": "EMB-03-002",
+      "fact_type": "vulnerabilidade_autor",
+      "description": "Documento de identidade indica data de nascimento em 15/03/1958, caracterizando idade superior a 60 anos.",
+      "weight": -1,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "supports",
+      "claim": "Indenização por danos morais decorrentes dos descontos indevidos.",
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 7,
+          "excerpt": "DATA DE NASCIMENTO\n15/03/1958"
+        }
+      ]
+    },
+    {
+      "id": "EMB-03-003",
+      "fact_type": "atenuantes_dano_moral",
+      "description": "Extrato da conta em nome da autora mostra crédito de R$ 5.000,00 referente ao contrato e movimentações subsequentes (TED, PIX e saque).",
+      "weight": 2,
+      "weights_version": "pesos_embasamento_v1",
+      "relation": "refutes",
+      "claim": "Indenização por danos morais decorrentes dos descontos indevidos.",
+      "sources": [
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "Cliente: MARIA DAS GRAÇAS SILVA PEREIRA\nCPF: 456.789.123-45 Agência: 0001 Conta: 20.348.719-5"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "12/05/2022 CRÉDITO - EMPRÉSTIMO CONSIGNADO Contr. 502348719 +5.000,00 5.000,00"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "13/05/2022 TED ENVIADA - CTA TITULARIDADE Bradesco / Ag 3421 CC 98765-4 -3.000,00 2.000,00"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "15/05/2022 TRANSFERÊNCIA PIX - ENVIADA Chave CPF - beneficiário familiar -1.500,00 500,00"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "17/05/2022 SAQUE ATM REDE 24H - SÃO LUÍS NSU 00128393 -485,00 15,00"
+        }
+      ]
+    }
+  ],
+  "contradictions": [
+    {
+      "id": "EMB-01-011",
+      "description": "Autora afirma não ter utilizado os valores nem ter extratos com movimentação; o extrato da conta em seu nome registra TED, PIX e saque após o crédito.",
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 2,
+          "excerpt": "Tampouco jamais utilizou os valores indicados pela instituição como sendo objeto da suposta operação de crédito, inexistindo nos extratos de sua conta corrente qualquer movimentação compatível"
+        },
+        {
+          "document_id": "03_Extrato_Bancario",
+          "page": 1,
+          "excerpt": "13/05/2022 TED ENVIADA ... -3.000,00 ... 15/05/2022 TRANSFERÊNCIA PIX - ENVIADA ... -1.500,00 ... 17/05/2022 SAQUE ATM REDE 24H ... -485,00"
+        }
+      ],
+      "note": "A negativa é contrariada por extrato com movimentações do valor creditado, documento objetivo que independe da versão do banco sobre o canal da operação."
+    },
+    {
+      "id": "EMB-01-016",
+      "description": "Contrato lista IOF e seguro financiados, mas mantém \"Valor total financiado\" igual ao valor líquido (R$ 5.000,00).",
+      "sources": [
+        {
+          "document_id": "02_Contrato_502348719",
+          "page": 1,
+          "excerpt": "Valor líquido liberado R$ 5.000,00 IOF financiado R$ 186,25 Seguro prestamista R$ 87,50 Valor total financiado R$ 5.000,00"
+        }
+      ],
+      "note": "Divergência interna no quadro resumo fragiliza a confiabilidade do documento contratual, favorecendo a autora na impugnação da regularidade."
+    },
+    {
+      "id": "EMB-01-017",
+      "description": "Resumo indica saldo devedor aproximado de R$ 1.037,66 após 21 parcelas; tabela mostra saldo superior a R$ 4 mil já na 22ª parcela.",
+      "sources": [
+        {
+          "document_id": "06_Demonstrativo_Evolucao_Divida",
+          "page": 3,
+          "excerpt": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 1.037,66 (cálculo meramente indicativo),"
+        },
+        {
+          "document_id": "06_Demonstrativo_Evolucao_Divida",
+          "page": 1,
+          "excerpt": "22 10/03/2024 4.326,00 80,90 39,10 120,00 4.286,90 EM ABERTO"
+        }
+      ],
+      "note": "Inconsistência numérica dentro do demonstrativo do banco reduz a credibilidade do controle da operação, o que beneficia a autora nesta acusação."
+    }
+  ],
+  "gaps": [
+    {
+      "id": "EMB-01-012",
+      "description": "Autora alega ter procurado o banco administrativamente, sem juntar protocolo, resposta ou comprovante da tentativa.",
+      "impact": "A ausência de comprovação documental da tentativa administrativa fragiliza a narrativa e impede verificar o teor e a data da reclamação.",
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 1,
+          "excerpt": "Ao tomar ciência dos descontos, a Autora procurou, de forma administrativa, o Banco Réu, solicitando esclarecimentos acerca da origem do débito."
+        }
+      ]
+    },
+    {
+      "id": "EMB-01-013",
+      "description": "Alega inexistência de movimentação compatível em seus extratos, mas não juntou extrato da conta onde recebe o benefício.",
+      "impact": "Sem o extrato próprio alegado, não há suporte documental à negativa de recebimento/uso na conta da autora de outro banco.",
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 2,
+          "excerpt": "inexistindo nos extratos de sua conta corrente qualquer movimentação compatível com depósito ou saque dos montantes alegadamente contratados."
+        }
+      ]
+    },
+    {
+      "id": "EMB-02-002",
+      "description": "A autora não juntou extrato/contracheques do benefício confirmando período e valores dos descontos desde 06/2022.",
+      "impact": "A falta de documentos oficiais do benefício dificulta a aferição precisa do quantum a restituir e do intervalo exato dos descontos, o que favorece a defesa nesta acusação.",
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 1,
+          "excerpt": "No mês de janeiro de 2024, ao verificar o extrato de pagamento de seu benefício, a Autora constatou a existência de descontos mensais no valor de R$ 120,00, efetuados desde Junho/2022,"
+        }
+      ]
+    },
+    {
+      "id": "EMB-02-003",
+      "description": "Não há comprovação específica de fatos que afastem engano justificável do fornecedor para fins de devolução em dobro (art. 42, par. único, CDC).",
+      "impact": "O pleito em dobro exige base fática concreta sobre a ausência de engano justificável; sua não demonstração enfraquece o pedido de repetição em dobro, favorecendo o banco.",
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 3,
+          "excerpt": "Tendo sido os valores cobrados indevidamente, impõe-se a restituição em dobro dos montantes já descontados do benefício previdenciário da Autora, nos exatos termos do artigo 42, parágrafo único, do Código de Defesa do Consumidor, [...] uma vez inexistente engano justificável por parte do Banco Réu."
+        }
+      ]
+    },
+    {
+      "id": "EMB-03-004",
+      "description": "A inicial descreve angústia e transtornos sem apresentar fatos concretos ou documentos que demonstrem repercussões específicas.",
+      "impact": "Para a condenação em dano moral, a descrição genérica sem elementos objetivos reduz a força probatória do abalo alegado, favorecendo a tese de inexistência ou menor gravidade do dano.",
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 3,
+          "excerpt": "causou-lhe inegáveis transtornos emocionais, angústia, sentimento de impotência e comprometimento de sua subsistência, extrapolando o mero aborrecimento cotidiano e configurando efetivo dano moral indenizável."
+        }
+      ]
+    },
+    {
+      "id": "EMB-03-005",
+      "description": "Não há documentos que indiquem o valor do benefício previdenciário ou demonstração objetiva do impacto do desconto de R$ 120,00 na renda da autora.",
+      "impact": "O agravante de comprometimento relevante da renda depende de prova do valor dos rendimentos e da proporção afetada; sua ausência enfraquece a pretensão de maior indenização.",
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 4,
+          "excerpt": "os descontos recaem sobre verba alimentar destinada ao sustento da Autora, pessoa idosa, comprometendo sua subsistência e dignidade."
+        }
+      ]
+    },
+    {
+      "id": "EMB-03-006",
+      "description": "Alegada busca de solução administrativa não veio acompanhada de protocolos, respostas do banco, ou registros oficiais do atendimento.",
+      "impact": "Para caracterizar agravante de manutenção dos descontos após reclamação, é necessária prova do contato e de sua data; a falta desses documentos favorece o réu.",
+      "sources": [
+        {
+          "document_id": "01_Autos_Processo_0801234-56-2024-8-10-0001",
+          "page": 1,
+          "excerpt": "Ao tomar ciência dos descontos, a Autora procurou, de forma administrativa, o Banco Réu, solicitando esclarecimentos acerca da origem do débito."
+        }
+      ]
+    }
+  ],
+  "justificativa": {
+    "risco_historico": "Probabilidade consolidada de derrota de 1,8% e perda esperada de R$ 232,01, com custo de defesa esperado de R$ 243,61. Embora o pior cenário da defesa (R$ 20.051,60) supere a alçada (R$ 12.000,00), o melhor e o médio cenários da defesa são muito inferiores aos do acordo (R$ 11,60 e R$ 243,61 na defesa versus R$ 4.962,48 e R$ 5.740,12 no acordo).",
+    "contexto_regional": "No MA a taxa de derrota histórica é 20,4% (abaixo da nacional de 30,1%; ranking 26). Efeitos estimados favoráveis: UF -0.8 p.p. e subassunto GENERICO -1.9 p.p. A presença de contrato (-18,4 p.p.) e extrato (-24,4 p.p.) reduz substancialmente o risco, com contribuições adicionais de comprovante de crédito (-2,6 p.p.) e demonstrativo da dívida (-0,7 p.p.).",
+    "comparacao_economica": "Custo total do acordo no alvo: R$ 5.740,12 (alvo de R$ 5.240,12 + custo de negociação de R$ 500,00) versus custo de defesa esperado de R$ 243,61. Vantagem econômica do acordo é R$ -5.496,51 e em 0,0% das simulações o acordo sai mais barato. A derrota de equilíbrio seria 42,7%, muito acima dos 1,8% atuais, logo a DEFESA está alinhada à economia.",
+    "qualidade_da_prova": "Provas diretas de contratação/autoria: contrato assinado (EMB-01-001), gravação telefônica de 07m42s (EMB-01-002), ACK de autorização de consignação no INSS (EMB-01-003), perícia grafotécnica compatível em 91% (EMB-01-004), selfie/liveness com 97,3% (EMB-01-005) e validação oficial de documentos (EMB-01-006). Há prova de crédito na conta da autora e uso subsequente (EMB-01-007, EMB-01-008, EMB-01-009, EMB-01-010), além de contradições da autora e lacunas documentais (EMB-01-011, EMB-01-012, EMB-01-013, EMB-01-014). Pontos frágeis a endereçar: inconsistências internas no contrato e no demonstrativo (EMB-01-016, EMB-01-017). Sobre os pedidos acessórios, embora haja comprovação de descontos (EMB-02-001), faltam extratos do INSS (EMB-02-002) e não há base concreta para repetição em dobro (EMB-02-003), sendo ainda cabível compensação do valor creditado/uso (EMB-02-004, EMB-02-005). No dano moral, existem agravantes de duração e idade (EMB-03-001, EMB-03-002), mas há atenuantes relevantes: recebimento/uso do crédito (EMB-03-003) e descrição genérica sem prova do abalo/impacto (EMB-03-004, EMB-03-005, EMB-03-006).",
+    "convergencia_das_analises": "Alta confiabilidade: p_derrota do histórico em 1,7% e do conteúdo em 2,0%, convergindo para 1,8% após a ponderação (alfa_histórico 0,6; beta_conteúdo 0,4). Base com 196 casos semelhantes e sem indicação de falhas de extração relevantes.",
+    "premissas_e_limitacoes": "Premissas do sistema: aceite do acordo no valor alvo é assumido; k calibrado em 280 acordos; custo de negociação de R$ 500,00 é ilustrativo; honorários/custas não entram na perda estimada; base histórica sintética (UF uniforme; processos de 2025). Subsidios disponíveis para juntada: contrato, extrato, comprovante de crédito, dossiê, demonstrativo da dívida e laudo referenciado.",
+    "analise_por_acusacao": [
+      {
+        "acusacao_id": "ACU-01",
+        "analise": "Prova robusta da existência/regularidade da contratação e da autoria, com múltiplas camadas de autenticação e lastro de crédito/uso. Fragilidades concentram-se em inconsistências numéricas a sanar, que não infirmam, por si, o consentimento ou a existência do vínculo.",
+        "embasamento_ids": [
+          "EMB-01-001",
+          "EMB-01-002",
+          "EMB-01-003",
+          "EMB-01-004",
+          "EMB-01-005",
+          "EMB-01-006",
+          "EMB-01-007",
+          "EMB-01-008",
+          "EMB-01-009",
+          "EMB-01-010",
+          "EMB-01-011",
+          "EMB-01-012",
+          "EMB-01-013",
+          "EMB-01-014",
+          "EMB-01-016",
+          "EMB-01-017"
+        ]
+      },
+      {
+        "acusacao_id": "ACU-02",
+        "analise": "Ainda que comprovados descontos, faltam contracheques/extrato do benefício e não há suporte para a devolução em dobro; caso supervenientemente reconhecida inexistência do contrato, é defensável a compensação do valor creditado/uso e a restituição simples.",
+        "embasamento_ids": [
+          "EMB-02-001",
+          "EMB-02-002",
+          "EMB-02-003",
+          "EMB-02-004",
+          "EMB-02-005"
+        ]
+      },
+      {
+        "acusacao_id": "ACU-03",
+        "analise": "Dano moral fragilizado por ausência de prova concreta do abalo e pela comprovação de recebimento/uso do crédito; existem agravantes de duração dos descontos e idade que exigem pedido subsidiário de modicidade.",
+        "embasamento_ids": [
+          "EMB-03-001",
+          "EMB-03-002",
+          "EMB-03-003",
+          "EMB-03-004",
+          "EMB-03-005",
+          "EMB-03-006"
+        ]
+      }
+    ]
+  },
+  "estrategia_acordo": null,
+  "teses_defesa": {
+    "teses": [
+      {
+        "acusacao_id": "ACU-01",
+        "tese": "Improcedência da inexistência de contratação: contrato assinado, gravação telefônica, autorização/ACK no INSS, perícia grafotécnica (91%), selfie/liveness (97,3%) e validação oficial de documentos, somados ao crédito na conta da autora e ao uso dos valores, evidenciam contratação regular e anuência; inconsistências numéricas apontadas devem ser qualificadas como erros materiais sem impacto no consentimento, com apresentação de esclarecimentos técnicos.",
+        "embasamento_ids": [
+          "EMB-01-001",
+          "EMB-01-002",
+          "EMB-01-003",
+          "EMB-01-004",
+          "EMB-01-005",
+          "EMB-01-006",
+          "EMB-01-007",
+          "EMB-01-008",
+          "EMB-01-009",
+          "EMB-01-010",
+          "EMB-01-011",
+          "EMB-01-016",
+          "EMB-01-017"
+        ]
+      },
+      {
+        "acusacao_id": "ACU-02",
+        "tese": "Improcedência da repetição em dobro por ausência de demonstração de má-fé e de prova específica que afaste engano justificável; na remota hipótese de condenação, requerer devolução simples com compensação/abatimento integral do valor de R$ 5.000,00 creditado e utilizado, exigindo a juntada de extratos oficiais do INSS para apurar eventual quantum.",
+        "embasamento_ids": [
+          "EMB-02-003",
+          "EMB-02-004",
+          "EMB-02-005",
+          "EMB-02-002"
+        ]
+      },
+      {
+        "acusacao_id": "ACU-03",
+        "tese": "Improcedência do dano moral por ausência de prova de abalo específico e pela mitigação decorrente do recebimento/uso do crédito; subsidiariamente, requerer quantum módico diante da falta de comprovação de impacto relevante na renda e da ausência de prova de reclamação administrativa eficaz.",
+        "embasamento_ids": [
+          "EMB-03-003",
+          "EMB-03-004",
+          "EMB-03-005",
+          "EMB-03-006",
+          "EMB-03-001",
+          "EMB-03-002"
+        ]
+      }
+    ],
+    "riscos_da_defesa": [
+      {
+        "descricao": "Inconsistências no quadro financeiro e no demonstrativo (IOF/seguro e saldos divergentes) podem reduzir a credibilidade documental e gerar dúvida sobre a regularidade operacional.",
+        "embasamento_ids": [
+          "EMB-01-016",
+          "EMB-01-017"
+        ]
+      },
+      {
+        "descricao": "A longa duração dos descontos e a condição de idosa podem sensibilizar o juízo e ensejar condenação em dano moral, ainda que mitigada.",
+        "embasamento_ids": [
+          "EMB-03-001",
+          "EMB-03-002"
+        ]
+      },
+      {
+        "descricao": "Se o juízo desconsiderar a gravação, a perícia grafotécnica ou a biometria por vício formal, cai parte relevante da prova de autoria/consentimento.",
+        "embasamento_ids": [
+          "EMB-01-002",
+          "EMB-01-004",
+          "EMB-01-005"
+        ]
+      },
+      {
+        "descricao": "Suprimento das lacunas pelo autor (p. ex., juntada de extratos/contracheques do INSS) pode facilitar a quantificação e aumentar o risco de condenação em repetição simples.",
+        "embasamento_ids": [
+          "EMB-02-002"
+        ]
+      },
+      {
+        "descricao": "Risco de cauda: o pior cenário da defesa (R$ 20.051,60) supera a alçada (R$ 12.000,00).",
+        "embasamento_ids": []
+      }
+    ]
+  },
+  "decisao_contraria_a_economia": false,
+  "what_changes": [
+    "Indícios de nulidade/invalidade da gravação de 07m42s, da perícia grafotécnica (91%) ou da selfie/liveness (97,3%).",
+    "Juntada de extratos/contracheques do INSS que detalhem descontos e impactem o cálculo do indébito.",
+    "Entendimento judicial desfavorável quanto às inconsistências documentais (EMB-01-016, EMB-01-017) como vício substancial do contrato.",
+    "Sinalização de tutela de urgência, inversão do ônus da prova ou prova de fraude na validação documental.",
+    "Mudança de postura do juízo local em casos análogos ou proposta de acordo dentro da faixa com contrapartidas relevantes (p. ex., desistência ampla dos pedidos)."
+  ],
+  "pontos_de_atencao": [
+    "Juntar o contrato original e a mídia da gravação (07m42s), com cadeia de custódia e laudo referenciado.",
+    "Apresentar logs e o ACK da autorização de consignação do INSS (11/05/2022).",
+    "Anexar dossiê de autenticação: perícia grafotécnica (91%), selfie/liveness (97,3%) e validações em SERPRO/Denatran/RFB.",
+    "Comprovar crédito de R$ 5.000,00 na conta da autora e o uso subsequente (TED, PIX e saque), com extratos.",
+    "Sanar e explicar formalmente as inconsistências do quadro resumo/demonstrativo (EMB-01-016, EMB-01-017), se necessário com documentos retificadores.",
+    "Impugnar repetição em dobro com base na ausência de prova específica (art. 42, par. único) e, subsidiariamente, preparar planilha de compensação/abatimento para repetição simples.",
+    "No dano moral, destacar ausência de prova concreta do abalo e pedir modicidade subsidiária."
+  ],
+  "assumptions": [
+    "O aceite do acordo no valor alvo é assumido; não há histórico de recusas.",
+    "k foi calibrado em 280 acordos históricos, assumindo que a coluna de valor nas linhas de Acordo é o valor pago.",
+    "O custo de negociação de R$ 500 é uma premissa ilustrativa.",
+    "Honorários e custas não entram na perda estimada, porque a base histórica não os separa.",
+    "A base histórica é sintética: UF com amostra uniforme e processos de 2025."
+  ],
+  "confidence_method_version": "mc-economic-agreement-v1",
+  "erros": [],
+  "demo_provenance": {
+    "generated_by": "decision_engine.run_pipeline",
+    "input_folder": "Caso_01_0801234-56-2024-8-10-0001",
+    "llm_responses": "recorded-engine-run"
+  }
+}

@@ -13,6 +13,9 @@ def test_chat_persists_messages_and_filters_unknown_citations(
     client: TestClient, monkeypatch
 ) -> None:
     captured: dict = {}
+    case = demo_case(client)
+    workspace = client.get(f"/api/cases/{case['id']}/workspace").json()
+    evidence_id = workspace["facts"][0]["id"]
 
     class FakeGateway:
         def __init__(self, api_key: str, model: str) -> None:
@@ -23,17 +26,16 @@ def test_chat_persists_messages_and_filters_unknown_citations(
             captured.update(context)
             return ChatAnswer(
                 answer="A recomendação é sustentada pela documentação disponível.",
-                evidence_ids=["demo-evidence-1", "invented-evidence"],
+                evidence_ids=[evidence_id, "invented-evidence"],
             )
 
     monkeypatch.setattr("app.routers.chat.OpenAIChatGateway", FakeGateway)
-    case = demo_case(client)
     response = client.post(
         f"/api/cases/{case['id']}/chat/messages",
         json={"message": "Por que foi recomendado acordo?"},
     )
     assert response.status_code == 201
-    assert response.json()["assistant_message"]["evidence_ids"] == ["demo-evidence-1"]
+    assert response.json()["assistant_message"]["evidence_ids"] == [evidence_id]
     assert len(response.json()["sources"]) == 1
     serialized_context = json.dumps(captured, default=str).lower()
     assert ".pdf" not in serialized_context

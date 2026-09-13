@@ -1,9 +1,8 @@
-import json
 from pathlib import Path
 
 from app.core.config import get_settings
 from app.core.database import _ensure_case_metadata_columns, get_engine, reset_database_state
-from app.models import Case, Document, RecommendationRecord
+from app.models import AppMetadata, Case, Document, LawyerDecision
 from app.services.seeds import seed_demo_data
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, inspect, text
@@ -16,46 +15,52 @@ def test_seed_is_idempotent_and_files_are_downloadable(client: TestClient) -> No
     assert first.json()["total"] == 2
     demo = next(item for item in first.json()["items"] if item["is_demo"])
     live = next(item for item in first.json()["items"] if not item["is_demo"])
-    assert demo["status"] == "ENCERRADO"
-    assert demo["recommendation"]["source_kind"] == "DEMO_FIXTURE"
+    assert demo["status"] == "AGUARDANDO_DECISAO"
+    assert demo["recommendation"]["source_kind"] == "ENGINE_PRECOMPUTED"
+    assert demo["recommendation"]["action"] == "DEFESA"
+    assert demo["valor_causa"] == 20_000
     assert live["status"] == "DOCUMENTOS_ENVIADOS"
+    assert live["valor_causa"] == 25_000
 
     with Session(get_engine()) as session:
-        demo_case = session.exec(select(Case).where(Case.is_demo.is_(True))).one()
-        recommendation = session.exec(
-            select(RecommendationRecord).where(RecommendationRecord.case_id == demo_case.id)
-        ).one()
-        stale_payload = json.loads(recommendation.payload_json)
-        stale_payload.pop("risk")
-        stale_payload.pop("settlement_range")
-        recommendation.payload_json = json.dumps(stale_payload)
-        session.add(recommendation)
-        session.commit()
-
         seed_demo_data(session, get_settings())
         assert len(session.exec(select(Case)).all()) == 2
         assert len(session.exec(select(Document)).all()) == 11
-        session.refresh(recommendation)
-        repaired_payload = json.loads(recommendation.payload_json)
-        assert repaired_payload["risk"]["cohort_size"] == 196
-        assert repaired_payload["settlement_range"]["target"] == 3200.0
-        repaired_source = repaired_payload["facts"][0]["sources"][0]
-        source_document = session.get(Document, repaired_source["document_id"])
-        assert source_document is not None
-        assert source_document.type.value == "CONTRATO"
-        assert "valor líquido liberado" in repaired_source["excerpt"]
+        marker = session.get(AppMetadata, "demo_baseline_version")
+        assert marker is not None
+        assert marker.value == "real-engine-v1"
 
     workspace = client.get(f"/api/cases/{demo['id']}/workspace").json()
-    assert workspace["case"]["status"] == "ENCERRADO"
-    assert workspace["risk"]["probabilities"]["parcial"] == 0.51
-    assert workspace["recommendation"]["settlement_range"]["target"] == 3200.0
-    assert workspace["decision"]["adhered"] is True
-    assert workspace["negotiation"]["accepted"] is True
-    assert workspace["outcome"]["outcome"] == "ACORDO"
+    assert len(workspace["facts"]) == 17
+    assert len(workspace["contradictions"]) == 3
+    assert len(workspace["gaps"]) == 7
+    assert workspace["decision"] is None
+    assert workspace["negotiation"] is None
+    assert workspace["outcome"] is None
     download = client.get(workspace["documents"][0]["file_url"])
     assert download.status_code == 200
     assert download.content.startswith(b"%PDF-")
     assert download.headers["content-disposition"].startswith("inline;")
+
+
+def test_seed_does_not_reset_live_demo_actions_after_baseline(client: TestClient) -> None:
+    case = next(item for item in client.get("/api/cases").json()["items"] if item["is_demo"])
+    decision = client.post(
+        f"/api/cases/{case['id']}/decision",
+        json={"action": "DEFESA"},
+    )
+    assert decision.status_code == 201
+
+    with Session(get_engine()) as session:
+        seed_demo_data(session, get_settings())
+        persisted = session.exec(
+            select(LawyerDecision).where(LawyerDecision.case_id == case["id"])
+        ).first()
+        persisted_case = session.get(Case, case["id"])
+
+    assert persisted is not None
+    assert persisted_case is not None
+    assert persisted_case.status == "AGUARDANDO_ENCERRAMENTO"
 
 
 def test_demo_seed_can_be_disabled(tmp_path: Path, monkeypatch) -> None:

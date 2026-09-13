@@ -13,6 +13,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[TestCli
     monkeypatch.setenv("STORAGE_DIR", str(tmp_path / "storage"))
     monkeypatch.setenv("DATA_DIR", str(data_dir))
     monkeypatch.setenv("DEMO_SEED", "true")
+    monkeypatch.setenv("DEMO_REPLAY_ENABLED", "false")
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
     reset_database_state()
     from app.main import create_app

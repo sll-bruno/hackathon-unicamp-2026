@@ -1,6 +1,7 @@
 from app.models.domain import (
     Action,
     AnalysisJob,
+    AppMetadata,
     Case,
     CaseIntake,
     CaseOutcome,
@@ -27,6 +28,7 @@ from app.models.domain import (
 __all__ = [
     "Action",
     "AnalysisJob",
+    "AppMetadata",
     "Case",
     "CaseIntake",
     "CaseOutcome",

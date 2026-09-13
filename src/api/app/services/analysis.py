@@ -1,10 +1,12 @@
 import json
+import time
 from collections.abc import Callable
 
 import decision_engine
 from contracts.pipeline import CaseInput, PipelineDocument, PipelineOutput, SubsidyFlags
 from sqlmodel import Session, select
 
+from app.core.config import get_settings
 from app.core.database import get_engine
 from app.models import (
     AnalysisJob,
@@ -16,6 +18,7 @@ from app.models import (
     RecommendationRecord,
 )
 from app.models.domain import utc_now
+from app.services.demo_outputs import LIVE_REPLAY_CNJ, load_precomputed_output
 from app.services.domain import transition_case
 
 
@@ -52,10 +55,20 @@ def invoke_pipeline(
     )
 
 
-def _persist_output(session: Session, job: AnalysisJob, output: PipelineOutput) -> None:
+def persist_engine_output(
+    session: Session,
+    job: AnalysisJob | None,
+    output: PipelineOutput,
+    *,
+    case_id: str | None = None,
+    source_kind: str = "ENGINE",
+) -> RecommendationRecord:
+    target_case_id = job.case_id if job is not None else case_id
+    if target_case_id is None:
+        raise ValueError("case_id is required when persisting an output without a job")
     old_recommendations = session.exec(
         select(RecommendationRecord).where(
-            RecommendationRecord.case_id == job.case_id,
+            RecommendationRecord.case_id == target_case_id,
             RecommendationRecord.is_current.is_(True),
         )
     ).all()
@@ -63,8 +76,8 @@ def _persist_output(session: Session, job: AnalysisJob, output: PipelineOutput) 
         previous.is_current = False
         session.add(previous)
     recommendation = RecommendationRecord(
-        case_id=job.case_id,
-        job_id=job.id,
+        case_id=target_case_id,
+        job_id=job.id if job is not None else None,
         action=output.recommendation.action,
         confidence_percent=output.recommendation.confidence_percent,
         summary=output.recommendation.summary,
@@ -74,7 +87,7 @@ def _persist_output(session: Session, job: AnalysisJob, output: PipelineOutput) 
         expected_savings=output.financial.expected_savings,
         versions_json=json.dumps(output.versions, ensure_ascii=False),
         payload_json=json.dumps(output.complete_payload(), ensure_ascii=False),
-        source_kind="ENGINE",
+        source_kind=source_kind,
         is_current=True,
     )
     session.add(recommendation)
@@ -93,6 +106,35 @@ def _persist_output(session: Session, job: AnalysisJob, output: PipelineOutput) 
                 ),
             )
         )
+    return recommendation
+
+
+DEMO_REPLAY_STAGES = (
+    ("INGESTAO", 14, 0.15),
+    ("EXTRACAO", 34, 0.27),
+    ("RISCO", 58, 0.20),
+    ("FINANCEIRO", 74, 0.14),
+    ("DECISAO", 88, 0.14),
+    ("PERSISTING_RESULT", 94, 0.10),
+)
+
+
+def _replay_precomputed_analysis(
+    session: Session,
+    job: AnalysisJob,
+    output: PipelineOutput,
+    duration_seconds: float,
+) -> PipelineOutput:
+    """Replay visible pipeline milestones while preserving the real engine output."""
+
+    for stage, progress_percent, duration_fraction in DEMO_REPLAY_STAGES:
+        job.stage = stage
+        job.progress_percent = progress_percent
+        session.add(job)
+        session.commit()
+        if duration_seconds > 0:
+            time.sleep(duration_seconds * duration_fraction)
+    return output
 
 
 def run_analysis_job(job_id: str) -> None:
@@ -119,6 +161,9 @@ def run_analysis_job(job_id: str) -> None:
 
         try:
             case_input = build_engine_input(session, case)
+            documents = list(
+                session.exec(select(Document).where(Document.case_id == case.id)).all()
+            )
 
             def persist_progress(stage: str, progress_percent: int) -> None:
                 # A engine sinaliza CONCLUIDO quando terminou o cálculo, antes de a API
@@ -135,11 +180,31 @@ def run_analysis_job(job_id: str) -> None:
                 session.add(job)
                 session.commit()
 
-            output = invoke_pipeline(case_input, on_progress=persist_progress)
+            settings = get_settings()
+            precomputed = (
+                load_precomputed_output(case.cnj, documents)
+                if settings.demo_replay_enabled and case.cnj == LIVE_REPLAY_CNJ
+                else None
+            )
+            output = (
+                _replay_precomputed_analysis(
+                    session,
+                    job,
+                    precomputed,
+                    settings.demo_replay_seconds,
+                )
+                if precomputed is not None
+                else invoke_pipeline(case_input, on_progress=persist_progress)
+            )
             job.stage = "PERSISTING_RESULT"
-            job.progress_percent = 90
+            job.progress_percent = max(job.progress_percent, 94 if precomputed else 90)
             session.add(job)
-            _persist_output(session, job, output)
+            persist_engine_output(
+                session,
+                job,
+                output,
+                source_kind="ENGINE_PRECOMPUTED" if precomputed else "ENGINE",
+            )
             job.status = JobStatus.COMPLETED
             job.stage = "COMPLETED"
             job.progress_percent = 100

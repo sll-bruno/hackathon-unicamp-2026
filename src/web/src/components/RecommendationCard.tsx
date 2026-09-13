@@ -1,19 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
+import { submitDecision } from '../api/workspace';
 import type { CaseStatus, Recommendation, Workspace } from '../types/workspace';
 import { formatBRL, reasonCodeLabel } from '../pages/Workspace/format';
 
 interface Props {
   recommendation: Recommendation;
   caseInfo: Workspace['case'];
+  decision: Workspace['decision'];
+  onChanged: () => void;
 }
 
 /** Cartão de decisão da Tela 3: ação recomendada, confiança e a decisão do advogado. */
-export function RecommendationCard({ recommendation: rec, caseInfo: c }: Props) {
+export function RecommendationCard({ recommendation: rec, caseInfo: c, decision, onChanged }: Props) {
   return (
     <section className="card rec-card" aria-labelledby="rec-title">
       <header className="card__header">
         <span className="eyebrow">Recomendação da política</span>
-        <DecisionControl status={c.status} />
+        <DecisionControl
+          caseId={c.case_id}
+          status={c.status}
+          recommendationAction={rec.action}
+          decision={decision}
+          onChanged={onChanged}
+        />
       </header>
 
       <div className="rec-card__body">
@@ -23,10 +32,11 @@ export function RecommendationCard({ recommendation: rec, caseInfo: c }: Props) 
           </h2>
           <p className="rec-card__reason">{rec.reason}</p>
           {rec.reason_codes.length > 0 && (
-            <ul className="chip-list" aria-label="Alertas da recomendação">
+            <ul className="chip-list" aria-label="Marcadores da recomendação">
               {rec.reason_codes.map((code) => (
                 <li key={code} className="chip chip--warning">
-                  <span aria-hidden="true">!</span> {reasonCodeLabel[code] ?? code}
+                  <span aria-hidden="true">!</span>
+                  {reasonCodeLabel[code] ?? code}
                 </li>
               ))}
             </ul>
@@ -86,28 +96,24 @@ function ConfidenceMeter({ value, method, nullReason }: { value: number | null; 
   );
 }
 
-type Decision = 'pending' | 'accepted' | 'rejected';
-
-function decisionFromStatus(status: CaseStatus): Decision {
-  if (status === 'PROPOSTA_ACEITA') return 'accepted';
-  if (status === 'DIVERGIU') return 'rejected';
-  return 'pending';
-}
-
-const decisionLabel: Record<Decision, string> = {
-  pending: 'Avaliar recomendação',
-  accepted: 'Proposta aceita',
-  rejected: 'Recomendação recusada',
-};
-
-/**
- * Substitui a antiga etiqueta de status por um controle: o advogado abre e
- * escolhe aceitar ou recusar a recomendação. Só muda o estado local — o
- * registro de verdade (`POST /cases/{id}/decision`) fica com o backend.
- */
-function DecisionControl({ status }: { status: CaseStatus }) {
-  const [decision, setDecision] = useState<Decision>(() => decisionFromStatus(status));
+function DecisionControl({
+  caseId,
+  status,
+  recommendationAction,
+  decision,
+  onChanged,
+}: {
+  caseId: string;
+  status: CaseStatus;
+  recommendationAction: 'ACORDO' | 'DEFESA';
+  decision: Workspace['decision'];
+  onChanged: () => void;
+}) {
   const [open, setOpen] = useState(false);
+  const [diverging, setDiverging] = useState(false);
+  const [details, setDetails] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -126,30 +132,38 @@ function DecisionControl({ status }: { status: CaseStatus }) {
     };
   }, [open]);
 
-  if (status === 'ENCERRADO') {
-    return (
-      <span className="decision-control__button" data-decision="accepted">
-        Processo encerrado
-      </span>
-    );
+  const save = async (action: 'ACORDO' | 'DEFESA', divergenceDetails?: string) => {
+    setSubmitting(true);
+    setError(null);
+    try {
+      await submitDecision(caseId, action, divergenceDetails);
+      setOpen(false);
+      onChanged();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setSubmitting(false);
+    }
+  };
+
+  if (status !== 'AGUARDANDO_DECISAO') {
+    const label = decision
+      ? decision.adhered ? 'Recomendação seguida' : 'Divergência registrada'
+      : status === 'ENCERRADO' ? 'Processo encerrado' : 'Decisão registrada';
+    return <span className="decision-control__resolved">{label}</span>;
   }
 
-  const choose = (next: Decision) => {
-    setDecision(next);
-    setOpen(false);
-  };
+  const oppositeAction = recommendationAction === 'ACORDO' ? 'DEFESA' : 'ACORDO';
 
   return (
     <div className="decision-control" ref={ref}>
       <button
         type="button"
         className="decision-control__button"
-        data-decision={decision}
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
-        {decisionLabel[decision]}
+        Avaliar recomendação
         <svg viewBox="0 0 10 6" aria-hidden="true" className="decision-control__chevron">
           <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -161,31 +175,50 @@ function DecisionControl({ status }: { status: CaseStatus }) {
             <button
               type="button"
               role="option"
-              aria-selected={decision === 'accepted'}
+              aria-selected="false"
               className="decision-control__option decision-control__option--accept"
-              onClick={() => choose('accepted')}
+              disabled={submitting}
+              onClick={() => void save(recommendationAction)}
             >
-              Aceitar recomendação
+              Seguir recomendação ({recommendationAction === 'ACORDO' ? 'Acordo' : 'Defesa'})
             </button>
           </li>
           <li>
             <button
               type="button"
               role="option"
-              aria-selected={decision === 'rejected'}
+              aria-selected="false"
               className="decision-control__option decision-control__option--reject"
-              onClick={() => choose('rejected')}
+              disabled={submitting}
+              onClick={() => setDiverging(true)}
             >
-              Recusar recomendação
+              Divergir para {oppositeAction === 'ACORDO' ? 'Acordo' : 'Defesa'}
             </button>
           </li>
-          {decision !== 'pending' && (
+          {diverging && (
             <li className="decision-control__menu-divider">
-              <button type="button" className="decision-control__option decision-control__option--undo" onClick={() => choose('pending')}>
-                Desfazer decisão
-              </button>
+              <form
+                className="decision-control__divergence"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  if (details.trim()) void save(oppositeAction, details.trim());
+                }}
+              >
+                <label htmlFor="divergence-details">Motivo da divergência</label>
+                <textarea
+                  id="divergence-details"
+                  value={details}
+                  onChange={(event) => setDetails(event.target.value)}
+                  placeholder="Explique o fato novo ou ajuste necessário"
+                  required
+                />
+                <button type="submit" disabled={submitting || !details.trim()}>
+                  {submitting ? 'Registrando…' : 'Confirmar divergência'}
+                </button>
+              </form>
             </li>
           )}
+          {error && <li className="decision-control__error" role="alert">{error}</li>}
         </ul>
       )}
     </div>

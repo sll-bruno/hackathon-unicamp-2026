@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from app.core.config import get_settings
 from app.core.database import get_engine
 from app.models import AnalysisJob, Case, CaseStatus, JobStatus, RecommendationRecord
 from app.services.analysis import recover_abandoned_jobs
@@ -160,6 +161,32 @@ def test_analysis_job_persists_live_engine_progress(client: TestClient, monkeypa
     ]
 
 
+def test_demo_replay_uses_real_precomputed_engine_output(
+    client: TestClient, monkeypatch
+) -> None:
+    case = live_case(client)
+    settings = get_settings()
+    settings.demo_replay_enabled = True
+    settings.demo_replay_seconds = 0
+    monkeypatch.setattr(
+        "app.services.analysis.decision_engine.run_pipeline",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            AssertionError("demo replay must not call the LLM pipeline")
+        ),
+    )
+
+    assert client.post(f"/api/cases/{case['id']}/analyze").status_code == 202
+    workspace = client.get(f"/api/cases/{case['id']}/workspace").json()
+
+    assert workspace["analysis_job"]["status"] == "COMPLETED"
+    assert workspace["case"]["status"] == "AGUARDANDO_DECISAO"
+    assert workspace["recommendation"]["source_kind"] == "ENGINE_PRECOMPUTED"
+    assert workspace["recommendation"]["action"] == "ACORDO"
+    assert len(workspace["facts"]) == 7
+    assert len(workspace["contradictions"]) == 3
+    assert len(workspace["gaps"]) == 16
+
+
 def test_failed_job_can_retry_and_snapshots_are_immutable(client: TestClient, monkeypatch) -> None:
     case = live_case(client)
 
@@ -233,11 +260,11 @@ def test_divergence_negotiation_and_dashboard_are_distinct_events(
 
     dashboard = client.get("/api/dashboard").json()
     assert dashboard["generated_from_persisted_events"] is True
-    assert dashboard["adherence"]["decisions"] == 2
-    assert dashboard["adherence"]["adhered"] == 1
-    assert dashboard["agreements"]["negotiations"] == 2
-    assert dashboard["agreements"]["accepted"] == 2
-    assert dashboard["economics"]["observed_disbursement"] == 6050.0
+    assert dashboard["adherence"]["decisions"] == 1
+    assert dashboard["adherence"]["adhered"] == 0
+    assert dashboard["agreements"]["negotiations"] == 1
+    assert dashboard["agreements"]["accepted"] == 1
+    assert dashboard["economics"]["observed_disbursement"] == 2800.0
 
     history = client.get("/api/history", params={"case_id": case["id"]}).json()["items"]
     event_types = {event["type"] for event in history}

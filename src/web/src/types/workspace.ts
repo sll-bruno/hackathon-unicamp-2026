@@ -124,6 +124,23 @@ export interface Workspace {
   gaps: Gap[];
   versions: Record<string, string>;
   analyzed_at: string | null;
+  decision: {
+    action: Action;
+    adhered: boolean;
+    divergence_reason?: string | null;
+    divergence_details?: string | null;
+  } | null;
+  negotiation: {
+    accepted: boolean;
+    final_value?: number | null;
+  } | null;
+  outcome: {
+    outcome: 'ACORDO' | 'IMPROCEDENCIA' | 'EXTINCAO' | 'PARCIAL' | 'PROCEDENCIA';
+    final_value?: number | null;
+    defense_cost?: number | null;
+    court_award?: number | null;
+    legal_costs?: number | null;
+  } | null;
   analysis_job?: {
     status: 'QUEUED' | 'RUNNING' | 'COMPLETED' | 'FAILED';
     stage: string;

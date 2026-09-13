@@ -39,6 +39,52 @@ export async function startAnalysis(caseId: string): Promise<NonNullable<Workspa
   return response.json() as Promise<NonNullable<Workspace['analysis_job']>>;
 }
 
+async function postWorkflow<T>(caseId: string, path: string, body: Record<string, unknown>): Promise<T> {
+  const response = await apiFetch(`/api/cases/${encodeURIComponent(caseId)}/${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    const detail = await response.json().catch(() => null) as { message?: string } | null;
+    throw new Error(detail?.message ?? `Não foi possível concluir a ação (${response.status}).`);
+  }
+  return response.json() as Promise<T>;
+}
+
+export function submitDecision(
+  caseId: string,
+  action: 'ACORDO' | 'DEFESA',
+  divergenceDetails?: string,
+) {
+  return postWorkflow(caseId, 'decision', {
+    action,
+    ...(divergenceDetails
+      ? { divergence_reason: 'OUTRO', divergence_details: divergenceDetails }
+      : {}),
+  });
+}
+
+export function submitNegotiation(caseId: string, accepted: boolean, finalValue?: number) {
+  return postWorkflow(caseId, 'negotiation-result', {
+    accepted,
+    ...(accepted ? { final_value: finalValue } : {}),
+  });
+}
+
+export function submitClosure(
+  caseId: string,
+  body: {
+    outcome: 'IMPROCEDENCIA' | 'EXTINCAO' | 'PARCIAL' | 'PROCEDENCIA';
+    final_value?: number;
+    defense_cost?: number;
+    court_award?: number;
+    legal_costs?: number;
+  },
+) {
+  return postWorkflow(caseId, 'closure', body);
+}
+
 /**
  * Carrega a área de trabalho pela API. Em desenvolvimento, se a API ainda não
  * responder, usa os dados de exemplo identificados como tal (isSample).
