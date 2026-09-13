@@ -255,9 +255,19 @@ flowchart LR
   E --> F[Novas recomendações versionadas]
 ```
 
-- A retroalimentação é **apenas retreino periódico**, offline e em lote (notebook/script em `src/pipeline/training/`). Não roda na API.
+- A retroalimentação é **apenas retreino periódico**, offline e em lote — scripts em
+  `src/pipeline/training/`: `export_feedback.py` → `train_risk.py --feedback-data` →
+  `compare_versions.py`. Não roda na API.
 - Toda recomendação guarda o mapa `versions` devolvido pela engine. Uma versão
   nova não reescreve recomendações antigas.
+- `export_feedback.py` seleciona casos `ENCERRADO` com `case_outcomes` maduro (≥ N dias,
+  para reduzir risco de recurso) e desfecho ≠ `ACORDO` (acordo não é resultado judicial);
+  `train_risk.py` concatena esse feedback à base histórica e recusa o retreino abaixo de
+  `--min-feedback-n` casos maduros. A candidata é gravada com nome de versão próprio
+  (`risco_vN.ubj`/`_meta.json`), nunca sobrescrevendo a versão em produção. Promoção é
+  manual, via `ENGINE_RISK_MODEL_VERSION` (`decision_engine/settings.py`) — troca de env
+  var, sem editar código, com rollback trivial. Detalhes e comandos:
+  [`src/pipeline/README.md`](../src/pipeline/README.md#retreino-periódico-feedback-de-casos-fechados).
 
 ## 10. Estrutura de pastas
 
@@ -303,6 +313,6 @@ volumes nomeados. SQLite roda com um worker, WAL e timeout de 30 segundos.
 |---|---|---|
 | 1 | Baseline de "economia": custo esperado da defesa (modelo) ou valor da causa (sticky do Fluxo C)? | Economia prevista/realizada |
 | 2 | ~~Perfis `advogado` e `banco`~~ **Demo:** perfil único e dashboard visível ao advogado. **Pós-demo:** `lawyers.role` (`advogado`/`banco`) + guarda nas rotas `/api/dashboard/*` e no menu | Tela 5 |
-| 3 | Período do retreino periódico (Fluxo C: "definir períodos") | §9 |
+| 3 | ~~Período do retreino periódico~~ **Mecanismo implementado** (§9): sob demanda quando `export_feedback.py` acumular casos maduros acima de `--min-feedback-n`; teto sugerido de 1x/semana. Valor exato de `--min-feedback-n` e `--matured-days` seguem em aberto | §9 |
 | 4 | Limites dos alertas de padrão (fora do MVP) | evolução do dashboard |
 | 5 | Critério de criticidade (fora do MVP) | evolução do histórico |

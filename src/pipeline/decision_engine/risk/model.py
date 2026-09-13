@@ -26,10 +26,12 @@ class RiskPrediction:
 
 
 class RiskModel:
-    def __init__(self, artifacts_dir: Path) -> None:
-        self.meta = json.loads((artifacts_dir / "risco_v1_meta.json").read_text(encoding="utf-8"))
+    def __init__(self, artifacts_dir: Path, version: str = "risco_v1") -> None:
+        self.meta = json.loads(
+            (artifacts_dir / f"{version}_meta.json").read_text(encoding="utf-8")
+        )
         self.booster = xgb.Booster()
-        self.booster.load_model(artifacts_dir / "risco_v1.ubj")
+        self.booster.load_model(artifacts_dir / f"{version}.ubj")
         self.ufs: list[str] = self.meta["ufs"]
         self.temperature: float = self.meta["temperatura"]
         self.severity: dict[str, float] = self.meta["severidade"]
@@ -104,5 +106,8 @@ class RiskModel:
 
 
 @lru_cache
-def load_risk_model(artifacts_dir: Path | None = None) -> RiskModel:
-    return RiskModel(artifacts_dir or load_settings().artifacts_dir)
+def load_risk_model(artifacts_dir: Path | None = None, version: str | None = None) -> RiskModel:
+    settings = load_settings()
+    return RiskModel(
+        artifacts_dir or settings.artifacts_dir, version or settings.risk_model_version
+    )

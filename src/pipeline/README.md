@@ -26,6 +26,39 @@ brew install tesseract tesseract-lang                      # OCR (uma vez)
 
 O CLI grava o resultado completo em `resultados/<pasta>.json`. Com `ENGINE_LLM_CACHE=record`, respostas de LLM já obtidas ficam em `.engine_llm_cache/` e não são cobradas de novo.
 
+## Retreino periódico (feedback de casos fechados)
+
+O modelo de risco (`risk/model.py`) é versionado por nome de artefato (`<versão>.ubj` +
+`<versão>_meta.json` em `decision_engine/artifacts/`) e a engine carrega a versão indicada
+por `ENGINE_RISK_MODEL_VERSION` (padrão `risco_v1`). Retreinar com feedback de casos reais
+encerrados não sobrescreve a versão em produção — gera uma candidata nova, validada antes
+de promovida. Fluxo:
+
+```bash
+# 1. Exporta casos ENCERRADO com desfecho maduro (>= 30 dias) do banco da API
+.venv/bin/python src/pipeline/training/export_feedback.py --matured-days 30
+
+# 2. Treina uma candidata concatenando o feedback à base histórica.
+#    Aborta se houver menos que --min-feedback-n casos maduros.
+.venv/bin/python src/pipeline/training/train_risk.py \
+  --version risco_v2 --base-version risco_v1 \
+  --feedback-data data/feedback/feedback_<timestamp>.csv --min-feedback-n 200
+
+# 3. Compara a candidata com a produção (log loss, Brier, ECE, acurácia vitória/derrota)
+.venv/bin/python src/pipeline/training/compare_versions.py \
+  --production risco_v1 --candidate risco_v2
+
+# 4. Promoção é manual: só depois de revisar a comparação acima
+export ENGINE_RISK_MODEL_VERSION=risco_v2
+```
+
+Regras do loop (`docs/RELATORIO_FLUXO_MOTOR_DECISAO.md §10`): retreino é sempre offline e
+em lote, nunca por interação individual; acordo não é desfecho judicial e não entra no
+treino do modelo de risco; recomendações antigas (`recommendations.payload_json`) mantêm a
+`versions.risk_model` com que foram geradas — promover uma versão nova não as reescreve.
+Cadência recomendada: sob demanda quando `export_feedback.py` acumular casos maduros acima
+do `--min-feedback-n`, no máximo uma vez por semana.
+
 ## Fluxo (`ENGINE_MODE=full`)
 
 1. `ingest/`: texto por página com `pdfplumber`; Tesseract nas páginas sem texto; UF pelo CNJ, valor da causa, flags e demonstrativo.

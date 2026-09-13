@@ -17,7 +17,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-from decision_engine.risk.features import CLASSES, FLAG_NAMES, CaseFeatures, encode, feature_names
+from decision_engine.risk.features import (
+    CLASSES,
+    FLAG_NAMES,
+    MICRO_TO_CLASS,
+    CaseFeatures,
+    encode,
+    feature_names,
+)
 from decision_engine.settings import PACKAGE_DIR
 from scipy.optimize import minimize_scalar
 from sklearn.linear_model import LogisticRegression
@@ -28,12 +35,6 @@ from sklearn.preprocessing import StandardScaler
 
 ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_DATA = ROOT / "data" / "Hackaton_Enter_Base_Candidatos.xlsx"
-MICRO_TO_CLASS = {
-    "Extinção": "extincao",
-    "Improcedência": "improcedencia",
-    "Parcial procedência": "parcial",
-    "Procedência": "procedencia",
-}
 SEED = 42
 
 
@@ -43,6 +44,21 @@ def load_dataset(path: Path) -> pd.DataFrame:
     results.columns = ["processo", "uf", "assunto", "sub", "macro", "micro", "vc", "vd"]
     subsidies.columns = ["processo", *FLAG_NAMES]
     return results.merge(subsidies, on="processo", validate="1:1")
+
+
+def load_feedback(path: Path) -> pd.DataFrame:
+    """Casos reais encerrados, no formato gerado por `training/export_feedback.py`.
+
+    Mesmas colunas de `load_dataset()` (processo, uf, assunto, sub, macro, micro, vc, vd
+    + flags), para poder ser concatenado direto com a base histórica antes do split.
+    """
+
+    frame = pd.read_csv(path)
+    required = {"processo", "uf", "assunto", "sub", "macro", "micro", "vc", "vd", *FLAG_NAMES}
+    missing = required - set(frame.columns)
+    if missing:
+        raise ValueError(f"feedback_data sem colunas obrigatórias: {sorted(missing)}")
+    return frame[list(required)]
 
 
 def to_cases(frame: pd.DataFrame) -> list[CaseFeatures]:
@@ -81,8 +97,28 @@ def expected_calibration_error(probabilities: np.ndarray, labels: np.ndarray) ->
     return float(error)
 
 
-def train(data_path: Path, output_dir: Path) -> dict:
+def train(
+    data_path: Path,
+    output_dir: Path,
+    *,
+    version: str = "risco_v1",
+    base_version: str | None = None,
+    feedback_path: Path | None = None,
+    min_feedback_n: int = 0,
+) -> dict:
     frame = load_dataset(data_path)
+    feedback_n = 0
+    if feedback_path is not None:
+        feedback = load_feedback(feedback_path)
+        feedback_n = len(feedback)
+        if feedback_n < min_feedback_n:
+            raise SystemExit(
+                f"feedback_data tem {feedback_n} casos maduros; mínimo exigido é "
+                f"{min_feedback_n}. Retreino abortado — acumule mais casos encerrados "
+                "antes de gerar uma nova versão."
+            )
+        frame = pd.concat([frame, feedback], ignore_index=True)
+
     judicial = frame[frame.micro.isin(MICRO_TO_CLASS)].reset_index(drop=True)
     agreements = frame[frame.micro == "Acordo"].reset_index(drop=True)
     ufs = sorted(judicial.uf.unique())
@@ -219,9 +255,11 @@ def train(data_path: Path, output_dir: Path) -> dict:
         cohorts[case.cohort_key] = cohorts.get(case.cohort_key, 0) + 1
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    model.get_booster().save_model(output_dir / "risco_v1.ubj")
+    model.get_booster().save_model(output_dir / f"{version}.ubj")
     meta = {
-        "versao": "risco_v1",
+        "versao": version,
+        "base_version": base_version,
+        "feedback_n": feedback_n,
         "treinado_em": datetime.now(UTC).isoformat(timespec="seconds"),
         "classes": list(CLASSES),
         "ufs": ufs,
@@ -235,7 +273,7 @@ def train(data_path: Path, output_dir: Path) -> dict:
         "perfil_regional": regional,
         "coortes": cohorts,
     }
-    (output_dir / "risco_v1_meta.json").write_text(
+    (output_dir / f"{version}_meta.json").write_text(
         json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8"
     )
     return meta
@@ -245,10 +283,36 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data", type=Path, default=DEFAULT_DATA)
     parser.add_argument("--output", type=Path, default=PACKAGE_DIR / "artifacts")
+    parser.add_argument("--version", default="risco_v1", help="Nome dos artefatos gerados")
+    parser.add_argument(
+        "--base-version",
+        default=None,
+        help="Versão em produção a partir da qual esta candidata foi gerada (só auditoria)",
+    )
+    parser.add_argument(
+        "--feedback-data",
+        type=Path,
+        default=None,
+        help="CSV de casos reais encerrados (training/export_feedback.py), concatenado à base",
+    )
+    parser.add_argument(
+        "--min-feedback-n",
+        type=int,
+        default=0,
+        help="Aborta o retreino se o feedback tiver menos casos maduros que este mínimo",
+    )
     args = parser.parse_args()
-    meta = train(args.data, args.output)
+    meta = train(
+        args.data,
+        args.output,
+        version=args.version,
+        base_version=args.base_version,
+        feedback_path=args.feedback_data,
+        min_feedback_n=args.min_feedback_n,
+    )
     summary = {key: meta[key] for key in ("max_depth", "n_arvores", "temperatura")}
     print(json.dumps({**summary, **meta["metricas_teste"]}, ensure_ascii=False, indent=2))
+    print("feedback_n", meta["feedback_n"], "base_version", meta["base_version"])
     print("severidade", meta["severidade"])
     print("acordo_k", meta["acordo_k"])
 
