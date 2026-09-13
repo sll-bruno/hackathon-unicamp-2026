@@ -9,7 +9,6 @@ export type Action = 'ACORDO' | 'DEFESA';
 
 export type CaseStatus =
   | 'RASCUNHO'
-  | 'DOCUMENTOS_ENVIADOS'
   | 'EM_ANALISE'
   | 'AGUARDANDO_DECISAO'
   | 'PROPOSTA_ACEITA'
