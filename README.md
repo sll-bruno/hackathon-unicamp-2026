@@ -1,203 +1,205 @@
-# HACKATHON UFMG 2026 — Enter AI Challenge
+# Enter Decision Platform
 
-**17 e 18 de Abril de 2026**
+> Política inteligente de acordos para ações de empréstimo não reconhecido.
 
-> Aplique IA para resolver, em equipe, um problema real que toda grande empresa do Brasil enfrenta.
+A Enter Decision Platform transforma autos, subsídios bancários e histórico
+judicial em uma recomendação operacional: **ACORDO ou DEFESA**, com valor
+sugerido, confiança, justificativa econômica e evidências verificáveis. O
+advogado continua responsável pela decisão e pode seguir ou divergir da
+recomendação com motivo registrado.
 
----
+## Acessos rápidos
 
-## Premiação
+> Substitua os três links abaixo antes da entrega final.
 
-**R$ 10.000** para a equipe vencedora
+- [Assistir à demonstração no YouTube](https://www.youtube.com/watch?v=SUBSTITUIR)
+- [Abrir os slides da apresentação](https://SUBSTITUIR-PELO-LINK-DOS-SLIDES)
+- [Acessar a aplicação publicada](https://SUBSTITUIR-PELO-LINK-DO-DEPLOY)
 
----
+Para executar o projeto localmente, consulte o [guia de setup](SETUP.md).
 
-## 1. Contexto
+## O problema
 
-A **Enter** é uma empresa de Enterprise AI — a maior empresa nativa de IA do país — focada em soluções para processos jurídicos cíveis massificados: casos repetitivos em que pessoas físicas processam grandes empresas (ex: consumidor que processa uma companhia aérea por atraso de voo).
+O Banco UFMG recebe cerca de 15 mil novos processos por mês. Aproximadamente
+5 mil discutem empréstimos que a parte autora afirma não ter contratado. Em
+cada processo, o banco e seu escritório externo precisam decidir rapidamente
+se é economicamente melhor propor um acordo ou apresentar defesa.
 
-Seu produto principal, o **EnterOS**, é um modelo de operação jurídico onde uma empresa centraliza a gestão de todos os seus escritórios de advocacia, aprimorando a qualidade das peças jurídicas e a produtividade dos advogados. O EnterOS é construído sobre agentes de IA que automatizam e agregam inteligência a todas as etapas de um processo judicial — do recebimento da ação até o encerramento do caso.
+O desafio não termina na recomendação. A política precisa ser compreensível
+para o advogado, aplicada de maneira consistente e acompanhada pelo banco para
+medir aderência, resultado e impacto financeiro.
 
----
+## A solução
 
-## 2. Problema: Política de Acordos
+A plataforma cobre os cinco requisitos centrais do desafio:
 
-O **Banco UFMG** recebe, em média, **~15 mil novos processos por mês**. Desses, cerca de **~5 mil** envolvem um cenário específico: a pessoa que está processando o banco alega que **não reconhece a contratação de um empréstimo** — ela afirma estar sofrendo descontos referentes ao pagamento de um empréstimo que nunca contratou.
+| Requisito | Como a plataforma responde |
+|---|---|
+| Regra de decisão | Combina risco histórico, evidência do processo e comparação econômica para recomendar Acordo ou Defesa. |
+| Sugestão de valor | Calcula abertura, oferta-alvo e teto de negociação, respeitando a alçada configurada. |
+| Acesso à recomendação | Entrega um workspace para o advogado analisar decisão, confiança, custos, riscos e fontes. |
+| Monitoramento de aderência | Registra se o advogado seguiu ou divergiu da recomendação e o motivo da divergência. |
+| Monitoramento de efetividade | Registra negociação e desfecho para comparar recomendação, custo esperado e resultado observado. |
 
-Diante de cada processo, o Banco precisa tomar uma decisão estratégica: **defender-se no judiciário ou propor um acordo**.
+### Jornada do advogado
 
-O fluxo atual funciona assim:
+1. Envia o PDF dos autos e, quando disponíveis, os subsídios do banco.
+2. Confirma ou corrige os dados extraídos antes de criar o processo.
+3. Acompanha as etapas de ingestão, extração, risco, análise financeira e decisão.
+4. Recebe a recomendação com confiança, cenários, teses e faixa de negociação.
+5. Verifica fatos, contradições e lacunas diretamente no documento, na página e no trecho citados.
+6. Consulta o chatbot sobre a recomendação sem sair do contexto do processo.
+7. Segue ou diverge da recomendação, registrando sua justificativa.
+8. Registra negociação e desfecho para alimentar aderência e efetividade.
 
-1. Um advogado externo recebe o processo pela plataforma da Enter.
-2. Na plataforma, ele acessa os **Autos** (petição inicial, procuração, etc.) e os **Subsídios** (documentos do banco: extrato, contrato, comprovante de crédito, etc.).
-3. Com base nesses documentos e na política do banco, decide: **defesa ou acordo?**
-4. Se optar por acordo, entra em contato com a parte autora para negociar.
-5. Após a decisão, reporta: se optou por acordo ou defesa; o valor proposto; e o resultado da negociação.
+## Como a política decide
 
-O desafio é triplo:
-- Definir uma **boa política de acordos**
-- Garantir que os advogados a sigam de forma **consistente**
-- **Monitorar continuamente** os resultados para avaliar se a política está sendo efetiva
-
----
-
-## 3. Sua Missão
-
-Construir uma solução que:
-
-- **Defina uma política de acordos** para o Banco UFMG em casos de não reconhecimento de contratação de empréstimo
-- **Garanta a implementação** dessa política pelo advogado que está analisando cada caso
-- **Monitore os resultados** para avaliar se a política de acordos está sendo efetiva
-
----
-
-## 4. Requisitos da Solução
-
-A solução deve conter, no mínimo:
-
-| # | Requisito |
-|---|-----------|
-| 1 | **Regra de decisão** — lógica que analise o processo e determine: acordo ou defesa |
-| 2 | **Sugestão de valor** — caso a recomendação seja acordo, sugerir qual valor oferecer |
-| 3 | **Acesso à recomendação** — meio prático do advogado acessar a recomendação para o caso que está analisando |
-| 4 | **Monitoramento de aderência** — forma do banco acompanhar se a política está sendo seguida pelos advogados |
-| 5 | **Monitoramento de efetividade** — forma do banco avaliar se a política está gerando os resultados esperados |
-
-> Fique à vontade para usar quaisquer ferramentas e tecnologias.
-
----
-
-## 5. O Que Você Está Recebendo
-
-Cada equipe receberá:
-
-- **Chave da OpenAI** com créditos carregados
-- **Base de dados** (`.csv`) com o resultado de 60.000 sentenças judiciais dos últimos meses do Banco UFMG em casos de não reconhecimento de contratação de empréstimo (número do caso, valor da causa, resultado, valor de condenação)
-- **Base de documentos** (subsídios) disponibilizados pelo Banco UFMG nos últimos 12 meses
-- **2 pastas de processos exemplo** para simulação, cada uma contendo:
-  - Autos na íntegra (petição inicial, procuração e demais documentos)
-  - Subsídios do cliente (documentos de defesa do banco)
-
-### Descrição dos Subsídios
-
-| Documento | Descrição |
-|-----------|-----------|
-| **Contrato** | Contrato firmado entre o Banco UFMG e a parte autora |
-| **Extrato** | Extrato da conta corrente da parte autora com o banco |
-| **Comprovante de crédito** | Documento regulatório junto ao BACEN atestando a legitimidade da operação |
-| **Dossiê** | Verificação de autenticidade das assinaturas e documentos pessoais do contrato |
-| **Demonstrativo de evolução da dívida** | Extrato mês a mês do saldo de dívida e pagamentos |
-| **Laudo referenciado** | Síntese da operação de crédito (data, valores, prazos, canal de contratação, etc.) |
-
----
-
-## 6. Formato de Entrega
-
-Cada equipe deve submeter **neste repositório**:
-
-```
-├── src/                  # código-fonte da solução
-├── data/                 # dados de exemplo (não inclua dados sensíveis)
-├── docs/                 # apresentação final e documentação
-│   └── presentation.*    # slides ou documento para a apresentação
-├── SETUP.md              # instruções de instalação e execução
-└── README.md             # este arquivo (pode ser complementado)
-```
-
-Além do repositório, submeter:
-
-1. **Repositório no GitHub** com o código-fonte completo
-2. **Arquivos auxiliares** necessários para executar a solução (dependências, setup, dados de exemplo)
-3. **Vídeo de até 2 minutos** demonstrando o funcionamento da ferramenta do ponto de vista do advogado
-4. **Apresentação** (slides ou outro formato) para a apresentação final — máx. 15 min — cobrindo:
-   - Explicação da política de acordos (linguagem acessível ao time jurídico)
-   - Potencial financeiro da iniciativa
-   - Experiência do usuário advogado
-   - Arquitetura e solução técnica
-   - Limitações conhecidas da solução
-   - Próximos passos (considerando 1 mês adicional de desenvolvimento)
-
----
-
-## 7. Critérios de Avaliação
-
-| # | Critério | Descrição |
-|---|----------|-----------|
-| 1 | **Leitura do problema** | Entendimento do caso, priorização correta e impacto no negócio |
-| 2 | **Criatividade e usabilidade** | Criatividade na abordagem e qualidade da experiência de uso |
-| 3 | **Colaboração** | Divisão de responsabilidades, colaboração e clareza na apresentação |
-| 4 | **Execução** | Acurácia do output, funcionalidades embarcadas, consistência e viabilidade |
-| 5 | **Uso de IA** | Aplicação de IA para acelerar, melhorar ou diferenciar a solução |
-
----
-
-## Arquitetura da solução
-
-A arquitetura proposta combina extração probatória rastreável, risco judicial, estimação do custo da condenação e comparação financeira entre acordo e defesa. O risco usa metadados e seis indicadores binários de disponibilidade, sem validação documental ou cenários de contestação. A extração rastreável apoia a explicação e os valores financeiros; confiança da LLM não é probabilidade de vitória.
-
-O fluxo principal é:
+A saída operacional é sempre **ACORDO** ou **DEFESA**. Baixa confiança funciona
+como alerta para revisão humana, não como uma terceira decisão.
 
 ```text
 Autos e subsídios
-  -> ingestão e extração com fontes por documento, página e trecho
-  -> estimativa de risco e severidade
-  -> comparação financeira entre acordo e defesa
-  -> recomendação explicável para o advogado
-  -> decisão humana, negociação e monitoramento de resultados
+        |
+        v
+Ingestão seletiva e extração rastreável
+        |
+        +----> fatos, contradições, lacunas e fontes
+        |
+        v
+Risco judicial + severidade da perda
+        |
+        v
+Custo esperado da defesa x custo total do acordo
+        |
+        v
+Recomendação + confiança + faixa de negociação
+        |
+        v
+Decisão humana -> negociação -> desfecho observado
 ```
 
-O código está dividido em quatro partes:
+### Entradas
 
-- `src/pipeline`: engine de ingestão, extração, risco, scoring e decisão;
-- `src/api`: API FastAPI, persistência e projeção dos dados;
-- `src/web`: aplicação React/Vite usada pelo advogado e pelo banco;
-- `src/contracts`: contrato mínimo compartilhado entre engine e API.
+- UF, subassunto e valor da causa;
+- disponibilidade de contrato, extrato, comprovante de crédito, dossiê,
+  demonstrativo da dívida e laudo;
+- alegações, pedidos, valores e cronologia extraídos dos documentos;
+- evidências favoráveis e contrárias ao banco, contradições e lacunas.
 
-Parâmetros, pesos, prompts e artefatos do modelo são versionados dentro de
-`src/pipeline/decision_engine`. O retreino é offline e uma nova versão só deve
-ser promovida após validação. As instruções de execução local e deploy estão em
-[`SETUP.md`](SETUP.md).
+O valor da condenação nunca é usado como entrada da decisão. Ele aparece
+somente como alvo histórico para estimar a severidade, evitando vazamento de
+informação futura.
 
----
+### Componentes da decisão
 
-## 8. Prazo
+- **Risco histórico:** estima quatro desfechos judiciais a partir de informação
+  disponível antes da decisão.
+- **Qualidade probatória:** classifica evidências com pesos versionados e
+  preserva sua origem.
+- **Motor financeiro:** compara o custo esperado da defesa com o custo do
+  acordo e calcula uma faixa de negociação.
+- **Análise de robustez:** simula 1.000 cenários e reduz a confiança quando os
+  sinais divergem, a coorte é pequena ou a extração é incerta.
+- **Decisão assistida:** apresenta motivos e teses ao advogado, que mantém a
+  palavra final.
 
-| Evento | Data/Hora |
-|--------|-----------|
-| **Submissão** | 18/04 às **04:00** (da manhã) |
-| **Apresentações finais** | 18/04 às **07:00** |
+## Principais diferenciais
 
-> Boa sorte — e bom café e/ou energético! ☕
+- **Explicabilidade acionável:** cada evidência aponta documento, página e
+  trecho, e a citação abre o PDF no ponto correspondente.
+- **IA cercada por regras determinísticas:** modelos e LLMs extraem e sintetizam;
+  contratos, estados, custos, alçadas e validações permanecem controláveis.
+- **Ingestão eficiente:** tenta texto nativo primeiro e reserva OCR para páginas
+  sem conteúdo suficiente.
+- **Human-in-the-loop real:** decisão do advogado, resposta da parte autora e
+  desfecho são eventos distintos e auditáveis.
+- **Chatbot com contexto restrito:** responde a partir do snapshot processado e
+  das evidências do caso, com citações para as fontes utilizadas.
+- **Política versionada:** parâmetros, pesos, prompts e artefatos do modelo
+  ficam identificados na recomendação produzida.
 
----
+## Demonstração incluída
 
-## Como Submeter
+O repositório contém dois casos completos fornecidos para simulação:
 
-### 1. Crie o repositório da sua equipe
+- **Caso 1:** conjunto documental completo e recomendação de defesa já
+  processada, pronto para explorar evidências e registrar o desfecho.
+- **Caso 2:** conjunto parcial de subsídios, pronto para executar a jornada de
+  análise e revelar a recomendação de acordo produzida pela engine.
 
-Acesse [github.com/talismanai/hackathon-ufmg-2026](https://github.com/talismanai/hackathon-ufmg-2026) e clique em **"Use this template" → "Create a new repository"**.
+As saídas jurídicas exibidas nesses casos foram geradas pela engine e
+persistidas como artefatos de demonstração. A reprodução controlada do progresso
+mantém a demo previsível sem alterar fatos, evidências, valores ou recomendação.
 
-- **Nome do repositório:** `hackathon-ufmg-2026-grupo<N>` — substitua `<N>` pelo número do seu grupo  
-  _Exemplo: `hackathon-ufmg-2026-grupo7`_
-- **Visibilidade:** `Public`
+## Arquitetura
 
-### 2. Clone e desenvolva
-
-```bash
-# Clone o repositório da sua equipe
-git clone https://github.com/<seu-usuario>/hackathon-ufmg-2026-grupo<N>.git
-cd hackathon-ufmg-2026-grupo<N>
-
-# Configure o ambiente seguindo o SETUP.md
+```text
+React + Vite (web)
+        |
+        | HTTP / JSON
+        v
+FastAPI (API e workflow)
+        |
+        +----> SQLite (casos, decisões, conversas e resultados)
+        +----> arquivos locais (PDFs e uploads)
+        +----> engine Python
+                   |
+                   +----> extração PDF / OCR seletivo
+                   +----> modelo de risco XGBoost
+                   +----> scoring e motor financeiro
+                   +----> OpenAI para extração e síntese estruturada
 ```
 
-### 3. Submeta
+### Tecnologias
 
-Envie a URL do seu repositório público para o formulário de entrega presente no site [hackathon.getenter.ai](https://hackathon.getenter.ai) até **18/04 às 04:00**.
+- React 19, TypeScript, Vite, TanStack Query, Recharts e React PDF;
+- FastAPI, SQLModel, SQLite e Pydantic;
+- XGBoost, scikit-learn, pdfplumber, Tesseract e OpenAI Responses API;
+- Docker Compose para execução local;
+- Vercel no frontend e Railway no backend da demonstração publicada.
 
+## Estrutura do repositório
 
-
-A URL deve seguir o formato:
+```text
+.
+├── data/                         # PDFs dos dois casos de demonstração
+├── src/
+│   ├── api/                      # API, persistência, workflow e chatbot
+│   ├── contracts/                # contratos compartilhados entre API e engine
+│   ├── pipeline/                 # ingestão, risco, finanças e decisão
+│   └── web/                      # interface React para advogado e banco
+├── .env.example                  # configuração de ambiente do backend/engine
+├── docker-compose.yml            # execução local da API
+├── pyproject.toml                # pacote e dependências Python
+├── README.md                     # apresentação do projeto
+└── SETUP.md                      # instruções de execução local
 ```
-https://github.com/<usuario-ou-org>/hackathon-ufmg-2026-grupo<N>
-```
+
+## Limitações e premissas
+
+- A disponibilidade de um documento não comprova sua autenticidade.
+- A base não fornece curva de aceite, contraproposta, duração do processo,
+  honorários separados ou custo real de negociação.
+- Custos e alçadas ausentes na base são premissas configuradas e aparecem como
+  tais na interface.
+- O frontend atual usa dados explicitamente marcados como simulados na tela de
+  histórico e nos dashboards visuais; a API já calcula agregados dos eventos
+  operacionais persistidos.
+- O MVP usa SQLite, um worker e tarefas em processo; não implementa fila durável,
+  autenticação ou isolamento entre organizações.
+- O chatbot e análises de novos casos fora da reprodução da demo exigem uma
+  chave válida da OpenAI.
+
+## Próximos passos
+
+- substituir os conjuntos simulados dos dashboards pelos agregados da API;
+- validar custos, alçadas e curva de aceite com dados reais do banco;
+- avaliar o modelo continuamente por coorte, UF e qualidade documental;
+- adicionar autenticação, autorização, trilha de auditoria expandida e fila
+  durável para processamento;
+- executar piloto controlado e medir economia, aderência e erro de previsão.
+
+## Execução local
+
+O caminho completo, incluindo requisitos, configuração, inicialização e reset
+da demonstração, está em [SETUP.md](SETUP.md).
