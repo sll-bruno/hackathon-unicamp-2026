@@ -1,0 +1,84 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-8);
+  font-size: var(--text-14);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--ls-label);
+  white-space: nowrap;
+}
+
+.accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.neutral {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+.muted {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--stroke-secondary);
+  color: var(--text-muted);
+}
+
+.negative {
+  background: var(--status-negative-bg);
+  color: var(--status-negative);
+}
+
+.positive {
+  background: var(--status-positive-bg);
+  color: var(--status-positive);
+}
+
+.pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.recommendation {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.actionAcordo,
+.actionDefesa {
+  font-size: var(--text-14);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+}
+
+.actionAcordo {
+  color: var(--accent);
+}
+
+.actionDefesa {
+  color: var(--text-primary);
+}
+
+.confidence {
+  color: var(--text-secondary);
+  font-size: var(--text-16);
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  color: var(--text-muted);
+}

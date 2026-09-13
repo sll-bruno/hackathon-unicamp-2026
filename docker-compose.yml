@@ -1,0 +1,31 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: src/api/Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////app/db/app.db}
+      STORAGE_DIR: ${STORAGE_DIR:-/app/storage}
+      DATA_DIR: ${DATA_DIR:-/app/data}
+      DEMO_SEED: ${DEMO_SEED:-true}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-20971520}
+    ports:
+      - "8000:8000"
+    volumes:
+      - app_db:/app/db
+      - app_storage:/app/storage
+      - ./data:/app/data:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health').read()"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+
+volumes:
+  app_db:
+  app_storage:

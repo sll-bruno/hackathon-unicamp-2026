@@ -1,9 +1,20 @@
-"""Contrato inicial compartilhado. Alinhar mudanças entre as três frentes."""
-from typing import Literal
-from pydantic import BaseModel, Field
+"""Contrato mínimo compartilhado entre a API e a engine de decisão.
+
+Os blocos aceitam campos adicionais para que a engine possa evoluir sem obrigar
+o backend a conhecer suas regras internas. A API persiste o payload validado por
+inteiro e projeta apenas os campos definidos aqui.
+"""
+
+from typing import Any, Literal
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
-class SubsidyFlags(BaseModel):
+class ContractModel(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+
+class SubsidyFlags(ContractModel):
     contrato: bool
     extrato: bool
     comprovante_credito: bool
@@ -12,37 +23,66 @@ class SubsidyFlags(BaseModel):
     laudo_referenciado: bool
 
 
-class CaseInput(BaseModel):
+class PipelineDocument(ContractModel):
+    id: str
+    type: str
+    path: str
+
+
+class CaseInput(ContractModel):
     case_id: str
+    cnj: str
     uf: str
-    thesis: str
-    claim_value: float = Field(ge=0)
+    assunto: str
+    subassunto: str
+    valor_causa: float = Field(ge=0)
     subsidy_flags: SubsidyFlags
-    document_paths: list[str] = Field(default_factory=list)
+    documents: list[PipelineDocument] = Field(default_factory=list)
 
 
-class Source(BaseModel):
-    document: str
-    page: int = Field(ge=1)
+class EvidenceSource(ContractModel):
+    document_id: str
+    page: int | None = Field(default=None, ge=1)
     excerpt: str
 
 
-class Fact(BaseModel):
+class Evidence(ContractModel):
     id: str
-    fact_type: str
-    description: str
+    text: str
+    type: str
     weight: float | None = None
-    weights_version: str
-    sources: list[Source] = Field(default_factory=list)
+    sources: list[EvidenceSource] = Field(default_factory=list)
 
 
-class PipelineOutput(BaseModel):
+class Recommendation(ContractModel):
     action: Literal["ACORDO", "DEFESA"]
-    confidence_percent: float | None = Field(ge=0, le=100)
-    confidence_method_version: str | None = None
+    confidence_percent: float | None = Field(default=None, ge=0, le=100)
+    summary: str
+    reason_codes: list[str] = Field(default_factory=list)
+
+
+class FinancialProjection(ContractModel):
+    suggested_offer: float | None = Field(default=None, ge=0)
     expected_defense_cost: float = Field(ge=0)
-    suggested_offer: float = Field(ge=0)
-    reason: str
-    facts: list[Fact] = Field(default_factory=list)
-    assumptions: list[str] = Field(default_factory=list)
-    versions: dict[str, str] = Field(default_factory=dict)
+    expected_savings: float = Field(ge=0)
+
+
+class PipelineOutput(ContractModel):
+    versions: dict[str, str]
+    recommendation: Recommendation
+    financial: FinancialProjection
+    evidences: list[Evidence] = Field(default_factory=list)
+
+    @field_validator("versions")
+    @classmethod
+    def versions_must_not_be_empty(cls, value: dict[str, str]) -> dict[str, str]:
+        if not value or any(
+            not key.strip() or not version.strip() for key, version in value.items()
+        ):
+            raise ValueError("versions must contain non-empty names and values")
+        return value
+
+    def complete_payload(self) -> dict[str, Any]:
+        """Return the complete output, including extra fields supplied by the engine."""
+
+        return self.model_dump(mode="json")
