@@ -1,9 +1,12 @@
 /* Tela 3 · Área de trabalho. Usa só tokens de styles/tokens.css (tema escuro). */
 
 :root {
-  /* Altura fixa da barra do app, usada pelo painel do chatbot para encaixar
-     exatamente abaixo dela (ver components/chat-panel.css). */
-  --app-bar-h: 57px;
+  /* Altura da topbar do shell compartilhado (components/AppLayout), usada para
+     encaixar o scroll com split (.ws--split) e o painel do chatbot exatamente
+     abaixo dela (ver components/chat-panel.css). Precisa bater com .topbar em
+     AppLayout.module.css — se divergir, sobra espaço de rolagem na página
+     inteira e o scroll do mouse passa a afetar o container errado. */
+  --app-bar-h: 5rem;
 }
 
 /* ── Barra do app (provisória até o shell compartilhado) ── */
@@ -164,10 +167,27 @@
    esquerda, o painel de chat ocupa a direita (ver components/ChatPanel.tsx).
    Cada metade rola por conta própria (altura própria + overflow), então o
    scroll do mouse só afeta o lado em que o cursor está, e a barra de rolagem
-   da esquerda fica colada na divisa com o chat — não lá no canto da tela. */
+   da esquerda fica colada na divisa com o chat — não lá no canto da tela.
+
+   Isso só funciona se a PÁGINA em si não tiver scroll próprio: senão sobra
+   uma barra de rolagem do documento (a da borda direita da janela) que rola
+   os dois lados juntos, por cima do scroll independente de cada metade. Por
+   isso .ws-shell--split "sangra" para fora do padding de .content
+   (AppLayout) e ocupa exatamente 100vh − topbar — nenhum pixel de altura
+   extra sobra para o documento rolar. */
 .ws-shell {
   display: flex;
   align-items: flex-start;
+}
+.ws-shell--split {
+  overflow: hidden;
+  margin: calc(var(--space-12) * -1) calc(var(--space-8) * -1);
+  height: calc(100vh - var(--app-bar-h));
+}
+@media (max-width: 720px) {
+  .ws-shell--split {
+    margin: calc(var(--space-8) * -1) calc(var(--space-4) * -1);
+  }
 }
 .ws--split {
   flex: 1 1 0%;

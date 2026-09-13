@@ -1,5 +1,6 @@
-import type { CaseStatus, RecommendedAction, Thesis } from './case';
+import type { CaseOutcome, CaseStatus, RecommendedAction, Thesis } from './case';
 import type { DocumentType, SubsidyType } from './workspace';
+import type { ConfidenceBand, DivergenceReason } from './adherence';
 
 export const STATUS_LABEL: Record<CaseStatus, string> = {
   RASCUNHO: 'Rascunho',
@@ -23,6 +24,14 @@ export const ACTION_LABEL: Record<RecommendedAction, string> = {
   DEFESA: 'Defesa',
 };
 
+export const OUTCOME_LABEL: Record<CaseOutcome, string> = {
+  ACORDO: 'Acordo',
+  EXTINCAO: 'Extinção',
+  IMPROCEDENCIA: 'Improcedência',
+  PARCIAL: 'Parcial',
+  PROCEDENCIA: 'Procedência',
+};
+
 export const SUBSIDY_LABEL: Record<SubsidyType, string> = {
   contrato: 'Contrato',
   extrato: 'Extrato bancário',
@@ -42,3 +51,17 @@ export const UF_LIST = [
   'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG',
   'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
 ] as const;
+
+export const DIVERGENCE_REASON_LABEL: Record<DivergenceReason, string> = {
+  DOCUMENTO_INVALIDO: 'Documento inválido',
+  FATO_NOVO: 'Fato novo',
+  ERRO_EXTRACAO: 'Erro de extração',
+  VALOR_IRREAL: 'Valor irreal',
+  OUTRO: 'Outro',
+};
+
+export const CONFIDENCE_BAND_LABEL: Record<ConfidenceBand, string> = {
+  alta: 'Confiança alta',
+  media: 'Confiança média',
+  baixa: 'Confiança baixa',
+};

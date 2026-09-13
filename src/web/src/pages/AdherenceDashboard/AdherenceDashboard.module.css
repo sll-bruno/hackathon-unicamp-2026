@@ -1,0 +1,15 @@
+.page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.message {
+  color: var(--text-secondary);
+  font-size: var(--text-14);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}

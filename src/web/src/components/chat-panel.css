@@ -6,8 +6,9 @@
 .chat-panel {
   position: sticky;
   top: var(--app-bar-h);
-  flex: 0 0 480px;
-  width: 480px;
+  flex: 0 0 50%;
+  width: 50%;
+  min-width: 360px;
   height: calc(100vh - var(--app-bar-h));
   display: flex;
   flex-direction: column;

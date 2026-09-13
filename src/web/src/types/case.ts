@@ -55,6 +55,10 @@ export interface CaseListItem {
   // casos uma vez que o caso chega em AGUARDANDO_ENCERRAMENTO/ENCERRADO).
   followed_recommendation: boolean | null;
   outcome: CaseOutcome | null; // só preenchido quando status === 'ENCERRADO'
+  // Valor efetivamente desembolsado (acordo pago ou condenação), de case_outcomes.final_value.
+  // Só preenchido quando status === 'ENCERRADO'. Usado para medir a economia real
+  // (claim_value - final_value) nos casos em que o advogado acatou a recomendação.
+  final_value: number | null;
 }
 
 // Dados básicos do processo extraídos por OCR a partir do auto (docs/architecture_engine.md).
