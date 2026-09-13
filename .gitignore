@@ -51,3 +51,6 @@ Thumbs.db
 
 # Superpowers planning docs (local process artifacts, not project deliverables)
 docs/superpowers/
+
+# Config local do Claude Code 
+.claude/
