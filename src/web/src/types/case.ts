@@ -42,7 +42,6 @@ export interface CaseListItem {
   claim_value: number;
   status: CaseStatus;
   office: string; // escritório responsável; não exibido nesta lista (um advogado só vê os próprios casos)
-  deadline_at: string | null; // ISO date
   updated_at: string; // ISO datetime
   recommendation: RecommendationSummary | null;
   alert: CaseAlert | null;
@@ -54,5 +53,4 @@ export interface CasesSummary {
   pending_outcome: number; // decisão tomada, falta registrar o desfecho
   document_errors: number; // documento com erro de leitura, precisa reenvio
   in_analysis: number;
-  deadline_soon: number; // prazo em até 5 dias
 }

@@ -1,6 +1,5 @@
-import { classifyPendency, type PendencyKind } from '../../lib/pendencies';
 import { toDisplayStatus, type DisplayStatus } from '../../lib/status';
-import type { CaseListItem, CaseStatus, RecommendationSummary } from '../../types/case';
+import type { CaseStatus, RecommendationSummary } from '../../types/case';
 import { ACTION_LABEL, STATUS_LABEL } from '../../types/labels';
 import styles from './Badges.module.css';
 
@@ -15,13 +14,6 @@ const STATUS_TONE: Record<DisplayStatus, Tone> = {
   ENCERRADO: 'muted',
 };
 
-const PENDENCY_TONE: Record<PendencyKind, Tone> = {
-  ALERTA: 'negative',
-  PRAZO: 'accent',
-  DECISAO: 'accent',
-  DESFECHO: 'neutral',
-};
-
 export function StatusBadge({ status }: { status: CaseStatus }) {
   const display = toDisplayStatus(status);
   return (
@@ -30,12 +22,6 @@ export function StatusBadge({ status }: { status: CaseStatus }) {
       {STATUS_LABEL[display]}
     </span>
   );
-}
-
-export function UrgencyBadge({ item }: { item: CaseListItem }) {
-  const pendency = classifyPendency(item);
-  if (!pendency) return <span className={styles.empty}>Em dia</span>;
-  return <span className={`${styles.badge} ${styles[PENDENCY_TONE[pendency.kind]]}`}>{pendency.label}</span>;
 }
 
 export function RecommendationTag({ recommendation }: { recommendation: RecommendationSummary | null }) {

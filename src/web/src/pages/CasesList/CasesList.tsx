@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isDeadlineSoon, useCases, useCasesSummary } from '../../api/cases';
-import { RecommendationTag, StatusBadge, UrgencyBadge } from '../../components/Badges/Badges';
+import { useCases, useCasesSummary } from '../../api/cases';
+import { RecommendationTag, StatusBadge } from '../../components/Badges/Badges';
 import { ButtonLink } from '../../components/Button/Button';
-import { Deadline } from '../../components/Deadline/Deadline';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { formatBRL } from '../../lib/format';
 import { pendencyRank } from '../../lib/pendencies';
@@ -24,14 +23,8 @@ const FILTERABLE_STATUS: Exclude<DisplayStatus, 'ENCERRADO'>[] = [
 
 const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
-const byUrgency = (a: CaseListItem, b: CaseListItem) => {
-  const rank = pendencyRank(a) - pendencyRank(b);
-  if (rank !== 0) return rank;
-  if (a.deadline_at === b.deadline_at) return 0;
-  if (a.deadline_at === null) return 1;
-  if (b.deadline_at === null) return -1;
-  return a.deadline_at.localeCompare(b.deadline_at);
-};
+// O que precisa de ação do advogado sobe para o topo da fila.
+const byUrgency = (a: CaseListItem, b: CaseListItem) => pendencyRank(a) - pendencyRank(b);
 
 function CaseRow({ item }: { item: CaseListItem }) {
   const navigate = useNavigate();
@@ -39,23 +32,24 @@ function CaseRow({ item }: { item: CaseListItem }) {
   return (
     <tr className={styles.row} tabIndex={0} onClick={go} onKeyDown={(e) => e.key === 'Enter' && go()}>
       <td>
-        <span className={styles.plaintiff}>{item.plaintiff_name}</span>
+        <span className={styles.plaintiff}>
+          {item.plaintiff_name}
+          {item.alert && (
+            <span className={styles.alertMark} title={item.alert.message} aria-label="Documento com erro de leitura">
+              !
+            </span>
+          )}
+        </span>
         <span className={styles.cnj}>{item.cnj}</span>
       </td>
       <td>{item.uf}</td>
       <td>{THESIS_LABEL[item.thesis]}</td>
       <td className={styles.num}>{formatBRL(item.claim_value)}</td>
       <td>
-        <UrgencyBadge item={item} />
-      </td>
-      <td>
         <StatusBadge status={item.status} />
       </td>
       <td>
         <RecommendationTag recommendation={item.recommendation} />
-      </td>
-      <td>
-        <Deadline item={item} />
       </td>
     </tr>
   );
@@ -68,35 +62,25 @@ export default function CasesList() {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState<DisplayStatus | 'TODOS'>('TODOS');
   const [rec, setRec] = useState<RecFilter>('TODAS');
-  const [onlySoon, setOnlySoon] = useState(false);
   const [onlyAlert, setOnlyAlert] = useState(false);
 
-  // Estado dos cards de pendência, que também funcionam como atalho de filtro.
-  const isDecisao = status === 'AGUARDANDO_DECISAO' && !onlySoon && !onlyAlert;
-  const isEncerramento = status === 'AGUARDANDO_ENCERRAMENTO' && !onlySoon && !onlyAlert;
+  // Estado dos chips de pendência, que também funcionam como atalho de filtro.
+  const isDecisao = status === 'AGUARDANDO_DECISAO' && !onlyAlert;
+  const isEncerramento = status === 'AGUARDANDO_ENCERRAMENTO' && !onlyAlert;
 
   const resetFiltros = () => {
     setStatus('TODOS');
-    setOnlySoon(false);
     setOnlyAlert(false);
   };
   const toggleQuickStatus = (target: DisplayStatus, active: boolean) => {
     if (active) return resetFiltros();
     setStatus(target);
-    setOnlySoon(false);
-    setOnlyAlert(false);
-  };
-  const toggleSoon = () => {
-    if (onlySoon) return resetFiltros();
-    setOnlySoon(true);
-    setStatus('TODOS');
     setOnlyAlert(false);
   };
   const toggleAlert = () => {
     if (onlyAlert) return resetFiltros();
     setOnlyAlert(true);
     setStatus('TODOS');
-    setOnlySoon(false);
   };
 
   const rows = useMemo(() => {
@@ -115,10 +99,9 @@ export default function CasesList() {
         if (rec === 'SEM') return c.recommendation === null;
         return c.recommendation?.action === rec;
       })
-      .filter((c) => !onlySoon || isDeadlineSoon(c))
       .filter((c) => !onlyAlert || c.alert !== null)
       .sort(byUrgency);
-  }, [cases.data, query, status, rec, onlySoon, onlyAlert]);
+  }, [cases.data, query, status, rec, onlyAlert]);
 
   const s = summary.data;
 
@@ -152,9 +135,6 @@ export default function CasesList() {
             onClick={() => toggleQuickStatus('AGUARDANDO_ENCERRAMENTO', isEncerramento)}
           >
             Falta desfecho · {s?.pending_outcome ?? '–'}
-          </button>
-          <button type="button" className={`${styles.chip} ${onlySoon ? styles.chipActive : ''}`} onClick={toggleSoon}>
-            Prazo curto · {s?.deadline_soon ?? '–'}
           </button>
         </div>
         <input
@@ -198,10 +178,8 @@ export default function CasesList() {
                 <th>UF</th>
                 <th>Tese</th>
                 <th className={styles.num}>Valor da causa</th>
-                <th>Urgência</th>
                 <th>Status</th>
                 <th>Recomendação</th>
-                <th>Prazo</th>
               </tr>
             </thead>
             <tbody>

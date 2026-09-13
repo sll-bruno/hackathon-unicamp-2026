@@ -123,6 +123,22 @@
   white-space: nowrap;
 }
 
+.alertMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  margin-left: var(--space-2);
+  border-radius: 50%;
+  background: var(--status-negative-bg);
+  color: var(--status-negative);
+  font-size: var(--text-12);
+  font-style: normal;
+  font-weight: var(--weight-medium);
+  vertical-align: middle;
+}
+
 .cnj {
   display: block;
   margin-top: 0.125rem;
