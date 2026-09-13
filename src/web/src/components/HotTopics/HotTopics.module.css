@@ -20,23 +20,33 @@
   text-align: left;
 }
 
-.dot {
-  width: 8px;
-  height: 8px;
+.icon {
+  display: inline-flex;
   flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
   border-radius: 50%;
+  font-size: var(--text-12);
+  font-style: normal;
+  font-weight: var(--weight-medium);
+  line-height: 1;
 }
 
-.dot.negative {
-  background: var(--status-negative);
+.icon.negative {
+  background: var(--status-negative-bg);
+  color: var(--status-negative);
 }
 
-.dot.accent {
-  background: var(--accent);
+.icon.accent {
+  background: var(--surface-raised);
+  color: var(--accent);
 }
 
-.dot.muted {
-  background: var(--text-muted);
+.icon.muted {
+  background: var(--surface-raised);
+  color: var(--text-muted);
 }
 
 .label {

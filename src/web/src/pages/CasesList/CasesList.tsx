@@ -18,7 +18,6 @@ type RecFilter = 'TODAS' | 'ACORDO' | 'DEFESA' | 'SEM';
 // Status que fazem sentido filtrar aqui — Encerrado já tem tela própria (Histórico).
 const FILTERABLE_STATUS: Exclude<DisplayStatus, 'ENCERRADO'>[] = [
   'RASCUNHO',
-  'DOCUMENTOS_ENVIADOS',
   'EM_ANALISE',
   'AGUARDANDO_DECISAO',
   'AGUARDANDO_ENCERRAMENTO',
@@ -118,12 +117,21 @@ export default function CasesList() {
   const s = summary.data;
 
   const hotTopics: HotTopicItem[] = [
-    { key: 'alert', label: 'Erro de leitura', value: s?.document_errors, tone: 'negative', active: onlyAlert, onClick: toggleAlert },
+    {
+      key: 'alert',
+      label: 'Erro de leitura',
+      value: s?.document_errors,
+      tone: 'negative',
+      icon: '!',
+      active: onlyAlert,
+      onClick: toggleAlert,
+    },
     {
       key: 'decisao',
       label: 'Revisar recomendação',
       value: s?.awaiting_decision,
       tone: 'accent',
+      icon: '?',
       active: isDecisao,
       onClick: () => toggleQuickStatus('AGUARDANDO_DECISAO', isDecisao),
     },
@@ -132,6 +140,7 @@ export default function CasesList() {
       label: 'Falta desfecho',
       value: s?.pending_outcome,
       tone: 'muted',
+      icon: '⚑',
       active: isEncerramento,
       onClick: () => toggleQuickStatus('AGUARDANDO_ENCERRAMENTO', isEncerramento),
     },

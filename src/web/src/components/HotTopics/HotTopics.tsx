@@ -5,6 +5,7 @@ export interface HotTopicItem {
   label: string;
   value: number | undefined;
   tone: 'negative' | 'accent' | 'muted';
+  icon: string;
   active: boolean;
   onClick: () => void;
 }
@@ -20,7 +21,9 @@ export function HotTopics({ items }: { items: HotTopicItem[] }) {
             onClick={item.onClick}
             aria-pressed={item.active}
           >
-            <span className={`${styles.dot} ${styles[item.tone]}`} aria-hidden />
+            <span className={`${styles.icon} ${styles[item.tone]}`} aria-hidden>
+              {item.icon}
+            </span>
             <span className={styles.label}>{item.label}</span>
             <span className={styles.value}>{item.value ?? '–'}</span>
           </button>
