@@ -57,11 +57,12 @@ Thumbs.db
 
 # Materiais locais fora da entrega pública
 /docs/
+/notebooks/
+/scripts/
 /tests/
 /data/README.md
 /src/**/README.md
 /src/**/*.test.ts
-/scripts/generate_demo_engine_outputs.py
 /requirements.txt
 
 # Beads / Dolt
