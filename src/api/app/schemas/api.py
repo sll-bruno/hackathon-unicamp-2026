@@ -54,6 +54,32 @@ class DocumentPatch(APIModel):
     type: DocumentType
 
 
+class IntakeConfirm(APIModel):
+    """Human corrections applied on top of the extracted intake fields."""
+
+    cnj: str | None = Field(default=None, max_length=40)
+    uf: str | None = Field(default=None, max_length=2)
+    assunto: str | None = Field(default=None, max_length=250)
+    subassunto: str | None = Field(default=None, max_length=250)
+    valor_causa: float | None = Field(default=None, ge=0)
+
+    @field_validator("cnj", "assunto", "subassunto")
+    @classmethod
+    def strip_optional_text(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        stripped = value.strip()
+        return stripped or None
+
+    @field_validator("uf")
+    @classmethod
+    def normalize_optional_confirm_uf(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        normalized = value.strip().upper()
+        return normalized or None
+
+
 class DecisionCreate(APIModel):
     action: Action
     divergence_reason: DivergenceReason | None = None

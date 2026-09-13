@@ -1,0 +1,185 @@
+/* Painel do chatbot, aberto ao lado da área de trabalho. Usa os tokens de
+   styles/tokens.css e reaproveita .eyebrow/.button/.sample-banner de
+   pages/Workspace/workspace.css (sempre carregado junto, pois este painel só
+   é renderizado a partir da área de trabalho). */
+
+.chat-panel {
+  position: sticky;
+  top: var(--app-bar-h);
+  flex: 0 0 480px;
+  width: 480px;
+  height: calc(100vh - var(--app-bar-h));
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--stroke-primary);
+  background: var(--surface-page);
+}
+
+.chat-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex: none;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-6) var(--space-4);
+  border-bottom: 1px solid var(--stroke-secondary);
+}
+.chat-panel__title {
+  margin-top: var(--space-1);
+  font-size: var(--text-24);
+}
+.chat-panel__close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--stroke-primary);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.chat-panel__close:hover {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+.chat-panel__close svg {
+  width: 14px;
+  height: 14px;
+}
+
+.chat-panel .sample-banner--compact {
+  flex: none;
+  padding: var(--space-3) var(--space-6) 0;
+}
+
+/* Só esta área rola; o cabeçalho e a barra de digitação ficam fixos. A barra
+   de rolagem é mais fina que a da área de trabalho, para não haver dúvida de
+   qual barra pertence a qual lado. */
+.chat-panel__thread {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  scrollbar-width: thin;
+  scrollbar-color: var(--stroke-secondary) transparent;
+}
+.chat-panel__thread::-webkit-scrollbar {
+  width: 4px;
+}
+.chat-panel__thread::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chat-panel__thread::-webkit-scrollbar-thumb {
+  background: var(--stroke-secondary);
+  border-radius: 999px;
+}
+.chat-panel__thread::-webkit-scrollbar-thumb:hover {
+  background: var(--stroke-primary);
+}
+
+.chat-bubble {
+  max-width: 92%;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--stroke-secondary);
+  border-radius: var(--radius-12);
+  background: var(--surface-primary);
+}
+.chat-bubble--user {
+  align-self: flex-end;
+  border-color: var(--stroke-primary);
+  background: var(--surface-raised);
+}
+.chat-bubble--assistant {
+  align-self: flex-start;
+  border-top: 2px solid var(--accent);
+}
+.chat-bubble__text {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-14);
+}
+
+.chat-citations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--stroke-secondary);
+}
+.chat-citation-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+.chat-citation {
+  align-self: flex-start;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--stroke-primary);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-12);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.chat-citation:hover {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+.chat-citation[aria-pressed='true'] {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+.chat-citation__quote {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-left: 2px solid var(--accent);
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-14);
+  font-weight: var(--weight-light);
+}
+
+.chat-panel__composer {
+  flex: none;
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6);
+  border-top: 1px solid var(--stroke-secondary);
+  background: var(--surface-raised);
+}
+.chat-panel__composer input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--stroke-primary);
+  border-radius: var(--radius-8);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--text-14);
+  outline: none;
+}
+.chat-panel__composer input::placeholder {
+  color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+  .chat-panel {
+    position: fixed;
+    inset: var(--app-bar-h) 0 0 0;
+    z-index: 15;
+    flex-basis: auto;
+    width: auto;
+    height: auto;
+    box-shadow: -24px 0 48px -24px rgba(0, 0, 0, 0.6);
+  }
+}

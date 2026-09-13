@@ -23,6 +23,9 @@ build/
 .next/
 .nuxt/
 
+# Vercel CLI
+.vercel/
+
 # Outputs e artefatos
 *.log
 *.tmp
@@ -48,18 +51,23 @@ Thumbs.db
 # Jupyter
 .ipynb_checkpoints/
 
-# Beads / Dolt files
+# Brainstorming visual companion
+.superpowers/
+
+# Superpowers planning docs (local process artifacts, not project deliverables)
+docs/superpowers/
+
+# Beads / Dolt
 .beads/
+.beads/proxieddb/
+.beads-credential-key
 .dolt/
 *.db
-.beads-credential-key
-.beads/proxieddb/
 
+# Config local de agentes
 .claude/
 .codex/
-.vercel/
 .agents/
-
 AGENTS.md
 CLAUDE.md
 

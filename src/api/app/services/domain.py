@@ -10,6 +10,7 @@ from app.core.errors import APIError
 from app.models import (
     AnalysisJob,
     Case,
+    CaseIntake,
     CaseOutcome,
     CaseStatus,
     CaseStatusHistory,
@@ -217,3 +218,39 @@ def get_chat_messages(session: Session, case_id: str, limit: int = 100) -> list[
         .limit(limit)
     ).all()
     return list(reversed(rows))
+
+
+def _serialize_intake_field(value: Any, page: int | None, excerpt: str | None) -> dict[str, Any]:
+    return {"value": value, "page": page, "excerpt": excerpt}
+
+
+def serialize_intake(intake: CaseIntake, extraction_version: str = "autos-v1") -> dict[str, Any]:
+    """Public intake payload: extracted fields with provenance, never internal paths."""
+    return {
+        "id": intake.id,
+        "original_name": intake.original_name,
+        "status": intake.status.value,
+        "stage": intake.stage,
+        "progress_percent": intake.progress_percent,
+        "safe_error": intake.safe_error,
+        "page_count": intake.page_count,
+        "ocr_pages": json_loads(intake.ocr_pages_json, []),
+        "extraction_version": extraction_version,
+        "fields": {
+            "cnj": _serialize_intake_field(intake.cnj, intake.cnj_page, intake.cnj_excerpt),
+            "uf": _serialize_intake_field(intake.uf, intake.uf_page, intake.uf_excerpt),
+            "assunto": _serialize_intake_field(
+                intake.assunto, intake.assunto_page, intake.assunto_excerpt
+            ),
+            "subassunto": _serialize_intake_field(
+                intake.subassunto, intake.subassunto_page, intake.subassunto_excerpt
+            ),
+            "valor_causa": _serialize_intake_field(
+                intake.valor_causa, intake.valor_causa_page, intake.valor_causa_excerpt
+            ),
+        },
+        "created_case_id": intake.created_case_id,
+        "created_at": intake.created_at,
+        "updated_at": intake.updated_at,
+        "file_url": f"/api/intakes/{intake.id}/file",
+    }

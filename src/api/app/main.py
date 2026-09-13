@@ -15,9 +15,11 @@ from app.routers import (
     dashboard_router,
     health_router,
     history_router,
+    intakes_router,
     workflow_router,
 )
 from app.services.analysis import recover_abandoned_jobs
+from app.services.autos import recover_abandoned_intakes
 from app.services.seeds import seed_demo_data
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -30,6 +32,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     create_db_and_tables()
     with Session(get_engine()) as session:
         recover_abandoned_jobs(session)
+        recover_abandoned_intakes(session)
         seed_demo_data(session, settings)
     yield
 
@@ -48,6 +51,7 @@ def create_app() -> FastAPI:
     for router in (
         health_router,
         cases_router,
+        intakes_router,
         workflow_router,
         history_router,
         dashboard_router,

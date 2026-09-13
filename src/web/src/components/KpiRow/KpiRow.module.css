@@ -1,0 +1,31 @@
+.row {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 8.5rem;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--stroke-secondary);
+  border-radius: var(--radius-12);
+  background: var(--surface-primary);
+  text-align: center;
+}
+
+.label {
+  color: var(--text-secondary);
+  font-size: var(--text-12);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+}
+
+.value {
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-24);
+  font-weight: var(--weight-light);
+  font-variant-numeric: tabular-nums;
+}

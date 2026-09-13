@@ -76,6 +76,14 @@ class ChatStatus(StrEnum):
     FAILED = "FAILED"
 
 
+class IntakeStatus(StrEnum):
+    UPLOADED = "UPLOADED"
+    EXTRACTING = "EXTRACTING"
+    NEEDS_REVIEW = "NEEDS_REVIEW"
+    FAILED = "FAILED"
+    CONFIRMED = "CONFIRMED"
+
+
 class Office(SQLModel, table=True):
     __tablename__ = "offices"
 
@@ -235,3 +243,37 @@ class ChatMessage(SQLModel, table=True):
     sources_json: str = "[]"
     status: ChatStatus = ChatStatus.COMPLETED
     created_at: datetime = Field(default_factory=utc_now, index=True)
+
+
+class CaseIntake(SQLModel, table=True):
+    """Upload-first intake: the AUTOS PDF is persisted before any case exists."""
+
+    __tablename__ = "case_intakes"
+
+    id: str = Field(default_factory=new_uuid, primary_key=True)
+    original_name: str
+    stored_path: str
+    status: IntakeStatus = Field(default=IntakeStatus.UPLOADED, index=True)
+    stage: str = "UPLOADED"
+    progress_percent: int = Field(default=0, ge=0, le=100)
+    safe_error: str | None = None
+    page_count: int | None = None
+    ocr_pages_json: str = "[]"
+    cnj: str | None = Field(default=None, index=True)
+    cnj_page: int | None = None
+    cnj_excerpt: str | None = None
+    uf: str | None = None
+    uf_page: int | None = None
+    uf_excerpt: str | None = None
+    assunto: str | None = None
+    assunto_page: int | None = None
+    assunto_excerpt: str | None = None
+    subassunto: str | None = None
+    subassunto_page: int | None = None
+    subassunto_excerpt: str | None = None
+    valor_causa: float | None = Field(default=None, ge=0)
+    valor_causa_page: int | None = None
+    valor_causa_excerpt: str | None = None
+    created_case_id: str | None = Field(default=None, foreign_key="cases.id", index=True)
+    created_at: datetime = Field(default_factory=utc_now, index=True)
+    updated_at: datetime = Field(default_factory=utc_now)
