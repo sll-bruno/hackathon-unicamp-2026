@@ -65,9 +65,7 @@ def case_input_from_folder(folder: str | Path) -> CaseInput:
         if kind:
             documents.append(PipelineDocument(id=pdf.stem, type=kind, path=str(pdf.resolve())))
     digits = re.search(r"(\d{7})-(\d{2})-(\d{4})-(\d)-(\d{2})-(\d{4})", folder.name)
-    cnj = (
-        "{}-{}.{}.{}.{}.{}".format(*digits.groups()) if digits else folder.name
-    )
+    cnj = "{}-{}.{}.{}.{}.{}".format(*digits.groups()) if digits else folder.name
     flags = subsidy_flags([document.type for document in documents])
     return CaseInput(
         case_id=folder.name,

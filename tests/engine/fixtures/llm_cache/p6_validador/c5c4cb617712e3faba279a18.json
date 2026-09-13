@@ -1,0 +1,232 @@
+{
+ "itens": [
+  {
+   "id": "EMB-01-001",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo indica canal digital mobile; corresponde à categoria registros_digitais."
+  },
+  {
+   "id": "EMB-01-002",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo registra device fingerprint do dispositivo."
+  },
+  {
+   "id": "EMB-01-003",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo informa latitude/longitude no ato da contratação."
+  },
+  {
+   "id": "EMB-01-004",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo aponta IP de origem na contratação."
+  },
+  {
+   "id": "EMB-01-005",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo menciona aceite eletrônico via Termo de Ciência."
+  },
+  {
+   "id": "EMB-01-006",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Docs do banco declaram crédito em conta do autor na CEF."
+  },
+  {
+   "id": "EMB-01-007",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Autor nega canais digitais; laudo aponta app. Contradição."
+  },
+  {
+   "id": "EMB-01-008",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Autor nega conta na CEF; documentos indicam crédito na CEF."
+  },
+  {
+   "id": "EMB-01-009",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "BO citado na inicial não consta entre os documentos apresentados."
+  },
+  {
+   "id": "EMB-01-010",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Reclamação BACEN alegada, porém ausente nos autos."
+  },
+  {
+   "id": "EMB-01-011",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Alegação de não possuir conta CEF sem prova documental."
+  },
+  {
+   "id": "EMB-01-012",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Ausência de prova quanto à inexistência de smartphone."
+  },
+  {
+   "id": "EMB-01-013",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Contrato/termo não foi juntado apesar de menção a aceite."
+  },
+  {
+   "id": "EMB-01-014",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Sem extrato/comprovante bancário da conta de destino do crédito."
+  },
+  {
+   "id": "EMB-01-015",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Falta de averbação/autorização do INSS nos autos."
+  },
+  {
+   "id": "EMB-01-016",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Declara acompanhar registros eletrônicos, mas não foram juntados."
+  },
+  {
+   "id": "EMB-01-017",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo informa inexistência de perícia grafotécnica complementar."
+  },
+  {
+   "id": "EMB-01-018",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo cita liveness, porém vídeo não localizado; inconsistência."
+  },
+  {
+   "id": "EMB-02-001",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Demonstrativo registra 8 parcelas PAGA entre 08/2023 e 03/2024."
+  },
+  {
+   "id": "EMB-02-002",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Documento indica parcela mensal de R$ 180,00."
+  },
+  {
+   "id": "EMB-02-003",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Não há extrato do benefício comprovando descontos."
+  },
+  {
+   "id": "EMB-02-004",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Inexistência de prova da falta de conta na CEF."
+  },
+  {
+   "id": "EMB-02-005",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "BO mencionado na inicial não foi juntado."
+  },
+  {
+   "id": "EMB-02-006",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Reclamação ao BACEN foi alegada, mas não anexada."
+  },
+  {
+   "id": "EMB-02-007",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Alegada divergência de conta sem contrato para comprovar."
+  },
+  {
+   "id": "EMB-02-008",
+   "status": "reprovado",
+   "categoria_sugerida": null,
+   "motivo": "Duplicado do crédito em conta já comprovado em EMB-02-009."
+  },
+  {
+   "id": "EMB-02-009",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo confirma TED em conta CEF de titularidade do tomador."
+  },
+  {
+   "id": "EMB-02-010",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Demonstrativo informa valor financiado de R$ 8.500,00."
+  },
+  {
+   "id": "EMB-03-001",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Contrato consignado em benefício INSS; desconto em verba alimentar."
+  },
+  {
+   "id": "EMB-03-002",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Resumo aponta 8 de 84 parcelas pagas; duração relevante."
+  },
+  {
+   "id": "EMB-03-003",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Inicial informa que o autor é idoso e aposentado."
+  },
+  {
+   "id": "EMB-03-004",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Autor alega renda exclusiva do benefício previdenciário."
+  },
+  {
+   "id": "EMB-03-005",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Parcela de R$ 180,00 pode atenuar o dano moral."
+  },
+  {
+   "id": "EMB-03-006",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Abalo descrito genericamente, sem documentos comprobatórios."
+  },
+  {
+   "id": "EMB-03-007",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "BO mencionado não está anexado."
+  },
+  {
+   "id": "EMB-03-008",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Reclamação ao BACEN citada, mas ausente nos autos."
+  },
+  {
+   "id": "EMB-03-009",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Sem protocolos/provas de reclamações prévias e manutenção de descontos."
+  },
+  {
+   "id": "EMB-03-010",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Extrato do benefício não foi juntado."
+  }
+ ]
+}

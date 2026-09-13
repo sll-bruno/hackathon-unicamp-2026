@@ -14,6 +14,8 @@ As outras frentes já avançaram em branches remotas. Este plano:
 
 > **Direção atual (hackathon):** prioridade é o fluxo da engine funcionando de ponta a ponta nos dois casos. Casos de borda, guardrails elaborados, modo map-reduce e a integração com backend e frontend (hoje placeholders) ficam para a fase de produção. PDFs e planilha são considerados corretos.
 
+**Status:** Etapas 0, 1A, 1B, 2A, 2B e 3 implementadas em versão simplificada (`ENGINE_MODE=full`, CLI `python -m decision_engine <pasta>`). Resultado real com `gpt-5`: Caso 01 → DEFESA (confiança 100%); Caso 02 → ACORDO (confiança 70%, faixa R$ 5.304 / 6.228 / 8.275). Pendente: Etapa 4 (calibração dos pesos e prompts — a análise de conteúdo do Caso 02 diverge do XGBoost — e documentação).
+
 ---
 
 ## 1. Estado atual das branches (lido via refs locais `origin/*`)

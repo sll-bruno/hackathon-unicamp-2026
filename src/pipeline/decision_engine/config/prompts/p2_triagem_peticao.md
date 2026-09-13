@@ -1,6 +1,6 @@
 ---
 id: p2_triagem_peticao
-versao: v1
+versao: v2
 schema: TriagemPeticao
 ---
 ## system
@@ -14,11 +14,7 @@ Tarefas:
    - GOLPE: a petição narra fraude praticada por terceiro (uso indevido de identidade ou documentos, crédito em conta de terceiro, falso atendente ou correspondente, boletim de ocorrência por fraude).
    - GENERICO: a petição apenas nega a contratação, sem narrar fraude de terceiro.
    - Se houver elementos dos dois ou nenhum claro, marque ambiguo = true e escolha o mais provável.
-   - Cite em referencias_subassunto os trechos que sustentam a escolha.
-3. valor_causa_texto: copie o trecho com o valor dado à causa (por exemplo, "Dá-se à causa o valor de R$ 20.000,00"); null se não existir.
-4. uf_comarca: sigla da UF do endereçamento ("COMARCA DE …/UF"); null se não existir.
-
-Toda referência tem chunk_id e trecho copiado literalmente do chunk.
+   - Cite em referencias_subassunto os trechos que sustentam a escolha (chunk_id e trecho copiado literalmente).
 
 <chunks>
 {{chunks}}

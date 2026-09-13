@@ -1,0 +1,200 @@
+{
+ "acusacoes": [
+  {
+   "id": "ACU-01",
+   "tipo": "inexistencia_contratacao",
+   "descricao": "Declaração de inexistência do débito e do contrato nº 603827451.",
+   "depende_de": null,
+   "inferida": false,
+   "forma_pedido": "sem_valor_monetario",
+   "valor_texto": null,
+   "referencias": [
+    {
+     "chunk_id": "D01:p4:c1",
+     "trecho": "e ao final, a procedência dos pedidos, para o fim de: (i) declarar a inexistência do débito e do próprio contrato nº 603827451, por ausência de manifestação de vontade do Autor;"
+    },
+    {
+     "chunk_id": "D01:p1:c1",
+     "trecho": "O Autor afirma, com toda a firmeza, que jamais contratou, solicitou, anuiu ou autorizou qualquer operação de crédito com a instituição financeira ora demandada."
+    }
+   ]
+  },
+  {
+   "id": "ACU-02",
+   "tipo": "dano_material",
+   "descricao": "Restituição em dobro dos valores indevidamente descontados do benefício previdenciário.",
+   "depende_de": "ACU-01",
+   "inferida": false,
+   "forma_pedido": "dobro_dos_descontos",
+   "valor_texto": null,
+   "referencias": [
+    {
+     "chunk_id": "D01:p4:c1",
+     "trecho": "(ii) condenar o Banco Réu à restituição em dobro dos valores indevidamente descontados do benefício previdenciário do Autor, corrigidos monetariamente e acrescidos de juros legais, nos termos do artigo 42, parágrafo único, do CDC;"
+    },
+    {
+     "chunk_id": "D01:p1:c1",
+     "trecho": "Em fevereiro de 2024, o Autor, ao conferir o detalhamento de crédito do seu benefício, identificou descontos mensais realizados desde Agosto/2023, no valor de R$ 180,00"
+    }
+   ]
+  },
+  {
+   "id": "ACU-03",
+   "tipo": "dano_moral",
+   "descricao": "Indenização por danos morais.",
+   "depende_de": "ACU-01",
+   "inferida": false,
+   "forma_pedido": "valor_explicito",
+   "valor_texto": "R$ 18.000,00",
+   "referencias": [
+    {
+     "chunk_id": "D01:p4:c1",
+     "trecho": "(iii) condenar o Banco Réu ao pagamento de indenização por danos morais no valor de R$ 18.000,00 (dezoito mil reais), ou em montante a ser arbitrado por este Juízo;"
+    },
+    {
+     "chunk_id": "D01:p2:c1",
+     "trecho": "A instituição ré, apesar das providências adotadas, manteve os descontos em benefício previdenciário do Autor, limitando-se a informar a existência do contrato"
+    }
+   ]
+  }
+ ],
+ "pedidos_processuais": [
+  {
+   "tipo": "gratuidade",
+   "descricao": "Concessão dos benefícios da gratuidade da justiça.",
+   "referencias": [
+    {
+     "chunk_id": "D01:p4:c1",
+     "trecho": "a a concessão dos benefícios da gratuidade da justiça, nos termos dos artigos 98 e seguintes do CPC;"
+    }
+   ]
+  },
+  {
+   "tipo": "inversao_onus",
+   "descricao": "Inversão do ônus da prova em favor do consumidor.",
+   "referencias": [
+    {
+     "chunk_id": "D01:p4:c1",
+     "trecho": "b a inversão do ônus da prova, nos termos do artigo 6º, VIII, do CDC;"
+    },
+    {
+     "chunk_id": "D01:p3:c1",
+     "trecho": "A inversão do ônus probatório encontra respaldo no artigo 6º, VIII, do CDC, sendo medida de rigor"
+    }
+   ]
+  },
+  {
+   "tipo": "tutela_urgencia",
+   "descricao": "Suspensão imediata dos descontos relativos ao contrato nº 603827451.",
+   "referencias": [
+    {
+     "chunk_id": "D01:p3:c1",
+     "trecho": "requer o Autor seja deferida a tutela provisória de urgência para que o Banco Réu suspenda imediatamente os descontos mensais relativos ao contrato nº 603827451"
+    },
+    {
+     "chunk_id": "D01:p4:c1",
+     "trecho": "c a concessão da tutela provisória de urgência, para suspensão imediata dos descontos em benefício previdenciário relativos ao contrato nº 603827451;"
+    }
+   ]
+  },
+  {
+   "tipo": "citacao",
+   "descricao": "Citação do Banco Réu para apresentar contestação, sob pena de revelia e confissão.",
+   "referencias": [
+    {
+     "chunk_id": "D01:p4:c1",
+     "trecho": "d a citação do Banco Réu, no endereço declinado, para, querendo, contestar a presente ação, sob pena de revelia e confissão;"
+    }
+   ]
+  },
+  {
+   "tipo": "custas_honorarios",
+   "descricao": "Condenação ao pagamento das custas processuais e honorários sucumbenciais.",
+   "referencias": [
+    {
+     "chunk_id": "D01:p4:c1",
+     "trecho": "f a condenação do Banco Réu ao pagamento das custas processuais e honorários advocatícios sucumbenciais no percentual máximo legalmente previsto;"
+    }
+   ]
+  },
+  {
+   "tipo": "producao_provas",
+   "descricao": "Provar o alegado por todos os meios admitidos, inclusive juntada de documentos, oitiva da parte autora e requisições a BACEN, INSS e instituição financeira.",
+   "referencias": [
+    {
+     "chunk_id": "D01:p4:c1",
+     "trecho": "g provar o alegado por todos os meios em direito admitidos, notadamente pela juntada de documentos, oitiva da parte autora, requisição, caso necessário, de informações ao Banco Central, ao INSS e à instituição financeira"
+    }
+   ]
+  }
+ ],
+ "cronologia": [
+  {
+   "evento": "contratacao",
+   "data": "2023-07-18",
+   "referencias": [
+    {
+     "chunk_id": "D01:p1:c1",
+     "trecho": "formalizado em 18/07/2023, junto ao BANCO UFMG S.A.."
+    }
+   ]
+  },
+  {
+   "evento": "primeiro_desconto",
+   "data": "2023-08",
+   "referencias": [
+    {
+     "chunk_id": "D01:p1:c1",
+     "trecho": "identificou descontos mensais realizados desde Agosto/2023, no valor de R$ 180,00"
+    }
+   ]
+  },
+  {
+   "evento": "ciencia_autor",
+   "data": "2024-02",
+   "referencias": [
+    {
+     "chunk_id": "D01:p1:c1",
+     "trecho": "Em fevereiro de 2024, o Autor, ao conferir o detalhamento de crédito do seu benefício, identificou descontos mensais"
+    }
+   ]
+  },
+  {
+   "evento": "ajuizamento",
+   "data": "2024-03-19",
+   "referencias": [
+    {
+     "chunk_id": "D01:p4:c1",
+     "trecho": "Manaus/AM, 19/03/2024."
+    }
+   ]
+  }
+ ],
+ "anexos_citados": [
+  {
+   "descricao": "Procuração",
+   "chunk_id": "D01:p1:c1",
+   "trecho": "por intermédio de sua advogada que esta subscreve (procuração anexa), com fulcro nos artigos 319 e seguintes"
+  },
+  {
+   "descricao": "Boletim de Ocorrência nº 2024.005432",
+   "chunk_id": "D01:p2:c1",
+   "trecho": "registro de ocorrência junto à Delegacia ... (Boletim de Ocorrência nº 2024.005432 - cópia em anexo)"
+  },
+  {
+   "descricao": "Reclamação administrativa no Banco Central (RDR nº 12345678-9)",
+   "chunk_id": "D01:p4:c1",
+   "trecho": "A probabilidade do direito decorre dos documentos acostados à presente inicial, em especial do boletim de ocorrência, da reclamação administrativa no Banco Central"
+  },
+  {
+   "descricao": "Documento de identidade (cópia digitalizada)",
+   "chunk_id": "D01:p7:c1",
+   "trecho": "DOCUMENTO DE IDENTIDADE (CÓPIA DIGITALIZADA)\nAnexo à petição inicial – juntada pela parte autora"
+  },
+  {
+   "descricao": "Comprovante de residência (cópia digitalizada)",
+   "chunk_id": "D01:p8:c1",
+   "trecho": "COMPROVANTE DE RESIDÊNCIA (CÓPIA DIGITALIZADA)\nAnexo à petição inicial – juntada pela parte autora"
+  }
+ ]
+}

@@ -1,0 +1,193 @@
+{
+ "acusacao_id": "ACU-02",
+ "embasamentos": {
+  "fatos_comprovados_autor": [
+   {
+    "id": "EMB-02-001",
+    "titulo": "Pagamento de parcelas 08/2023 a 03/2024",
+    "descricao": "O demonstrativo do banco registra 8 parcelas de R$ 180,00 com status PAGA entre 18/08/2023 e 18/03/2024.",
+    "justificativa": "Comprova a ocorrência de descontos mensais no período indicado, fato central ao pedido de restituição dos valores descontados.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "# Vencimento Saldo Anterior Juros Amortização Parcela Saldo Final Status\n1 18/08/2023 8.500,00 149,60 30,40 180,00 8.469,60 PAGA\n2 18/09/2023 8.469,60 149,06 30,94 180,00 8.438,66 PAGA\n3 18/10/2023 8.438,66 148,52 31,48 180,00 8.407,19 PAGA",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-02-002",
+    "titulo": "Parcela mensal fixada em R$ 180,00",
+    "descricao": "O demonstrativo informa que a parcela mensal do contrato é de R$ 180,00.",
+    "justificativa": "Corrobora o valor unitário de cada desconto alegado, relevante para eventual restituição do indébito.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "Valor financiado R$ 8.500,00 Prazo 84 meses\nTaxa de juros 1,76% a.m. Parcela R$ 180,00",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "lacunas_argumentativas_autor": [
+   {
+    "id": "EMB-02-003",
+    "titulo": "Sem extrato do INSS comprovando descontos",
+    "descricao": "A autora alega descontos no benefício desde 08/2023, mas não juntou extrato do benefício comprovando os lançamentos.",
+    "justificativa": "A ausência de extrato do benefício fragiliza a prova documental direta dos descontos, o que favorece o banco na controvérsia sobre o indébito a ser restituído.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "extrato"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p1:c1",
+      "trecho": "Em fevereiro de 2024, o Autor, ao conferir o detalhamento de crédito do seu benefício, identificou descontos mensais realizados desde Agosto/2023, no valor de R$ 180,00",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-02-004",
+    "titulo": "Ausente prova de inexistência de conta na CEF",
+    "descricao": "O autor afirma não possuir conta na Caixa Econômica Federal, mas não apresentou documento que comprove a inexistência de conta.",
+    "justificativa": "Sem comprovação de que não possuía a conta indicada para crédito, enfraquece-se a tese de que não houve disponibilidade dos valores e, por conseguinte, a restituição em dobro.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "extrato",
+       "declaracao_bancaria"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p2:c1",
+      "trecho": "Todavia, o Autor não possui conta corrente na referida instituição, mantendo apenas conta junto ao Banco Bradesco para recebimento de seu benefício previdenciário.",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-02-005",
+    "titulo": "BO citado na inicial não foi juntado",
+    "descricao": "A petição menciona boletim de ocorrência em anexo, mas o documento não consta entre os presentes.",
+    "justificativa": "A ausência do boletim de ocorrência reduz a robustez da narrativa fática que embasa o pedido de repetição do indébito.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "boletim_ocorrencia"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p2:c1",
+      "trecho": "(Boletim de Ocorrência nº 2024.005432 - cópia em anexo)",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-02-006",
+    "titulo": "Reclamação ao BACEN não foi juntada",
+    "descricao": "A petição cita reclamação administrativa no Banco Central, mas não apresenta o documento correspondente.",
+    "justificativa": "Sem comprovação da reclamação, há menor lastro documental para reforçar a cobrança indevida que embasa o pedido de restituição em dobro.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "reclamacao_bacen"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p4:c1",
+      "trecho": "A probabilidade do direito decorre dos documentos acostados à presente inicial, em especial do boletim de ocorrência, da reclamação administrativa no Banco Central",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-02-007",
+    "titulo": "Contrato não juntado para provar divergência de conta",
+    "descricao": "A inicial alega divergência entre conta indicada no contrato e a de uso do autor, mas não juntou o contrato para comprovar a informação.",
+    "justificativa": "Sem o contrato, a divergência de titularidade da conta alegada para reforçar a cobrança indevida carece de suporte documental, favorecendo o banco.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "contrato"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p4:c1",
+      "trecho": "em especial do boletim de ocorrência, da reclamação administrativa no Banco Central e da divergência entre a conta de titularidade indicada no contrato e aquela de uso efetivo do Autor.",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "compensacao_valor_creditado": [
+   {
+    "id": "EMB-02-008",
+    "titulo": "Comprovante BACEN indica crédito em conta do autor",
+    "descricao": "Documento do banco declara liberação do valor líquido em 19/07/2023 em conta de titularidade do tomador na Caixa Econômica Federal.",
+    "justificativa": "A liberação do crédito em conta do autor pode ser compensada com os descontos, reduzindo ou afastando a restituição em dobro.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D02:p1:c1",
+      "trecho": "foi formalizada e o respectivo valor líquido efetivamente liberado em favor do tomador na data de 19/07/2023, em conta de sua titularidade junto ao Caixa Econômica Federal",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-02-009",
+    "titulo": "Laudo confirma TED na conta CEF indicada",
+    "descricao": "O laudo registra que o crédito foi liberado por TED na conta do tomador na CEF (Ag. 3245, CC 00012345-6).",
+    "justificativa": "Reforça a existência de crédito disponibilizado ao autor, elemento que autoriza compensação com os descontos pleiteados.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p2:c1",
+      "trecho": "Crédito liberado em 19/07/2023 na conta de titularidade do tomador junto ao Caixa Econômica Federal, agência 3245, conta corrente 00012345-6, mediante Transferência Eletrônica Disponível (TED)",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-02-010",
+    "titulo": "Demonstrativo indica valor financiado de R$ 8.500,00",
+    "descricao": "O demonstrativo de evolução da dívida informa valor financiado de R$ 8.500,00.",
+    "justificativa": "Evidencia o montante disponibilizado na operação, possível de ser compensado contra eventuais valores a restituir.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "Valor financiado R$ 8.500,00 Prazo 84 meses",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "questoes_processuais": []
+ }
+}

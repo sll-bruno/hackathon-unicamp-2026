@@ -166,10 +166,14 @@ def train(data_path: Path, output_dir: Path) -> dict:
         model.predict_proba(encode(to_cases(agreements), ufs)), temperature
     )
     p_loss = agreement_probs[:, 2] + agreement_probs[:, 3]
-    loss_if_condemned = agreements.vc.to_numpy() * (
-        agreement_probs[:, 2] * severity["parcial"]
-        + agreement_probs[:, 3] * severity["procedencia"]
-    ) / p_loss
+    loss_if_condemned = (
+        agreements.vc.to_numpy()
+        * (
+            agreement_probs[:, 2] * severity["parcial"]
+            + agreement_probs[:, 3] * severity["procedencia"]
+        )
+        / p_loss
+    )
     k_values = agreements.vd.to_numpy() / loss_if_condemned
     settlement_k = {
         f"p{int(q * 100)}": round(float(np.quantile(k_values, q)), 4)
@@ -188,12 +192,20 @@ def train(data_path: Path, output_dir: Path) -> dict:
                 "n": int(by_uf.size()[uf]),
                 "taxa_derrota": round(float(loss_by_uf[uf]), 4),
                 "taxa_derrota_golpe": round(
-                    float(judicial[(judicial.uf == uf) & (judicial["sub"] == "Golpe")]
-                          .micro.isin(["Parcial procedência", "Procedência"]).mean()), 4
+                    float(
+                        judicial[(judicial.uf == uf) & (judicial["sub"] == "Golpe")]
+                        .micro.isin(["Parcial procedência", "Procedência"])
+                        .mean()
+                    ),
+                    4,
                 ),
                 "taxa_derrota_generico": round(
-                    float(judicial[(judicial.uf == uf) & (judicial["sub"] == "Genérico")]
-                          .micro.isin(["Parcial procedência", "Procedência"]).mean()), 4
+                    float(
+                        judicial[(judicial.uf == uf) & (judicial["sub"] == "Genérico")]
+                        .micro.isin(["Parcial procedência", "Procedência"])
+                        .mean()
+                    ),
+                    4,
                 ),
                 "ranking_derrota": int(position + 1),
                 "diferenca_nacional_pp": round((float(loss_by_uf[uf]) - national_loss) * 100, 1),

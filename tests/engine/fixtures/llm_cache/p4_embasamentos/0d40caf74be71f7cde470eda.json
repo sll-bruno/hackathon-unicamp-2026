@@ -1,0 +1,360 @@
+{
+ "acusacao_id": "ACU-01",
+ "embasamentos": {
+  "provas_contratacao": [
+   {
+    "id": "EMB-01-001",
+    "titulo": "Contrato indica assinatura manual do tomador",
+    "descricao": "O instrumento contratual registra que a autora firmou a CCB de forma manual em 10/05/2022.",
+    "justificativa": "A existência de contrato com assinatura manuscrita é prova direta da contratação, contrariando a alegação de inexistência do débito.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D02:p2:c1",
+      "trecho": "E por estarem assim justos e contratados, o TOMADOR firma a presente Cédula de forma manual, em 10/05/2022, tendo o EMITENTE promovido o depósito do valor líquido em 12/05/2022.",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-002",
+    "titulo": "Gravação de atendimento telefônico indicada no laudo",
+    "descricao": "O laudo referenciado informa a existência de gravação de voz do atendimento telefônico (07m42s).",
+    "justificativa": "A gravação de aceite por voz, se existente, constitui prova de manifestação de vontade e reforça a regularidade da contratação.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D07:p1:c1",
+      "trecho": "Gravação de voz do atendimento telefônico: arquivo MP3 armazenado em cofre digital (duração 07m42s)",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-003",
+    "titulo": "Autorização de consignação com ACK do INSS",
+    "descricao": "O laudo registra o envio da autorização de consignação ao INSS com ACK de retorno em 11/05/2022.",
+    "justificativa": "O retorno do INSS sobre a autorização de desconto em folha confirma a formalização regular do consignado.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D07:p2:c1",
+      "trecho": "Autorização de consignação enviada ao INSS com ACK de retorno em 11/05/2022",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "autenticacao_forte": [
+   {
+    "id": "EMB-01-004",
+    "titulo": "Grafotécnica aponta compatibilidade de 91%",
+    "descricao": "O dossiê pericial concluiu compatibilidade elevada (91%) entre a assinatura do contrato e padrões da autora.",
+    "justificativa": "Compatibilidade grafotécnica robustece a autoria da assinatura no contrato impugnado, favorecendo a tese do banco.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D05:p1:c1",
+      "trecho": "Assinatura manuscrita no contrato COMPATÍVEL (índice 91%)",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-005",
+    "titulo": "Liveness com match facial de 97,3%",
+    "descricao": "A captura de liveness apresentou match facial de 97,3% com a foto do RG da autora.",
+    "justificativa": "Biometria facial com liveness confirma presença e identidade no ato, reforçando a regularidade da contratação.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D05:p1:c1",
+      "trecho": "Selfie / liveness CONFIRMADA - match facial 97,3%",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-006",
+    "titulo": "Documentos pessoais validados em bases oficiais",
+    "descricao": "O dossiê validou o RG da autora e comprovante de residência, sem indícios de adulteração.",
+    "justificativa": "Validação documental reduz a hipótese de uso indevido de identidade, sustentando a versão do banco.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D05:p1:c1",
+      "trecho": "Documento de identidade (RG) VÁLIDO - sem adulteração aparente",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D05:p1:c1",
+      "trecho": "Comprovante de residência VÁLIDO",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "registros_digitais": [],
+  "credito_em_conta_do_autor": [
+   {
+    "id": "EMB-01-007",
+    "titulo": "Crédito de R$ 5.000,00 na conta da autora",
+    "descricao": "Extrato da conta 20.348.719-5, titularidade da autora, registra crédito do contrato 502348719 em 12/05/2022.",
+    "justificativa": "Comprova que o valor foi disponibilizado em conta de titularidade da autora, contrariando a inexistência do débito.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "12/05/2022 CRÉDITO - EMPRÉSTIMO CONSIGNADO Contr. 502348719 +5.000,00 5.000,00",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-008",
+    "titulo": "Comprovante BACEN confirma liberação do crédito",
+    "descricao": "Declaração regulatória atesta a efetiva liberação do valor líquido ao tomador em 12/05/2022.",
+    "justificativa": "Documento regulatório independente reforça a prova de liberação do crédito em favor da autora.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p1:c1",
+      "trecho": "foi formalizada e o respectivo valor líquido efetivamente liberado em favor do tomador na data de 12/05/2022, em conta de sua titularidade junto ao Banco UFMG S.A.",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "uso_do_credito_pelo_autor": [
+   {
+    "id": "EMB-01-009",
+    "titulo": "TED de R$ 3.000,00 para conta no Bradesco",
+    "descricao": "Extrato mostra TED enviada em 13/05/2022 de R$ 3.000,00 para Bradesco Ag 3421 CC 98765-4.",
+    "justificativa": "Movimentação do valor recebido indica uso do crédito pela própria autora, contrária à tese de inexistência da operação.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "13/05/2022 TED ENVIADA - CTA TITULARIDADE Bradesco / Ag 3421 CC 98765-4 -3.000,00 2.000,00",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-010",
+    "titulo": "PIX de R$ 1.500,00 a beneficiário familiar",
+    "descricao": "Extrato registra transferência PIX enviada em 15/05/2022 de R$ 1.500,00 a beneficiário familiar.",
+    "justificativa": "Transferência subsequente ao crédito sugere disponibilidade e uso dos recursos pela autora.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "15/05/2022 TRANSFERÊNCIA PIX - ENVIADA Chave CPF - beneficiário familiar -1.500,00 500,00",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-011",
+    "titulo": "Saque em ATM de R$ 485,00 após o crédito",
+    "descricao": "Extrato aponta saque em 17/05/2022 de R$ 485,00 na Rede 24H em São Luís.",
+    "justificativa": "Saque após o depósito reforça consumo do valor disponibilizado.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "17/05/2022 SAQUE ATM REDE 24H - SÃO LUÍS NSU 00128393 -485,00 15,00",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "contradicoes_do_autor": [
+   {
+    "id": "EMB-01-012",
+    "titulo": "Negativa de uso contrariada por extrato com movimentos",
+    "descricao": "Autora afirma inexistir movimentação compatível com o empréstimo, mas extrato mostra crédito, TED, PIX e saque.",
+    "justificativa": "A contradição enfraquece a narrativa de inexistência de contratação e de não utilização dos valores.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p2:c1",
+      "trecho": "inexistindo nos extratos de sua conta corrente qualquer movimentação compatível com depósito ou saque dos montantes alegadamente contratados.",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "12/05/2022 CRÉDITO - EMPRÉSTIMO CONSIGNADO Contr. 502348719 +5.000,00 5.000,00",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "lacunas_argumentativas_autor": [
+   {
+    "id": "EMB-01-013",
+    "titulo": "Descontos alegados sem extrato do benefício INSS",
+    "descricao": "Autora alega descontos desde 06/2022, mas não juntou extrato do benefício comprovando-os.",
+    "justificativa": "A falta de comprovantes próprios dos descontos fragiliza a narrativa de inexistência e a cronologia apresentada.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "EXTRATO_BENEFICIO_INSS"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p1:c1",
+      "trecho": "No mês de janeiro de 2024, ao verificar o extrato de pagamento de seu benefício, a Autora constatou a existência de descontos mensais no valor de R$ 120,00, efetuados desde Junho/2022,",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-014",
+    "titulo": "Reclamação administrativa sem prova de protocolo",
+    "descricao": "Autora relata ter buscado solução administrativa, mas não juntou comprovante de atendimento ou protocolo.",
+    "justificativa": "A ausência de comprovação da tentativa prévia de solução reduz a força de sua narrativa sobre a irregularidade do contrato.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "PROTOCOLO_ATENDIMENTO_ADMINISTRATIVO",
+       "REGISTRO_OUVIDORIA",
+       "COMPROVANTE_SAC"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p1:c1",
+      "trecho": "Ao tomar ciência dos descontos, a Autora procurou, de forma administrativa, o Banco Réu, solicitando esclarecimentos acerca da origem do débito.",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "comportamento_do_autor": [
+   {
+    "id": "EMB-01-015",
+    "titulo": "Demora para impugnar descontos consignados",
+    "descricao": "Autora diz ter notado em 01/2024 descontos existentes desde 06/2022, indicando longa inércia.",
+    "justificativa": "A inércia prolongada diante dos descontos favorece a tese de que a contratação era conhecida e regularmente executada.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p1:c1",
+      "trecho": "No mês de janeiro de 2024, ao verificar o extrato de pagamento de seu benefício, a Autora constatou a existência de descontos mensais no valor de R$ 120,00, efetuados desde Junho/2022,",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "questoes_processuais": [],
+  "fatos_comprovados_autor": [
+   {
+    "id": "EMB-01-016",
+    "titulo": "Condição de idosa comprovada no RG",
+    "descricao": "Documento de identidade indica data de nascimento em 15/03/1958, evidenciando idade avançada.",
+    "justificativa": "A condição de idosa reforça vulnerabilidade do consumidor, argumento que pode sustentar maior rigor probatório do banco quanto à contratação.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p7:c1",
+      "trecho": "DATA DE NASCIMENTO\n15/03/1958",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "lacunas_probatorias_banco": [
+   {
+    "id": "EMB-01-017",
+    "titulo": "Gravação de voz não juntada aos autos",
+    "descricao": "Laudo informa existência de arquivo MP3 da ligação, mas o áudio não foi apresentado no processo.",
+    "justificativa": "A ausência do arquivo de gravação limita a verificação do aceite telefônico, fragilizando a prova da anuência.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "GRAVACAO_AUDIO_ATENDIMENTO_TELEFONICO"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D07:p1:c1",
+      "trecho": "Gravação de voz do atendimento telefônico: arquivo MP3 armazenado em cofre digital (duração 07m42s)",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-018",
+    "titulo": "ACK do INSS citado sem documento comprobatório",
+    "descricao": "Laudo menciona ACK de retorno do INSS, porém não há o comprovante da autorização juntado.",
+    "justificativa": "Falta do ACK documental impede a conferência independente da autorização de consignação, o que favorece a tese autoral.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "COMPROVANTE_AUTORIZACAO_CONSIGNACAO_INSS_COM_ACK"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D07:p2:c1",
+      "trecho": "Autorização de consignação enviada ao INSS com ACK de retorno em 11/05/2022",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "indicios_de_fraude": [],
+  "inconsistencias_documentos_banco": [
+   {
+    "id": "EMB-01-019",
+    "titulo": "Quadro financeiro indica total financiado incoerente",
+    "descricao": "Contrato mostra IOF e seguro financiados, mas mantém \"Valor total financiado\" igual ao \"Valor líquido liberado\" (R$ 5.000,00).",
+    "justificativa": "Divergência interna no quadro resumo pode gerar dúvida sobre a higidez da formalização.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D02:p1:c1",
+      "trecho": "Valor líquido liberado R$ 5.000,00\nIOF financiado R$ 186,25\nSeguro prestamista R$ 87,50\nValor total financiado R$ 5.000,00",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-020",
+    "titulo": "Resumo do demonstrativo com saldo incompatível",
+    "descricao": "Resumo informa saldo devedor aproximado de R$ 1.037,66, mas após a 21ª parcela o saldo final indicado é R$ 4.326,00.",
+    "justificativa": "Inconsistência entre resumo e tabela reduz a confiabilidade do demonstrativo apresentado pelo banco.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D06:p1:c1",
+      "trecho": "21 10/02/2024 4.364,39 81,61 38,39 120,00 4.326,00 PAGA",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D06:p3:c1",
+      "trecho": "Resumo: 21 de 72 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$\n1.037,66 (cálculo meramente indicativo),",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ]
+ }
+}

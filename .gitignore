@@ -62,3 +62,9 @@ Thumbs.db
 
 AGENTS.md
 CLAUDE.md
+
+# Cache local das respostas de LLM da engine
+.engine_llm_cache/
+
+# Saídas locais do CLI da engine
+resultados/

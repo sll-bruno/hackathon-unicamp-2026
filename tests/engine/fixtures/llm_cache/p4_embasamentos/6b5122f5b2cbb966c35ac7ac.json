@@ -1,0 +1,378 @@
+{
+ "acusacao_id": "ACU-01",
+ "embasamentos": {
+  "provas_contratacao": [],
+  "autenticacao_forte": [],
+  "registros_digitais": [
+   {
+    "id": "EMB-01-001",
+    "titulo": "Canal digital via aplicativo",
+    "descricao": "Laudo indica contratação pelo canal Digital - Aplicativo Mobile (self-service).",
+    "justificativa": "Registros de canal digital são indícios de fluxo regular de contratação e enfraquecem a tese de inexistência absoluta do ajuste.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p1:c1",
+      "trecho": "(cid:127) Canal: Digital - Aplicativo Mobile (self-service)",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-002",
+    "titulo": "Device fingerprint registrado",
+    "descricao": "Laudo registra o device fingerprint do dispositivo utilizado na contratação.",
+    "justificativa": "A identificação técnica do dispositivo é um rastro digital que corrobora a existência de uma sessão de contratação atribuível a um aparelho específico.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p1:c1",
+      "trecho": "(cid:127) Dispositivo: identificado por device fingerprint (hash DFP-9A43E1B7)",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-003",
+    "titulo": "Geolocalização coletada na contratação",
+    "descricao": "Laudo aponta latitude e longitude do dispositivo no momento da contratação.",
+    "justificativa": "A coleta de geolocalização é registro típico de jornada digital e ampara a narrativa de contratação eletrônica.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p1:c1",
+      "trecho": "(cid:127) Geolocalização do dispositivo no momento da contratação: latitude -3.1019, longitude -60.0261",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-004",
+    "titulo": "Endereço IP registrado",
+    "descricao": "Laudo registra o endereço IP de origem da contratação.",
+    "justificativa": "Registro de IP integra o conjunto de evidências técnicas do aceite eletrônico e afasta, em parte, a alegação de total inexistência de manifestação.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p1:c1",
+      "trecho": "(cid:127) Endereço IP: 179.218.**.**",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-005",
+    "titulo": "Aceite eletrônico por termo de ciência",
+    "descricao": "Laudo informa aceite eletrônico das condições por Termo de Ciência.",
+    "justificativa": "A existência de aceite eletrônico documentado é elemento típico de contratação digital, útil à defesa quanto à existência do vínculo.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p2:c1",
+      "trecho": "(cid:127) Aceite eletrônico das condições contratuais via Termo de Ciência",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "credito_em_conta_do_autor": [
+   {
+    "id": "EMB-01-006",
+    "titulo": "Crédito em conta declarada do autor",
+    "descricao": "Comprovante BACEN e laudo declaram liberação em conta de titularidade do tomador na CEF (Ag. 3245, CC 00012345-6).",
+    "justificativa": "A indicação formal de titularidade da conta de crédito favorece a tese de que o valor foi destinado ao autor, contrariando a inexistência de relação.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D02:p1:c1",
+      "trecho": "foi formalizada e o respectivo valor líquido efetivamente liberado em favor do tomador na data de 19/07/2023, em conta de sua titularidade junto ao Caixa Econômica Federal, inexistindo óbice regulatório à sua validade.",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p2:c1",
+      "trecho": "Crédito liberado em 19/07/2023 na conta de titularidade do tomador junto ao Caixa Econômica Federal, agência 3245, conta corrente 00012345-6, mediante Transferência Eletrônica Disponível (TED)",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "uso_do_credito_pelo_autor": [],
+  "contradicoes_do_autor": [
+   {
+    "id": "EMB-01-007",
+    "titulo": "Nega app versus canal digital",
+    "descricao": "Autor nega uso de canais digitais; laudo aponta contratação via aplicativo mobile.",
+    "justificativa": "Contradição entre a alegação do autor e o laudo técnico enfraquece a tese de inexistência de contratação.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p1:c1",
+      "trecho": "O Autor afirma, com toda a firmeza, que jamais contratou, solicitou, anuiu ou autorizou qualquer operação de crédito... Nunca se dirigiu a qualquer agência, canal digital... não possuindo sequer smartphone compatível...",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p1:c1",
+      "trecho": "(cid:127) Canal: Digital - Aplicativo Mobile (self-service)",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-008",
+    "titulo": "Nega conta CEF versus crédito na CEF",
+    "descricao": "Autor diz não possuir conta na CEF; documentos do banco declaram crédito em conta de sua titularidade na CEF.",
+    "justificativa": "Divergência direta entre a narrativa do autor e os documentos do banco fragiliza a negativa absoluta de relação contratual.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p2:c1",
+      "trecho": "Todavia, o Autor não possui conta corrente na referida instituição, mantendo apenas conta junto ao Banco Bradesco para recebimento de seu benefício previdenciário.",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D02:p1:c1",
+      "trecho": "Instituição depositária Caixa Econômica Federal - Ag. 3245 - CC 00012345-6",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "lacunas_argumentativas_autor": [
+   {
+    "id": "EMB-01-009",
+    "titulo": "B.O. citado não juntado",
+    "descricao": "Autor menciona boletim de ocorrência, mas o documento não consta do pacote.",
+    "justificativa": "A ausência do B.O. enfraquece a narrativa de pronta reação e de fraude, favorecendo o banco nesta acusação.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "boletim_ocorrencia"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p2:c1",
+      "trecho": "Diante da constatação dos descontos e da informação da existência do contrato, o Autor providenciou, de imediato, o registro de ocorrência... (Boletim de Ocorrência nº 2024.005432 - cópia em anexo)",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-010",
+    "titulo": "Reclamação BACEN não juntada",
+    "descricao": "Autor alega reclamação no Banco Central (RDR nº 12345678-9), mas não há comprovante nos autos.",
+    "justificativa": "Sem comprovação da reclamação administrativa, reduz-se a força do relato de diligências do autor quanto à suposta fraude.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "reclamacao_bacen"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p4:c1",
+      "trecho": "A probabilidade do direito decorre dos documentos acostados à presente inicial, em especial do boletim de ocorrência, da reclamação administrativa no Banco Central",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-011",
+    "titulo": "Sem prova de que não tem conta CEF",
+    "descricao": "Alegação de inexistência de conta na CEF não veio acompanhada de extratos ou declaração bancária.",
+    "justificativa": "Falta de prova de titularidade bancária sustenta a tese de que o crédito pode ter sido destinado à conta do próprio autor, como afirma o banco.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "extrato_INSS",
+       "extrato_Bradesco",
+       "declaracao_CEF_inexistencia_conta"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p2:c1",
+      "trecho": "Todavia, o Autor não possui conta corrente na referida instituição, mantendo apenas conta junto ao Banco Bradesco para recebimento de seu benefício previdenciário.",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-012",
+    "titulo": "Sem prova de ausência de smartphone",
+    "descricao": "Alegação de que não possui smartphone compatível não foi comprovada.",
+    "justificativa": "Sem elementos técnicos, a incompatibilidade com o canal digital permanece não demonstrada, o que favorece o banco nesta acusação.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "comprovante_ausencia_smartphone",
+       "laudo_tecnico_dispositivo"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p1:c1",
+      "trecho": "Ocorre que o Autor jamais efetuou cadastro, baixou aplicativo ou realizou qualquer interação... não possuindo sequer smartphone compatível com as exigências tecnológicas usuais do referido canal.",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "comportamento_do_autor": [],
+  "questoes_processuais": [],
+  "fatos_comprovados_autor": [],
+  "lacunas_probatorias_banco": [
+   {
+    "id": "EMB-01-013",
+    "titulo": "Termo/contrato não foi juntado",
+    "descricao": "Laudo menciona aceite por Termo de Ciência, mas o instrumento contratual não consta dos autos.",
+    "justificativa": "A falta do instrumento contratual/termo assinado prejudica a comprovação da manifestação de vontade, favorecendo o autor na tese de inexistência.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "contrato",
+       "dossie"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p2:c1",
+      "trecho": "(cid:127) Aceite eletrônico das condições contratuais via Termo de Ciência",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-014",
+    "titulo": "Sem extrato da conta de destino",
+    "descricao": "Há indicação da conta CEF de crédito, mas não foi juntado extrato bancário que comprove o recebimento pelo autor.",
+    "justificativa": "A ausência de extrato da conta beneficiária enfraquece a prova de que o crédito entrou efetivamente em conta do autor.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "extrato"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D02:p1:c1",
+      "trecho": "Instituição depositária Caixa Econômica Federal - Ag. 3245 - CC 00012345-6",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-015",
+    "titulo": "Sem averbação/autorização do INSS",
+    "descricao": "Contrato é consignado INSS, porém não há retorno/averbação do INSS nos autos.",
+    "justificativa": "A falta de comprovação da autorização/averbação junto ao INSS fragiliza a demonstração de regularidade da consignação.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "autorizacao_consignacao_INSS"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D02:p1:c1",
+      "trecho": "Modalidade 0213 - Crédito pessoal consignado - INSS",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-016",
+    "titulo": "Registros eletrônicos não apresentados",
+    "descricao": "Comprovante BACEN afirma acompanhar registros eletrônicos pertinentes, mas tais artefatos não foram juntados.",
+    "justificativa": "A não apresentação dos registros prometidos (logs, capturas, trilhas) reduz a força probatória do banco sobre o aceite eletrônico.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "dossie",
+       "logs_autenticacao",
+       "evidencias_aceite"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D02:p2:c1",
+      "trecho": "A presente declaração é acompanhada dos registros eletrônicos pertinentes, mantidos pela instituição em conformidade com o artigo 70 da Lei nº 13.506/2017",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-01-017",
+    "titulo": "Sem perícia grafotécnica",
+    "descricao": "Laudo informa que não houve verificação grafotécnica por empresa terceira.",
+    "justificativa": "A ausência de perícia em assinatura/termos limita a comprovação de autoria, o que beneficia a tese do autor de inexistência da contratação.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "pericia_grafotecnica"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p2:c1",
+      "trecho": "Não foi providenciada, até o momento, verificação grafotécnica complementar por empresa terceira.",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "indicios_de_fraude": [],
+  "inconsistencias_documentos_banco": [
+   {
+    "id": "EMB-01-018",
+    "titulo": "Liveness declarado mas vídeo ausente",
+    "descricao": "Laudo indica autenticação por biometria facial, porém relata que o vídeo de liveness não foi localizado.",
+    "justificativa": "A inconsistência interna sobre a biometria reduz a confiabilidade da autenticação e favorece a tese autoral de inexistência/irregularidade da contratação.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p1:c1",
+      "trecho": "(cid:127) Autenticação: biometria facial (liveness) + senha eletrônica 6 dígitos",
+      "documentos_esperados": []
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D04:p2:c1",
+      "trecho": "No entanto, não foi localizado nos arquivos digitais o vídeo de liveness (biometria facial) tradicionalmente capturado ao final do fluxo, fato reportado internamente para apuração pela área de Segurança da Informação.",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ]
+ }
+}

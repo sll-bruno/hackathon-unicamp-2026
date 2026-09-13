@@ -18,18 +18,11 @@ EXPECTED_PLACEHOLDERS = {
         "documentos_presentes",
         "tipos_ausentes",
         "anexos_citados",
-        "candidatos",
         "categorias",
         "chunks",
     },
     "p5_fichamento": {"acusacoes", "categorias_por_tipo", "chunks"},
-    "p6_validador": {
-        "acusacoes",
-        "categorias_por_tipo",
-        "chunks_pedidos",
-        "reprovados_deterministicos",
-        "itens",
-    },
+    "p6_validador": {"acusacoes", "categorias_por_tipo", "itens"},
     "p7_decisora": {"analise", "erros_da_tentativa_anterior"},
 }
 
@@ -83,4 +76,4 @@ def test_prompt_render_rejects_missing_or_unknown_values() -> None:
 def test_prompt_versions_fit_the_contract() -> None:
     versions = prompt_versions()
     assert set(versions) == {f"prompt_{prompt_id}" for prompt_id in PROMPT_IDS}
-    assert all(isinstance(value, str) and value.startswith("v1-") for value in versions.values())
+    assert all(isinstance(value, str) and value.startswith("v") for value in versions.values())

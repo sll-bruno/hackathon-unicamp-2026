@@ -1,0 +1,198 @@
+{
+ "acusacao_id": "ACU-03",
+ "embasamentos": {
+  "agravantes_dano_moral": [
+   {
+    "id": "EMB-03-001",
+    "titulo": "Descontos em benefício previdenciário do autor",
+    "descricao": "A operação é consignada no INSS, incidindo sobre benefício previdenciário do autor.",
+    "justificativa": "Descontos em verba de natureza alimentar tendem a intensificar o abalo moral alegado, pois afetam diretamente a subsistência do autor.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "Contrato nº 603827451 — Empréstimo Consignado em Benefício Previdenciário (INSS)",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-03-002",
+    "titulo": "Descontos por oito meses confirmados",
+    "descricao": "O demonstrativo indica 8 de 84 parcelas liquidadas entre ago/2023 e mar/2024.",
+    "justificativa": "A longa duração dos descontos reforça o sofrimento e a gravidade do dano, superando mero aborrecimento.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p3:c1",
+      "trecho": "Resumo: 8 de 84 parcelas liquidadas, Saldo devedor em aberto na data de referência: aproximadamente R$ 2.748,38 (cálculo meramente indicativo),",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "vulnerabilidade_autor": [
+   {
+    "id": "EMB-03-003",
+    "titulo": "Autor idoso e aposentado",
+    "descricao": "A petição indica que o autor é pessoa idosa e aposentada pelo RGPS.",
+    "justificativa": "A condição de idoso aumenta a vulnerabilidade do consumidor, o que pode intensificar o dano moral decorrente dos descontos.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p1:c1",
+      "trecho": "O Autor é pessoa idosa, aposentado pelo Regime Geral de Previdência Social (RGPS),",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-03-004",
+    "titulo": "Renda exclusiva do benefício previdenciário",
+    "descricao": "O autor alega que sua renda mensal provém exclusivamente do benefício previdenciário.",
+    "justificativa": "Dependência integral do benefício (verba alimentar) amplia o impacto dos descontos para fins de dano moral.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p1:c1",
+      "trecho": "contando com renda mensal proveniente exclusivamente de seu benefício previdenciário, indispensável à sua subsistência e à de sua família.",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "atenuantes_dano_moral": [
+   {
+    "id": "EMB-03-005",
+    "titulo": "Parcela mensal de R$ 180,00",
+    "descricao": "O valor da prestação consignada é de R$ 180,00.",
+    "justificativa": "Desconto de baixo valor relativo pode mitigar a intensidade do dano moral alegado.",
+    "referencias": [
+     {
+      "tipo": "trecho",
+      "chunk_id": "D03:p1:c1",
+      "trecho": "Taxa de juros 1,76% a.m. Parcela R$ 180,00",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ],
+  "lacunas_argumentativas_autor": [
+   {
+    "id": "EMB-03-006",
+    "titulo": "Abalo moral descrito genericamente",
+    "descricao": "A inicial menciona angústia e sofrimento psíquico sem apresentar documentos que comprovem prejuízos concretos.",
+    "justificativa": "Sem prova específica do abalo, o pedido indenizatório por dano moral fica fragilizado para esta acusação.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "laudo_psicologico_ou_medico",
+       "documentos_comprovando_prejuizos_concretos",
+       "extrato_bancario_do_periodo"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p3:c1",
+      "trecho": "A conduta do Banco Réu, ao promover descontos mensais em benefício previdenciário do Autor, oriundos de contratação sem respaldo em efetiva manifestação de vontade, associada à exposição indevida de seus dados pessoais, gerou ao Autor angústia, sofrimento psíquico e comprometimento de sua subsistência,",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-03-007",
+    "titulo": "Boletim de ocorrência não juntado",
+    "descricao": "A petição afirma ter anexado B.O., mas o documento não está entre os presentes.",
+    "justificativa": "A falta do B.O. reduz a força do relato dos fatos e do sofrimento alegado para dano moral.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "boletim_ocorrencia"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p2:c1",
+      "trecho": "(Boletim de Ocorrência nº 2024.005432 - cópia em anexo)",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-03-008",
+    "titulo": "Reclamação ao BACEN não juntada",
+    "descricao": "A inicial cita RDR no Banco Central como documento anexo, ausente no pacote.",
+    "justificativa": "A ausência da RDR enfraquece a narrativa de providências tomadas e do abalo decorrente da inércia do banco.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "reclamacao_bacen"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p4:c1",
+      "trecho": "A probabilidade do direito decorre dos documentos acostados à presente inicial, em especial do boletim de ocorrência, da reclamação administrativa no Banco Central e da divergência entre a conta de titularidade indicada no contrato e aquela de uso efetivo do Autor.",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-03-009",
+    "titulo": "Manutenção após reclamação sem prova",
+    "descricao": "Alega-se manutenção dos descontos após reclamações, sem comprovar protocolos ou respostas.",
+    "justificativa": "Sem prova de reclamação prévia e de sua data, não se comprovam circunstâncias que agravariam o dano moral.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "protocolo_atendimento_banco",
+       "resposta_formal_banco",
+       "reclamacao_bacen",
+       "boletim_ocorrencia"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p2:c1",
+      "trecho": "A instituição ré, apesar das providências adotadas, manteve os descontos em benefício previdenciário do Autor, limitando-se a informar a existência do contrato",
+      "documentos_esperados": []
+     }
+    ]
+   },
+   {
+    "id": "EMB-03-010",
+    "titulo": "Extrato do benefício não anexado",
+    "descricao": "O autor diz ter identificado descontos no detalhamento do benefício, sem juntar o extrato correspondente.",
+    "justificativa": "A ausência do extrato do benefício dificulta aferir a efetiva dinâmica e impacto financeiro dos descontos para dano moral.",
+    "referencias": [
+     {
+      "tipo": "ausencia_documental",
+      "chunk_id": null,
+      "trecho": null,
+      "documentos_esperados": [
+       "extrato"
+      ]
+     },
+     {
+      "tipo": "trecho",
+      "chunk_id": "D01:p1:c1",
+      "trecho": "Em fevereiro de 2024, o Autor, ao conferir o detalhamento de crédito do seu benefício, identificou descontos mensais realizados desde Agosto/2023, no valor de R$ 180,00,",
+      "documentos_esperados": []
+     }
+    ]
+   }
+  ]
+ }
+}

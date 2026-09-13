@@ -31,7 +31,11 @@ def _ocr_page(path: Path, page_index: int, language: str, dpi: int) -> tuple[str
     lines: dict[tuple[int, int, int], list[str]] = {}
     confidences = []
     for word, conf, block, paragraph, line in zip(
-        data["text"], data["conf"], data["block_num"], data["par_num"], data["line_num"],
+        data["text"],
+        data["conf"],
+        data["block_num"],
+        data["par_num"],
+        data["line_num"],
         strict=True,
     ):
         if word.strip():

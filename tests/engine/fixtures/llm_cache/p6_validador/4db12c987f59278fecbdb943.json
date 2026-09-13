@@ -1,0 +1,298 @@
+{
+ "itens": [
+  {
+   "id": "EMB-01-001",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Contrato indica assinatura manual e data; enquadramento correto."
+  },
+  {
+   "id": "EMB-01-002",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo indica existência de gravação (07m42s); categoria adequada."
+  },
+  {
+   "id": "EMB-01-003",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo registra autorização de consignação com ACK; correto."
+  },
+  {
+   "id": "EMB-01-004",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Dossiê aponta assinatura compatível (91%); autenticação forte."
+  },
+  {
+   "id": "EMB-01-005",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Liveness confirmada (97,3%); autenticação forte adequada."
+  },
+  {
+   "id": "EMB-01-006",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "RG e comprovante de residência validados; categoria correta."
+  },
+  {
+   "id": "EMB-01-007",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Extrato comprova crédito do contrato na conta da autora."
+  },
+  {
+   "id": "EMB-01-008",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Comprovante declara liberação em conta da autora; correto."
+  },
+  {
+   "id": "EMB-01-009",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Extrato mostra TED de R$3.000,00; uso do crédito comprovado."
+  },
+  {
+   "id": "EMB-01-010",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Extrato mostra PIX de R$1.500,00; uso do crédito comprovado."
+  },
+  {
+   "id": "EMB-01-011",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Extrato registra saque em ATM após o crédito; uso comprovado."
+  },
+  {
+   "id": "EMB-01-012",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Inicial nega movimentação; extrato comprova crédito. Contradição evidenciada."
+  },
+  {
+   "id": "EMB-01-013",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Descontos alegados sem extrato do INSS anexado; lacuna."
+  },
+  {
+   "id": "EMB-01-014",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Sem protocolo/comprovante da reclamação administrativa; lacuna."
+  },
+  {
+   "id": "EMB-01-015",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Relatada descoberta em 01/2024 de descontos desde 06/2022; inércia."
+  },
+  {
+   "id": "EMB-01-016",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "RG indica nascimento em 15/03/1958; fato favorável comprovado."
+  },
+  {
+   "id": "EMB-01-017",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo cita áudio, mas arquivo não foi juntado; lacuna do banco."
+  },
+  {
+   "id": "EMB-01-018",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "ACK do INSS citado sem comprovante; lacuna probatória do banco."
+  },
+  {
+   "id": "EMB-01-019",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Quadro financeiro incoerente (IOF/seguro financiados sem refletir no total)."
+  },
+  {
+   "id": "EMB-01-020",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Resumo (~R$1.037,66) conflita com saldo após 21ª (R$4.326,00)."
+  },
+  {
+   "id": "EMB-02-001",
+   "status": "reprovado",
+   "categoria_sugerida": null,
+   "motivo": "Trecho não consta no chunk citado (D06:p1:c1); referência incorreta."
+  },
+  {
+   "id": "EMB-02-002",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Tabela indica 1ª parcela em 10/06/2022 com status PAGA."
+  },
+  {
+   "id": "EMB-02-003",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Ausente extrato do benefício do INSS comprovando descontos."
+  },
+  {
+   "id": "EMB-02-004",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Pedido em dobro sem prova de má-fé/ausência de engano justificável."
+  },
+  {
+   "id": "EMB-02-005",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Autora nega uso sem juntar extratos próprios; lacuna."
+  },
+  {
+   "id": "EMB-02-006",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Extrato comprova crédito de R$5.000,00; cabe compensação."
+  },
+  {
+   "id": "EMB-02-007",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "TED de R$3.000,00 no dia seguinte; uso do crédito."
+  },
+  {
+   "id": "EMB-02-008",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "PIX de R$1.500,00 após crédito; uso do valor."
+  },
+  {
+   "id": "EMB-02-009",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Saque em espécie após o crédito; uso do valor."
+  },
+  {
+   "id": "EMB-02-010",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Comprovante atesta liberação em conta da autora; compensação possível."
+  },
+  {
+   "id": "EMB-03-001",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Demonstrativo indica 21 de 72 parcelas pagas; longa duração."
+  },
+  {
+   "id": "EMB-03-002",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Inicial afirma que descontos atingem verba alimentar; trecho sustenta."
+  },
+  {
+   "id": "EMB-03-003",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Inicial relata reclamação administrativa sem solução; agravante citado."
+  },
+  {
+   "id": "EMB-03-004",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Inicial alega descontos desde 06/2022; agravante temporal."
+  },
+  {
+   "id": "EMB-03-005",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Inicial indica autora idosa e aposentada; vulnerabilidade demonstrada."
+  },
+  {
+   "id": "EMB-03-006",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Inicial declara renda exclusiva do benefício; vulnerabilidade indicada."
+  },
+  {
+   "id": "EMB-03-007",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Relatadas limitações digitais/locomoção; vulnerabilidade apontada."
+  },
+  {
+   "id": "EMB-03-008",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Extrato evidencia uso do crédito (TED/PIX/saque); atenuante."
+  },
+  {
+   "id": "EMB-03-009",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Dossiê indica assinatura compatível (91%); atenuante."
+  },
+  {
+   "id": "EMB-03-010",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Liveness confirmada com match 97,3%; atenuante."
+  },
+  {
+   "id": "EMB-03-011",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo registra existência de gravação telefônica; atenuante."
+  },
+  {
+   "id": "EMB-03-012",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Laudo menciona ACK do INSS; atenuante."
+  },
+  {
+   "id": "EMB-03-013",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Contrato indica assinatura manual e data; atenuante."
+  },
+  {
+   "id": "EMB-03-014",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Contrato fixa parcela mensal de R$120,00; possível atenuante."
+  },
+  {
+   "id": "EMB-03-015",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Abalo moral descrito genericamente sem prova específica."
+  },
+  {
+   "id": "EMB-03-016",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Ausentes protocolos/comprovantes da alegada reclamação prévia."
+  },
+  {
+   "id": "EMB-03-017",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Extrato do INSS mencionado, mas não juntado; lacuna."
+  },
+  {
+   "id": "EMB-03-018",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Declaração de hipossuficiência citada, porém ausente; lacuna."
+  },
+  {
+   "id": "EMB-03-019",
+   "status": "aprovado",
+   "categoria_sugerida": null,
+   "motivo": "Sem extratos bancários próprios para negar uso; lacuna."
+  }
+ ]
+}
