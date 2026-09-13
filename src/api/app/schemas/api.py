@@ -24,12 +24,22 @@ class CaseCreate(APIModel):
     assunto: str = Field(min_length=1, max_length=250)
     subassunto: str = Field(default="", max_length=250)
     valor_causa: float = Field(ge=0)
+    plaintiff_name: str | None = Field(default=None, max_length=250)
+    court: str | None = Field(default=None, max_length=250)
+    contract_number: str | None = Field(default=None, max_length=100)
     subsidy_flags: SubsidyFlagsInput = Field(default_factory=SubsidyFlagsInput)
 
     @field_validator("cnj", "assunto", "subassunto")
     @classmethod
     def strip_text(cls, value: str) -> str:
         return value.strip()
+
+    @field_validator("plaintiff_name", "court", "contract_number")
+    @classmethod
+    def strip_optional_metadata(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        return value.strip() or None
 
     @field_validator("uf")
     @classmethod
@@ -38,11 +48,27 @@ class CaseCreate(APIModel):
 
 
 class CasePatch(APIModel):
+    cnj: str | None = Field(default=None, min_length=5, max_length=40)
     uf: str | None = Field(default=None, min_length=2, max_length=2)
     assunto: str | None = Field(default=None, min_length=1, max_length=250)
     subassunto: str | None = Field(default=None, max_length=250)
     valor_causa: float | None = Field(default=None, ge=0)
+    plaintiff_name: str | None = Field(default=None, max_length=250)
+    court: str | None = Field(default=None, max_length=250)
+    contract_number: str | None = Field(default=None, max_length=100)
     subsidy_flags: SubsidyFlagsInput | None = None
+
+    @field_validator("cnj", "assunto", "subassunto")
+    @classmethod
+    def strip_optional_text(cls, value: str | None) -> str | None:
+        return value.strip() if value is not None else None
+
+    @field_validator("plaintiff_name", "court", "contract_number")
+    @classmethod
+    def strip_optional_metadata(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        return value.strip() or None
 
     @field_validator("uf")
     @classmethod

@@ -1,6 +1,6 @@
 import type { ExtractedCaseData } from '../types/case';
 import type { DocumentType } from '../types/workspace';
-import { simulateLatency } from './client';
+import { USE_MOCKS, apiFetch, apiGet, simulateLatency } from './client';
 import { type DraftDocument, getDraft, saveDraft } from './mocks/draftStore';
 import { mockCases } from './mocks/cases';
 
@@ -81,24 +81,98 @@ export async function extractFromAuto(file: File): Promise<ExtractedCaseData> {
   return simulateLatency(match ? match.data : FALLBACK_DATA, 1000);
 }
 
-// POST /api/cases — cria ou atualiza o rascunho (persistido em localStorage, ver
-// api/mocks/draftStore.ts) e devolve o id.
+// POST/PATCH /api/cases — persiste o caso e envia os PDFs na integração real.
+// O localStorage fica restrito ao modo mock.
 export async function saveCaseDraft(
   id: string | null,
   data: ExtractedCaseData,
-  documents: DraftDocument[],
+  documents: (DraftDocument & { file?: File })[],
 ): Promise<{ id: string }> {
-  const draftId = id ?? crypto.randomUUID();
-  saveDraft(draftId, data, documents);
-  return simulateLatency({ id: draftId }, 400);
+  if (USE_MOCKS) {
+    const draftId = id ?? crypto.randomUUID();
+    saveDraft(draftId, data, documents.map(({ type, filename }) => ({ type, filename })));
+    return simulateLatency({ id: draftId }, 400);
+  }
+
+  const persistedId = id && !getDraft(id) ? id : null;
+  const subsidyTypes = TYPE_KEYWORDS.map(([type]) => type).filter((type) => type !== 'autos');
+  const payload = {
+    cnj: data.cnj,
+    uf: data.uf,
+    assunto: 'Empréstimo consignado não reconhecido',
+    subassunto: data.thesis === 'GOLPE' ? 'Golpe' : 'Genérico',
+    valor_causa: data.claim_value,
+    plaintiff_name: data.plaintiff_name,
+    court: data.court,
+    contract_number: data.contract_number,
+    subsidy_flags: Object.fromEntries(
+      subsidyTypes.map((type) => [type, documents.some((document) => document.type === type)]),
+    ),
+  };
+  const response = await apiFetch(persistedId ? `/api/cases/${encodeURIComponent(persistedId)}` : '/api/cases', {
+    method: persistedId ? 'PATCH' : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error(`${persistedId ? 'PATCH' : 'POST'} caso → ${response.status}`);
+  const saved = await response.json() as { id: string };
+
+  for (const document of documents) {
+    if (!document.file) continue;
+    const form = new FormData();
+    form.append('type', document.type.toUpperCase());
+    form.append('file', document.file);
+    const upload = await apiFetch(`/api/cases/${encodeURIComponent(saved.id)}/documents`, {
+      method: 'POST',
+      body: form,
+    });
+    if (!upload.ok) throw new Error(`POST documento ${document.filename} → ${upload.status}`);
+  }
+  return { id: saved.id };
 }
 
 // Recupera os dados de um rascunho pra retomar o cadastro em CaseNew: primeiro tenta um
 // DraftRecord persistido; senão cai pros dados básicos do CaseListItem (ex. o rascunho de
 // exemplo que nunca passou pelo formulário), preenchendo o resto vazio.
-export function resolveDraftFormData(id: string): { data: ExtractedCaseData; documents: DraftDocument[] } | null {
+export async function resolveDraftFormData(
+  id: string,
+): Promise<{ data: ExtractedCaseData; documents: DraftDocument[] } | null> {
   const draft = getDraft(id);
   if (draft) return { data: draft.data, documents: draft.documents };
+
+  if (!USE_MOCKS) {
+    try {
+      const workspace = await apiGet<{
+        case: {
+          cnj: string;
+          uf: string;
+          thesis: string;
+          claim_value: number;
+          plaintiff?: string | null;
+          court?: string | null;
+          contract_number?: string | null;
+        };
+        documents: { type: string; filename: string }[];
+      }>(`/cases/${encodeURIComponent(id)}/workspace`);
+      return {
+        data: {
+          cnj: workspace.case.cnj,
+          uf: workspace.case.uf,
+          thesis: /golpe/i.test(workspace.case.thesis) ? 'GOLPE' : 'GENERICO',
+          claim_value: workspace.case.claim_value,
+          plaintiff_name: workspace.case.plaintiff ?? '',
+          court: workspace.case.court ?? '',
+          contract_number: workspace.case.contract_number ?? '',
+        },
+        documents: workspace.documents.map((document) => ({
+          type: document.type.toLowerCase() as DocumentType,
+          filename: document.filename,
+        })),
+      };
+    } catch {
+      return null;
+    }
+  }
 
   const item = mockCases.find((c) => c.id === id);
   if (!item) return null;
@@ -116,8 +190,10 @@ export function resolveDraftFormData(id: string): { data: ExtractedCaseData; doc
   };
 }
 
-// POST /api/cases/{id}/analyze — dispara a análise (assíncrona no contrato real; aqui
-// só simula o tempo de fila antes de levar o advogado pra Área de trabalho).
+// POST /api/cases/{id}/analyze — dispara a análise real ou simula no modo mock.
 export async function analyzeCase(id: string): Promise<{ id: string }> {
-  return simulateLatency({ id }, 600);
+  if (USE_MOCKS) return simulateLatency({ id }, 600);
+  const response = await apiFetch(`/api/cases/${encodeURIComponent(id)}/analyze`, { method: 'POST' });
+  if (!response.ok) throw new Error(`POST análise → ${response.status}`);
+  return { id };
 }

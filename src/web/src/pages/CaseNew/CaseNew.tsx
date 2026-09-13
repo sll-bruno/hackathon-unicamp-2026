@@ -43,10 +43,15 @@ export default function CaseNew() {
 
   useEffect(() => {
     if (!draftId) return;
-    const resolved = resolveDraftFormData(draftId);
-    if (!resolved) return;
-    setForm(resolved.data);
-    setResumedFilenames(Object.fromEntries(resolved.documents.map((d) => [d.type, d.filename])));
+    let active = true;
+    void resolveDraftFormData(draftId).then((resolved) => {
+      if (!active || !resolved) return;
+      setForm(resolved.data);
+      setResumedFilenames(Object.fromEntries(resolved.documents.map((d) => [d.type, d.filename])));
+    });
+    return () => {
+      active = false;
+    };
   }, [draftId]);
 
   const set = <K extends keyof ExtractedCaseData>(key: K, value: ExtractedCaseData[K]) =>
@@ -94,14 +99,16 @@ export default function CaseNew() {
   const docByType = (type: DocumentType) => documents.find((d) => d.type === type);
   const unclassified = documents.filter((d) => d.type === null);
 
-  const canAnalyze = Boolean(form.cnj && form.uf && form.claim_value > 0);
+  const hasDocuments = documents.some((document) => document.type !== null)
+    || Object.keys(resumedFilenames).length > 0;
+  const canAnalyze = Boolean(form.cnj && form.uf && form.claim_value > 0 && hasDocuments);
 
   const submit = async (mode: Saving) => {
     setSaving(mode);
     try {
       const docList = ALL_TYPES.flatMap((type) => {
         const uploaded = docByType(type);
-        if (uploaded) return [{ type, filename: uploaded.file.name }];
+        if (uploaded) return [{ type, filename: uploaded.file.name, file: uploaded.file }];
         const resumed = resumedFilenames[type];
         return resumed ? [{ type, filename: resumed }] : [];
       });

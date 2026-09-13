@@ -31,6 +31,9 @@ CASE_SPECS = (
         "folder": "Caso_01_0801234-56-2024-8-10-0001",
         "uf": "MA",
         "valor_causa": 10_000.0,
+        "plaintiff_name": "Maria das Graças Silva Pereira",
+        "court": "3ª Vara Cível · São Luís/MA",
+        "contract_number": "502348719",
         "flags": (True, True, True, True, True, True),
         "documents": (
             (DocumentType.AUTOS, "01_Autos_Processo_0801234-56-2024-8-10-0001.pdf"),
@@ -48,6 +51,9 @@ CASE_SPECS = (
         "folder": "Caso_02_0654321-09-2024-8-04-0001",
         "uf": "AM",
         "valor_causa": 8_000.0,
+        "plaintiff_name": "José Raimundo Oliveira Costa",
+        "court": "5ª Vara Cível · Manaus/AM",
+        "contract_number": "603827451",
         "flags": (False, False, True, False, True, True),
         "documents": (
             (DocumentType.AUTOS, "01_Autos_Processo_0654321-09-2024-8-04-0001.pdf"),
@@ -81,6 +87,10 @@ def _get_or_create_profile(session: Session) -> Lawyer:
 def _create_case(session: Session, spec: dict) -> tuple[Case, bool]:
     existing = session.exec(select(Case).where(Case.cnj == spec["cnj"])).first()
     if existing is not None:
+        for field in ("plaintiff_name", "court", "contract_number"):
+            if getattr(existing, field) is None:
+                setattr(existing, field, spec[field])
+                session.add(existing)
         return existing, False
     contrato, extrato, comprovante, dossie, demonstrativo, laudo = spec["flags"]
     case = Case(
@@ -89,6 +99,9 @@ def _create_case(session: Session, spec: dict) -> tuple[Case, bool]:
         assunto="Empréstimo consignado não reconhecido",
         subassunto="Inexistência de relação jurídica",
         valor_causa=spec["valor_causa"],
+        plaintiff_name=spec["plaintiff_name"],
+        court=spec["court"],
+        contract_number=spec["contract_number"],
         contrato=contrato,
         extrato=extrato,
         comprovante_credito=comprovante,

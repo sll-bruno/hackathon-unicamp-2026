@@ -111,6 +111,9 @@ class Case(SQLModel, table=True):
     assunto: str = Field(index=True)
     subassunto: str = ""
     valor_causa: float = Field(ge=0)
+    plaintiff_name: str | None = Field(default=None, max_length=250)
+    court: str | None = Field(default=None, max_length=250)
+    contract_number: str | None = Field(default=None, max_length=100)
     contrato: bool = False
     extrato: bool = False
     comprovante_credito: bool = False

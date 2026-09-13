@@ -80,6 +80,46 @@ def test_full_engine_payload_is_projected_to_workspace_contract(
     assert cited_ids <= document_ids
 
 
+def test_case_metadata_survives_analysis(client: TestClient, monkeypatch) -> None:
+    created = client.post(
+        "/api/cases",
+        json={
+            "cnj": "0000099-00.2026.8.26.0001",
+            "uf": "SP",
+            "assunto": "Empréstimo não reconhecido",
+            "subassunto": "Golpe",
+            "valor_causa": 4321,
+            "plaintiff_name": "Carla Mendes",
+            "court": "7ª Vara Cível",
+            "contract_number": "CTR-99",
+        },
+    )
+    assert created.status_code == 201
+    case = created.json()
+    uploaded = client.post(
+        f"/api/cases/{case['id']}/documents",
+        data={"type": "AUTOS"},
+        files={"file": ("autos.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
+    )
+    assert uploaded.status_code == 201
+    monkeypatch.setattr(
+        "app.services.analysis.decision_engine.run_pipeline",
+        lambda case_input, **_kwargs: pipeline_result(document_id=case_input.documents[0].id),
+    )
+
+    assert client.post(f"/api/cases/{case['id']}/analyze").status_code == 202
+
+    persisted = client.get(f"/api/cases/{case['id']}").json()
+    workspace = client.get(f"/api/cases/{case['id']}/workspace").json()
+    assert persisted["plaintiff_name"] == "Carla Mendes"
+    assert persisted["court"] == "7ª Vara Cível"
+    assert persisted["contract_number"] == "CTR-99"
+    assert workspace["case"]["plaintiff"] == "Carla Mendes"
+    assert workspace["case"]["court"] == "7ª Vara Cível"
+    assert workspace["case"]["contract_number"] == "CTR-99"
+    assert workspace["analysis_job"]["status"] == "COMPLETED"
+
+
 def test_analysis_job_persists_live_engine_progress(client: TestClient, monkeypatch) -> None:
     case = live_case(client)
     observed: list[tuple[str, int]] = []

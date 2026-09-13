@@ -31,6 +31,9 @@ interface ApiCase {
   assunto: string;
   subassunto: string;
   valor_causa: number;
+  plaintiff_name: string | null;
+  court: string | null;
+  contract_number: string | null;
   status: CaseListItem['status'];
   created_at: string;
   updated_at: string;
@@ -59,7 +62,7 @@ function apiCaseToListItem(item: ApiCase): CaseListItem {
   return {
     id: item.id,
     cnj: item.cnj,
-    plaintiff_name: 'Parte autora não informada',
+    plaintiff_name: item.plaintiff_name || 'Parte autora não informada',
     uf: item.uf,
     thesis: /golpe/i.test(item.subassunto) ? 'GOLPE' : 'GENERICO',
     claim_value: item.valor_causa,

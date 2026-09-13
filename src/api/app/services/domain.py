@@ -152,6 +152,9 @@ def serialize_case(
         "assunto": case.assunto,
         "subassunto": case.subassunto,
         "valor_causa": case.valor_causa,
+        "plaintiff_name": case.plaintiff_name,
+        "court": case.court,
+        "contract_number": case.contract_number,
         "subsidy_flags": {
             "contrato": case.contrato,
             "extrato": case.extrato,
@@ -232,10 +235,13 @@ def build_workspace(session: Session, case: Case) -> dict[str, Any]:
         "case": {
             "case_id": case.id,
             "cnj": case.cnj,
+            "plaintiff": case.plaintiff_name,
+            "court": case.court,
             "uf": case.uf,
             "assunto": case.assunto,
             "thesis": case.subassunto,
             "claim_value": case.valor_causa,
+            "contract_number": case.contract_number,
             "status": case.status.value,
         },
         "documents": [

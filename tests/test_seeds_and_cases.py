@@ -2,10 +2,11 @@ import json
 from pathlib import Path
 
 from app.core.config import get_settings
-from app.core.database import get_engine, reset_database_state
+from app.core.database import _ensure_case_metadata_columns, get_engine, reset_database_state
 from app.models import Case, Document, RecommendationRecord
 from app.services.seeds import seed_demo_data
 from fastapi.testclient import TestClient
+from sqlalchemy import create_engine, inspect, text
 from sqlmodel import Session, select
 
 
@@ -70,6 +71,17 @@ def test_demo_seed_can_be_disabled(tmp_path: Path, monkeypatch) -> None:
     reset_database_state()
 
 
+def test_legacy_case_table_gets_metadata_columns(tmp_path: Path) -> None:
+    engine = create_engine(f"sqlite:///{tmp_path / 'legacy.db'}")
+    with engine.begin() as connection:
+        connection.execute(text("CREATE TABLE cases (id VARCHAR PRIMARY KEY)"))
+
+    _ensure_case_metadata_columns(engine)
+
+    columns = {column["name"] for column in inspect(engine).get_columns("cases")}
+    assert {"plaintiff_name", "court", "contract_number"} <= columns
+
+
 def test_case_crud_upload_security_and_invalid_state(client: TestClient) -> None:
     created = client.post(
         "/api/cases",
@@ -79,12 +91,18 @@ def test_case_crud_upload_security_and_invalid_state(client: TestClient) -> None
             "assunto": "Empréstimo não reconhecido",
             "subassunto": "Fraude",
             "valor_causa": 1234.5,
+            "plaintiff_name": "  Ana Souza  ",
+            "court": "  2ª Vara Cível  ",
+            "contract_number": "  ABC-123  ",
         },
     )
     assert created.status_code == 201
     case = created.json()
     assert case["uf"] == "SP"
     assert case["status"] == "RASCUNHO"
+    assert case["plaintiff_name"] == "Ana Souza"
+    assert case["court"] == "2ª Vara Cível"
+    assert case["contract_number"] == "ABC-123"
 
     upload = client.post(
         f"/api/cases/{case['id']}/documents",
@@ -96,6 +114,10 @@ def test_case_crud_upload_security_and_invalid_state(client: TestClient) -> None
     assert document["name"] == "evil.pdf"
     assert client.get(document["file_url"]).status_code == 200
     assert client.get(f"/api/cases/{case['id']}").json()["status"] == "DOCUMENTOS_ENVIADOS"
+    workspace = client.get(f"/api/cases/{case['id']}/workspace").json()
+    assert workspace["case"]["plaintiff"] == "Ana Souza"
+    assert workspace["case"]["court"] == "2ª Vara Cível"
+    assert workspace["case"]["contract_number"] == "ABC-123"
 
     invalid_extension = client.post(
         f"/api/cases/{case['id']}/documents",

@@ -56,6 +56,7 @@ def list_cases(
             if needle in case.cnj.casefold()
             or needle in case.assunto.casefold()
             or needle in case.subassunto.casefold()
+            or needle in (case.plaintiff_name or "").casefold()
         ]
     serialized = [serialize_case(session, case) for case in cases]
     if action is not None:
@@ -92,6 +93,9 @@ def create_case(payload: CaseCreate, session: Session = Depends(get_session)) ->
         assunto=payload.assunto,
         subassunto=payload.subassunto,
         valor_causa=payload.valor_causa,
+        plaintiff_name=payload.plaintiff_name,
+        court=payload.court,
+        contract_number=payload.contract_number,
         **flags.model_dump(),
     )
     session.add(case)
@@ -130,7 +134,7 @@ def update_case(case_id: str, payload: CasePatch, session: Session = Depends(get
             setattr(case, field, value)
     case.updated_at = utc_now()
     session.add(case)
-    session.commit()
+    commit_or_conflict(session, "CNJ_ALREADY_EXISTS", "Já existe um caso com este CNJ")
     session.refresh(case)
     return serialize_case(session, case)
 

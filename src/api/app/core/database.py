@@ -2,7 +2,7 @@ from collections.abc import Generator
 from functools import lru_cache
 from pathlib import Path
 
-from sqlalchemy import event, text
+from sqlalchemy import event, inspect, text
 from sqlalchemy.engine import Engine
 from sqlmodel import Session, SQLModel, create_engine
 
@@ -38,7 +38,25 @@ def create_db_and_tables() -> None:
     # Import registers every table with SQLModel.metadata.
     from app.models import domain  # noqa: F401
 
-    SQLModel.metadata.create_all(get_engine())
+    engine = get_engine()
+    SQLModel.metadata.create_all(engine)
+    _ensure_case_metadata_columns(engine)
+
+
+def _ensure_case_metadata_columns(engine: Engine) -> None:
+    """Add nullable case metadata to databases created before these fields existed."""
+    columns = {column["name"] for column in inspect(engine).get_columns("cases")}
+    definitions = {
+        "plaintiff_name": "VARCHAR(250)",
+        "court": "VARCHAR(250)",
+        "contract_number": "VARCHAR(100)",
+    }
+    missing = [(name, sql_type) for name, sql_type in definitions.items() if name not in columns]
+    if not missing:
+        return
+    with engine.begin() as connection:
+        for name, sql_type in missing:
+            connection.execute(text(f"ALTER TABLE cases ADD COLUMN {name} {sql_type}"))
 
 
 def get_session() -> Generator[Session, None, None]:
