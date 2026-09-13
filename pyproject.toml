@@ -23,7 +23,6 @@ dependencies = [
     "pyyaml>=6.0,<7",
     "rapidfuzz>=3.10,<4",
     "scikit-learn>=1.5,<2",
-    "tiktoken>=0.8,<1",
     "xgboost>=2.1,<4",
 ]
 
