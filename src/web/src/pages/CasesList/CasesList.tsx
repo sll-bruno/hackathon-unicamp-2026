@@ -1,9 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCases, useCasesSummary } from '../../api/cases';
 import { RecommendationTag, StatusBadge } from '../../components/Badges/Badges';
 import { ButtonLink } from '../../components/Button/Button';
+import { HotTopics, type HotTopicItem } from '../../components/HotTopics/HotTopics';
+import { KpiRow } from '../../components/KpiRow/KpiRow';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { WelcomeBanner } from '../../components/WelcomeBanner/WelcomeBanner';
 import { formatBRL } from '../../lib/format';
 import { pendencyRank } from '../../lib/pendencies';
 import { toDisplayStatus, type DisplayStatus } from '../../lib/status';
@@ -20,6 +23,8 @@ const FILTERABLE_STATUS: Exclude<DisplayStatus, 'ENCERRADO'>[] = [
   'AGUARDANDO_DECISAO',
   'AGUARDANDO_ENCERRAMENTO',
 ];
+
+const VISIBLE_ROWS = 5;
 
 const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
@@ -63,8 +68,9 @@ export default function CasesList() {
   const [status, setStatus] = useState<DisplayStatus | 'TODOS'>('TODOS');
   const [rec, setRec] = useState<RecFilter>('TODAS');
   const [onlyAlert, setOnlyAlert] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
-  // Estado dos chips de pendência, que também funcionam como atalho de filtro.
+  // Estado dos hot-topics, que também funcionam como atalho de filtro.
   const isDecisao = status === 'AGUARDANDO_DECISAO' && !onlyAlert;
   const isEncerramento = status === 'AGUARDANDO_ENCERRAMENTO' && !onlyAlert;
 
@@ -103,10 +109,52 @@ export default function CasesList() {
       .sort(byUrgency);
   }, [cases.data, query, status, rec, onlyAlert]);
 
+  // Qualquer mudança de filtro volta a lista para o estado colapsado.
+  useEffect(() => {
+    setExpanded(false);
+  }, [query, status, rec, onlyAlert]);
+
+  const visibleRows = expanded ? rows : rows.slice(0, VISIBLE_ROWS);
+  const hiddenCount = rows.length - visibleRows.length;
+
   const s = summary.data;
+
+  const hotTopics: HotTopicItem[] = [
+    { key: 'alert', label: 'Erro de leitura', value: s?.document_errors, tone: 'negative', active: onlyAlert, onClick: toggleAlert },
+    {
+      key: 'decisao',
+      label: 'Revisar recomendação',
+      value: s?.awaiting_decision,
+      tone: 'accent',
+      active: isDecisao,
+      onClick: () => toggleQuickStatus('AGUARDANDO_DECISAO', isDecisao),
+    },
+    {
+      key: 'desfecho',
+      label: 'Falta desfecho',
+      value: s?.pending_outcome,
+      tone: 'muted',
+      active: isEncerramento,
+      onClick: () => toggleQuickStatus('AGUARDANDO_ENCERRAMENTO', isEncerramento),
+    },
+  ];
 
   return (
     <div className={styles.page}>
+      <section className={styles.hero}>
+        <WelcomeBanner />
+        <div className={styles.heroRow}>
+          <KpiRow
+            openValueSum={s?.open_value_sum}
+            newThisMonth={s?.new_this_month}
+            adherencePercent={s?.adherence_percent}
+            effectivenessPercent={s?.effectiveness_percent}
+          />
+          <div className={styles.divider} aria-hidden />
+          <HotTopics items={hotTopics} />
+        </div>
+      </section>
+
       <PageHeader
         title="Meus processos"
         description={
@@ -118,25 +166,6 @@ export default function CasesList() {
       />
 
       <section className={styles.filters} aria-label="Filtros">
-        <div className={styles.chips}>
-          <button type="button" className={`${styles.chip} ${onlyAlert ? styles.chipActive : ''}`} onClick={toggleAlert}>
-            Erro de leitura · {s?.document_errors ?? '–'}
-          </button>
-          <button
-            type="button"
-            className={`${styles.chip} ${isDecisao ? styles.chipActive : ''}`}
-            onClick={() => toggleQuickStatus('AGUARDANDO_DECISAO', isDecisao)}
-          >
-            Revisar recomendação · {s?.awaiting_decision ?? '–'}
-          </button>
-          <button
-            type="button"
-            className={`${styles.chip} ${isEncerramento ? styles.chipActive : ''}`}
-            onClick={() => toggleQuickStatus('AGUARDANDO_ENCERRAMENTO', isEncerramento)}
-          >
-            Falta desfecho · {s?.pending_outcome ?? '–'}
-          </button>
-        </div>
         <input
           className={styles.search}
           type="search"
@@ -183,11 +212,16 @@ export default function CasesList() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((c) => (
+              {visibleRows.map((c) => (
                 <CaseRow key={c.id} item={c} />
               ))}
             </tbody>
           </table>
+          {hiddenCount > 0 && (
+            <button type="button" className={styles.expandRow} onClick={() => setExpanded(true)}>
+              Mostrar mais {hiddenCount} processos
+            </button>
+          )}
         </div>
       )}
 
