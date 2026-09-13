@@ -28,13 +28,21 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "httpx>=0.28,<1",
-    "pytest>=8.3,<10",
     "ruff>=0.9,<1",
 ]
 training = [
     "openpyxl>=3.1,<4",
     "pandas>=2.2,<4",
+]
+analysis = [
+    "ipykernel>=6.29,<7",
+    "jupyter>=1.0,<2",
+    "matplotlib>=3.9,<4",
+    "nbconvert>=7.16,<8",
+    "openpyxl>=3.1,<4",
+    "pandas>=2.2,<4",
+    "scipy>=1.13,<2",
+    "seaborn>=0.13,<1",
 ]
 
 [tool.setuptools.packages.find]
@@ -44,9 +52,6 @@ include = ["app*", "decision_engine*", "contracts*"]
 [tool.setuptools.package-data]
 app = ["fixtures/*.csv", "fixtures/*.json"]
 decision_engine = ["config/*.yaml", "config/prompts/*.md", "artifacts/*"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100

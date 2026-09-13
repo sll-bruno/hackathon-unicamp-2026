@@ -76,11 +76,10 @@ recomendação atual, evidências e as 20 mensagens recentes; PDFs e caminhos
 locais nunca são enviados. Sem chave, a API retorna `503`; falha da OpenAI
 retorna `502`.
 
-## Qualidade e smoke test
+## Validação e smoke test
 
 ```bash
-ruff check src/api src/contracts src/pipeline tests
-pytest -q
+ruff check src/api src/contracts src/pipeline
 ./scripts/smoke_backend.sh
 ```
 

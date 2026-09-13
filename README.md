@@ -135,7 +135,28 @@ Além do repositório, submeter:
 
 A arquitetura proposta combina extração probatória rastreável, risco judicial, estimação do custo da condenação e comparação financeira entre acordo e defesa. O risco usa metadados e seis indicadores binários de disponibilidade, sem validação documental ou cenários de contestação. A extração rastreável apoia a explicação e os valores financeiros; confiança da LLM não é probabilidade de vitória.
 
-Consulte [`docs/architecture_engine.md`](docs/architecture_engine.md) para os fluxos, contratos de entrada e saída, fórmulas e regra de decisão.
+O fluxo principal é:
+
+```text
+Autos e subsídios
+  -> ingestão e extração com fontes por documento, página e trecho
+  -> estimativa de risco e severidade
+  -> comparação financeira entre acordo e defesa
+  -> recomendação explicável para o advogado
+  -> decisão humana, negociação e monitoramento de resultados
+```
+
+O código está dividido em quatro partes:
+
+- `src/pipeline`: engine de ingestão, extração, risco, scoring e decisão;
+- `src/api`: API FastAPI, persistência e projeção dos dados;
+- `src/web`: aplicação React/Vite usada pelo advogado e pelo banco;
+- `src/contracts`: contrato mínimo compartilhado entre engine e API.
+
+Parâmetros, pesos, prompts e artefatos do modelo são versionados dentro de
+`src/pipeline/decision_engine`. O retreino é offline e uma nova versão só deve
+ser promovida após validação. As instruções de execução local e deploy estão em
+[`SETUP.md`](SETUP.md).
 
 ---
 

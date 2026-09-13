@@ -11,7 +11,7 @@ import type {
 } from '../types/adherence';
 
 // Uma linha de lawyer_decisions já resolvida com os dados de recommendation/case
-// necessários pro dashboard (docs/ARCHITECTURE.md §6, tabelas lawyer_decisions + recommendations).
+// necessários para o dashboard.
 export interface AdherenceRecord {
   action: RecommendedAction;
   accepted: boolean;
@@ -40,8 +40,8 @@ const PERIOD_DAYS: Record<Exclude<AdherenceFilters['period'], 'all'>, number> = 
 };
 const DAY_MS = 86_400_000;
 
-// docs/ARCHITECTURE.md não define os limiares — provisório até o time de engine validar
-// a distribuição real de confidence_percent.
+// Limiares provisórios até o time de engine validar a distribuição real de
+// confidence_percent.
 export function bucketFromPercent(percent: number | null): ConfidenceBand | null {
   if (percent === null) return null;
   if (percent >= 80) return 'alta';

@@ -66,8 +66,8 @@ export default function CaseNew() {
     }
   };
 
-  // Cada arquivo é classificado pelo nome (docs/architecture_engine.md descreve o
-  // equivalente real como `detected_type`, calculado a partir do conteúdo do PDF).
+  // Cada arquivo é classificado pelo nome; o equivalente real é `detected_type`,
+  // calculado a partir do conteúdo do PDF.
   // Um novo documento substitui qualquer outro já enviado do mesmo tipo.
   const handleFilesAdded = (files: FileList | null) => {
     if (!files) return;

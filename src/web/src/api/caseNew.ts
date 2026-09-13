@@ -11,8 +11,8 @@ const normalize = (s: string) =>
     .toLowerCase();
 
 // Classificação determinística pelo nome do arquivo — sem depender de conteúdo/OCR.
-// No pipeline real (docs/architecture_engine.md) isso é `detected_type`, calculado a
-// partir do conteúdo do PDF; aqui usamos palavras-chave que já aparecem nos nomes
+// No pipeline real isso é `detected_type`, calculado a partir do conteúdo do PDF;
+// aqui usamos palavras-chave que já aparecem nos nomes
 // padronizados dos documentos (ex.: "02_Contrato_...", "03_Extrato_Bancario...").
 const TYPE_KEYWORDS: [DocumentType, string[]][] = [
   ['autos', ['auto']],
@@ -74,8 +74,8 @@ const FALLBACK_DATA: ExtractedCaseData = {
   contract_number: '',
 };
 
-// Simula o OCR do auto (docs/architecture_engine.md): roda dentro do pipeline de análise
-// no contrato real, mas aqui é mockado a partir do nome do arquivo pra fins de demo.
+// Simula o OCR do auto: roda dentro do pipeline de análise no contrato real, mas aqui
+// é mockado a partir do nome do arquivo para fins de demo.
 export async function extractFromAuto(file: File): Promise<ExtractedCaseData> {
   const match = KNOWN_AUTOS.find((k) => file.name.includes(k.cnjDigits));
   return simulateLatency(match ? match.data : FALLBACK_DATA, 1000);

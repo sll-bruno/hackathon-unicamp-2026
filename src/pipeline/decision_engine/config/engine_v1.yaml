@@ -1,6 +1,5 @@
 # Parâmetros da engine — versão engine_v1.
-# Valores iniciais a calibrar. Origem de cada número em docs/PLANO_ENGINE_IA_V2.md
-# e docs/PLANO_IMPLEMENTACAO_ENGINE.md. A decisão final é da LLM decisora (P7);
+# Valores iniciais a calibrar. A decisão final é da LLM decisora (P7);
 # nenhum parâmetro abaixo é gatilho de ACORDO/DEFESA.
 version: engine_v1
 
