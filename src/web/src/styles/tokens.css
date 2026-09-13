@@ -90,6 +90,55 @@
   --status-negative-bg: #f9e6e4;
   --status-warning: #8a5a00;
   --status-warning-bg: #fff1dc;
+  --surface-raised: var(--color-white);
+  --accent-text: #9a5b00; /* laranja legível sobre fundo claro; --accent fica para preenchimentos */
+
+  /* Produto · gráficos (validados com checagem de daltonismo sobre --surface-primary) */
+  --viz-outcome-1: #5598e7; /* extinção */
+  --viz-outcome-2: #1c5cab; /* improcedência */
+  --viz-outcome-3: #ec835a; /* procedência parcial */
+  --viz-outcome-4: #b3261e; /* procedência */
+
+  color-scheme: light;
+}
+
+/*
+ * Tema escuro (único tema do produto, aplicado em index.html). Mesmos papéis
+ * semânticos da Enter com os valores invertidos das seções escuras do site.
+ */
+:root[data-theme='dark'] {
+  --surface-page: var(--color-black);
+  --surface-primary: var(--color-neutral-90);
+  --surface-raised: #202020;
+  --accent-text: var(--color-orange);
+  --surface-inverted: var(--color-neutral-00);
+  --text-primary: var(--color-white);
+  --text-body: #e4e4e4;
+  --text-secondary: var(--white-64);
+  --text-muted: #ffffff80;
+  --text-primary-inverted: var(--color-black);
+  --text-secondary-inverted: var(--black-64);
+  --stroke-primary: var(--white-20);
+  --stroke-secondary: #ffffff1a;
+  --stroke-secondary-inverted: var(--black-10);
+  --hover: var(--white-8);
+  --pressed: var(--white-16);
+  --hover-inverted: var(--black-8);
+  --pressed-inverted: var(--black-16);
+
+  --status-positive: #74c995;
+  --status-positive-bg: #74c9951f;
+  --status-negative: #ff8f85;
+  --status-negative-bg: #ff8f851f;
+  --status-warning: #f5c56b;
+  --status-warning-bg: #f5c56b1f;
+
+  --viz-outcome-1: #5294e2;
+  --viz-outcome-2: #2360b5;
+  --viz-outcome-3: #e06a55;
+  --viz-outcome-4: #b02e2e;
+
+  color-scheme: dark;
 }
 
 *,
